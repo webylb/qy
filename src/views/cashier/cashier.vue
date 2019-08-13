@@ -1,0 +1,520 @@
+<template>
+  <div class="coupon-goods home-page" ref="homePage">
+    <shop-header ref="shopHeader" v-if="showHeader" style="position: absolute;top:0;left: 0;z-index: 999" line-style="background:#fff" :title="title"></shop-header>
+    <div :style="couponGoodsStyle" class="couponGoodsContent" ref="couponGoodsContent" v-show="!showLoad">
+      <div class="goods-detail">
+        <div class="goods-cont">
+          <div class="goods-img">
+            <img src="https://c9.51jujibao.com/腾讯视频VIP会员-1月.png" alt="">
+          </div>
+          <div class="goods-attr">
+            <div class="goods-name">
+              <span class="name">腾讯视频</span>
+              <span class="num">x1</span>
+            </div>
+            <div class="goods-price">
+              <span class="unit">¥ </span>
+              <span class="price">11.00</span>
+              <span>官方价</span>
+            </div>
+          </div>
+        </div>
+        <div class="use-cont-hint">
+          <div class="use-wrap">
+            <div class="v-ext">
+              商品原价
+            </div>
+            <div class="v-price">
+              ¥ {{ priceToFixed(11) }}
+            </div>
+          </div>
+        </div>
+        <div class="use-cont-hint">
+          <div class="use-wrap">
+            <div class="v-ext">
+              抵用券
+            </div>
+            <div class="v-price">
+              -¥ {{ priceToFixed(11) }}
+            </div>
+          </div>
+        </div>
+        <div class="use-cont-hint">
+          <div class="use-wrap">
+            <div class="v-ext">
+            </div>
+            <div class="v-price">
+              <span class="all-price-text">总计:</span><span class="all-price"><span>¥</span>{{ priceToFixed(11) }}</span>
+            </div>
+          </div>
+        </div>
+        <p class="customer-service-text">
+          客服电话: <a href="tel:4006680091" style="letter-spacing: 0rem;color: #42b0e9;font-size: 0.875rem;">4006680091 转 2 </a>
+        </p>
+      </div>
+    </div>
+    <div class="immediate-payment fadeIn" ref="immediatePayment">
+      <div class="pay-hint">
+        <div class="pay-pricetext">还需支付:</div>
+        <div class="pay-goodprice"> <span> ¥ </span> {{ priceToFixed(11) }}</div>
+      </div>
+      <div class="pay-btn" @click="immediatePay">
+        特惠购买
+      </div>
+    </div>
+    <loading v-show="showLoad" style="padding-top: 50%"></loading>
+  </div>
+</template>
+
+<script>
+  import BScroll  from 'better-scroll'
+  import ShopHeader from '../../base/shop-header/shop-header'
+  import Loading from '../../base/loading/loading'
+  import * as core from '../../api/serviceCenter'
+  import tool from '../../common/js/util'
+  import wxShareMixin from '../../common/js/wxShareMixin'
+
+  export default {
+    components: {
+      ShopHeader,
+      Loading
+    },
+    mixins:[wxShareMixin],
+    data () {
+      return {
+        InitHeight: false,
+        merchantName: window.infoData.merchantName,
+        loadingTitle: '加载中...',
+        showLoad: false,
+        showHeader: false,
+        title: "",
+        couponGoodsStyle: "",
+        shareUrl: location.href.split('#')[0],
+        shareLink:  window.location.href.split("#")[0]+'#'+window.location.href.split("#")[1],  //分享出去的链接
+        shareTitle: '',  //分享的标题
+        shareDesc: '', //分享的详情介绍
+        shareImgUrl: '',
+      }
+    },
+    beforeCreate() {
+
+    },
+    created () {
+      document.title = this.$route.meta.title
+
+      //判断是否为微信
+      let ua = navigator.userAgent.toLowerCase();
+      let isWeixin = ua.indexOf('micromessenger') != -1;
+      if (!isWeixin) {
+        this.showHeader = true
+        this.couponGoodsStyle = "top:2.75rem"
+      } else {
+        let config = {};
+        config.url = window.location.href;
+        // 判断当前url是否存在?参数匹配符
+        if(!config.url.match(/\?/)) {
+          location.replace(window.location.href.split('#')[0] + '?' + window.location.hash);
+          return;
+        }
+        this.showHeader = false
+        this.couponGoodsStyle = "top:0rem"
+      }
+    },
+    mounted(){
+      this.$nextTick(function(){
+        setTimeout(() => {
+          this.initHeight()
+        }, 1000)
+      })
+      window.addEventListener('scroll', this.handleScroll)
+    },
+    watch: {
+
+    },
+    destroyed () {
+      window.removeEventListener('scroll', this.handleScroll)
+    },
+    methods: {
+      handleScroll () {
+        var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+        //console.log(scrollTop)
+        this.$refs.immediatePayment.style.top = "auto"
+      },
+      initHeight(){
+        let winHeight
+        if (window.innerHeight)
+        winHeight = window.innerHeight;
+        else if ((document.body) && (document.body.clientHeight))
+        winHeight = document.body.clientHeight;
+
+        // document.body.clientHeight = winHeight
+        // this.$refs.immediatePayment.style.bottom = '0'
+        this.$refs.immediatePayment.style.top = winHeight - this.$refs.immediatePayment.clientHeight  + 'px';
+      },
+      priceToFixed(val){
+        if(val){
+          return (val).toFixed(2)
+        }else{
+          return ''
+        }
+      },
+      scrollToTop(){
+        window.scrollBy(0,1)
+      },
+      changeTitle(){
+        let head = document.getElementsByTagName('head');
+        let meta = document.createElement('meta');
+        head[0].appendChild(meta)
+        document.title = this.title
+      },
+      onLoaded(){
+        //this.scroll.refresh()
+      },
+      _initScroll () {
+        this.$nextTick(()=>{
+          if (!this.GoodsListScroll) {
+            this.scroll = new BScroll(this.$refs.couponGoodsContent,{
+              probeType: 3,
+              startY: 0,
+              bounce: false,
+              click: true
+            })
+          }else{
+            this.scroll.refresh()
+          }
+        })
+      },
+      immediatePay(){
+        if(this.isPaying){
+          this.isPaying = false
+          this.toPlay()
+        }else{
+          this.$toastBox.showToastBox("请求中...")
+        }
+      },
+      toPlay(){
+        let returnUrl = window.location.href.split("#")[0]+'#/successPage'
+        let data = {}
+        if(this.$refs.rechargeInputItem){
+          if(this.rechargeNum){
+            data = {skuId: this.goodsSku,account:this.rechargeNum,returnUrl: returnUrl,outItemNo:this.outItemNo,providerId:this.providerId}
+          }else{
+            this.$toastBox.showToastBox("请输入充值账号!")
+            this.isPaying = true
+            return;
+          }
+        } else {
+          data = {skuId: this.goodsSku, count: this.shopNum,returnUrl: returnUrl,outItemNo:this.outItemNo,providerId:this.providerId}
+        }
+        core.vipGoodsPay(data).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            if(res.result.goUrl){
+              window.location.href = res.result.goUrl
+              this.isPaying = true
+            }else{
+              this.callWxPay(res.result.weixinOrderInfo);
+            }
+          }else if(res.code && '01' === res.code && res.isLogin == 'false'){
+            if(res.url){
+              window.location.href = res.url
+            }
+          }else if(res.code && '02' === res.code) {
+            this.isPaying = true
+            this.$router.push("/openMembers")
+          }else if(res.code == 'err_not_enough_stock_out' || res.code == 'err_not_enough_stock'){
+            this.stock = 0
+            this.showPopup = true
+            this.hintInformation = res.message
+            this.isPaying = true
+            for(let i in this.swiperList){
+              if(this.swiperList[i].id == data.sku){
+                this.swiperList[i].stock = 0
+              }
+            }
+          } else {
+            this.isPaying = true
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(err=>{
+          this.isPaying = true
+          this.$toastBox.showToastBox("网络错误")
+        })
+      },
+      callWxPay(params) {
+        if (typeof WeixinJSBridge == "undefined"){
+          if(document.addEventListener){
+            document.addEventListener('WeixinJSBridgeReady', this.jsApiCall(params), false);
+          }else if (document.attachEvent){
+            document.attachEvent('WeixinJSBridgeReady', this.jsApiCall(params));
+            document.attachEvent('onWeixinJSBridgeReady', this.jsApiCall(params));
+          }
+        }else{
+          this.jsApiCall(params);
+        }
+      },
+      jsApiCall(params) {
+        console.log(params)
+        let that = this
+        WeixinJSBridge.invoke('getBrandWCPayRequest', {
+          'appId': params.appId,
+          'timeStamp': String(params.timeStamp),
+          'nonceStr': params.nonceStr,
+          'package': params.package,
+          'signType': params.signType,
+          'paySign': params.paySign
+          },function (res) {
+            console.log(res)
+            if (res.err_msg === 'get_brand_wcpay_request:ok') {
+              //that.$toastBox.showToastBox('微信支付成功')
+              that.isPaying = true
+              that.$router.push({path:'/successPage'})
+            } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
+              //that.$toastBox.showToastBox('用户取消支付')
+              that.isPaying = true
+            } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
+              //that.$toastBox.showToastBox('网络异常，请重试')
+              that.isPaying = true
+            }
+          }
+        );
+      }
+    },
+    updated() {
+
+    },
+  }
+</script>
+
+
+<style lang="stylus" rel="stylesheet/stylus" scoped>
+  .coupon-goods
+    background-color #fff
+    .immediate-payment
+      position fixed
+      left 0
+      bottom 0
+      right 0
+      width 100%
+      max-width 750px
+      height 3.063rem
+      line-height 3.063rem
+      background-color #fff
+      color rgb(111,65,9)
+      font-size 1.125rem
+      font-weight 600
+      display flex
+      align-items center
+      .pay-hint
+        flex 1
+        height 3.063rem
+        padding-left 1rem
+        display flex
+        .pay-pricetext
+          font-size 0.938rem
+          color: #2d2b32
+          font-weight 600
+        .pay-goodprice
+          font-size 1.25rem
+          font-weight 600
+          color #ff1414
+          padding-left 0.5rem
+          span
+            font-size 0.938rem
+            font-weight 600
+      .pay-btn
+        width 8.75rem
+        background-image: linear-gradient(90deg,#f6cf8d 0%,#fbe5b8 100%);
+        font-size 1.125rem
+        font-weight 600
+        color #2d2b32
+        text-align center
+        box-sizing border-box
+
+    .couponGoodsContent
+      position fixed
+      left 0
+      top 0
+      right 0
+      bottom 3.063rem
+      width 100%
+      max-width 750px
+      background-color rgb(245,245,245)
+      padding-bottom 0.063rem
+      .goods-detail
+        min-height 1px
+        .goods-cont
+          padding 1.25rem 0.75rem
+          display flex
+          justify-content flex-start
+          background #fff
+          margin-bottom 0.5rem
+          .goods-img
+            height 4.406rem
+            width 6.594rem
+            img
+              width 100%
+              height auto
+              object-fit cover
+          .goods-attr
+            flex 1
+            margin-left 0.625rem
+            position relative
+            .goods-name
+              display flex
+              justify-content space-between
+              font-size  0.938rem
+              .name
+                color #333
+              .num
+                color #999
+            .goods-price
+              position absolute
+              bottom 0
+              left 0
+              font-size 0.813rem
+              color #999999
+              span
+                display inline-block
+              .unit
+                color #ff4800
+                font-weight bold
+              .price
+                color #ff4800
+                font-size 1.125rem
+                font-weight bold
+                margin-right 0.5rem
+                margin-left 0.2rem
+
+        .use-cont-hint
+          padding 0 0.75rem
+          box-sizing border-box
+          background #ffffff
+          &:nth-last-child(2)
+            .use-wrap
+              border-bottom none
+          .use-wrap
+            height 3rem
+            width 100%
+            display flex
+            justify-content space-between
+            align-items center
+            box-sizing border-box
+            border-bottom 1px solid #e6e6e6
+            .v-ext
+              font-size 0.938rem
+              color #333
+            .v-price
+              font-size 0.75rem
+              color #999
+              .all-price-text
+                font-size 0.938rem
+                color #333
+              .all-price
+                font-size 0.938rem;
+                color #ff1414
+                margin-left 0.3rem
+                span
+                  font-size 0.75rem
+                  display inline-block
+                  margin-right 0.2rem
+        .customer-service-text
+          position absolute
+          bottom 2rem
+          width 100%
+          max-width 750px
+          text-align center
+          color #999
+          font-size 0.875rem
+
+        .good-descript
+          margin-top 0.5rem
+          padding 0 0.75rem
+          box-sizing border-box
+          background #ffffff
+          .good-descript-title
+            padding-top 0.75rem
+            margin-bottom 0.938rem
+            font-size 1.063rem
+            height 1rem
+            position relative
+            padding-left 0.5rem
+            &:before
+              position absolute
+              left 0
+              bottom 0
+              content ""
+              width 0.188rem
+              height 1rem
+              background-color #ff4800
+	            border-radius 0.094rem
+          .good-descript-text
+            padding-bottom 0.5rem
+            font-size 0.813rem
+            text-align justify
+            text-justify newspaper
+            word-break normal
+            overflow hidden
+            line-height 1.2rem
+            padding-top 0.2rem
+            p
+              text-align justify
+              text-justify newspaper
+              word-break normal
+              overflow hidden
+            span
+              text-align justify
+              text-justify newspaper
+              word-break normal
+              overflow hidden
+
+// 改变placeholder
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+  color:  #c1c1c1;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+  color: #c1c1c1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+  color:  #c1c1c1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color:  #c1c1c1;
+}
+
+// 改变后来生成html样式
+.good-descript-text >>> p + p
+  margin-top 0.375rem
+
+.good-descript-text >>> p > img
+  //margin 0 auto
+  width 100%
+  height auto
+  padding 0.4rem
+  box-sizing border-box
+
+
+.good-descript-text >>> b
+  font-weight bold !important
+
+.good-descript-text >>> strong
+  font-weight bold
+
+@-webkit-keyframes fadeIn {
+    from {
+      opacity: 0.5
+    }
+    to {
+      opacity: 1
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0.5
+    }
+    to {
+        opacity: 1
+    }
+}
+</style>

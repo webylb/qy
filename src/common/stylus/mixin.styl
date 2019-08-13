@@ -1,0 +1,24 @@
+//样式函数
+//背景图的
+bg-image($url)
+  background-image url($url+"@2x.png")
+  @media (-webkit-min-device-pixel-ratio:3),(min-device-pixel-ratio:3)
+    background-image :url($url+"@3x.png")
+
+//控制字体不折行的
+no-wrap()
+  text-overflow ellipsis
+  overflow hidden
+  white-space nowrap
+
+
+//扩展小图标点击区域的
+extend-click()
+  position relative
+  &:before
+    content ''
+    position absolute
+    top -10px
+    left -10px
+    right -10px
+    bottom -10px
