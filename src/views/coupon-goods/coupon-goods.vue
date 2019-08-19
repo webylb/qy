@@ -256,7 +256,7 @@
           this.initHeight()
         }, 1000)
       })
-      window.addEventListener('scroll', this.handleScroll)
+      //window.addEventListener('scroll', this.handleScroll)
     },
     watch: {
       activeIndex(newval,oldval){
@@ -310,15 +310,15 @@
         //this.$refs.immediatePayment.style.bottom = '0'
       },
       initHeight(){
-        let winHeight
-        if (window.innerHeight)
-        winHeight = window.innerHeight;
-        else if ((document.body) && (document.body.clientHeight))
-        winHeight = document.body.clientHeight;
+        // let winHeight
+        // if (window.innerHeight)
+        // winHeight = window.innerHeight;
+        // else if ((document.body) && (document.body.clientHeight))
+        // winHeight = document.body.clientHeight;
 
-        // document.body.clientHeight = winHeight
-        // this.$refs.immediatePayment.style.bottom = '0'
-        this.$refs.immediatePayment.style.top = winHeight - this.$refs.immediatePayment.clientHeight  + 'px';
+        //this.$refs.immediatePayment.style.top = winHeight - this.$refs.immediatePayment.clientHeight  + 'px';
+
+        this.scroll.refresh()
       },
       priceToFixed(val){
         if(val){
@@ -409,7 +409,7 @@
       _initScroll () {
         // 创建分类列表的Scroll对象
         this.$nextTick(()=>{
-          if (!this.GoodsListScroll) {
+          if (!this.scroll) {
             this.scroll = new BScroll(this.$refs.couponGoodsContent,{
               probeType: 3,
               startY: 0,
@@ -431,6 +431,7 @@
               click: true
             })
           }else{
+            this.scroll.refresh()
             this.GoodsListScroll.refresh()
           }
         })
@@ -467,11 +468,12 @@
               this.callWxPay(res.result.weixinOrderInfo);
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
+            this.isPaying = true
             if(res.url){
               var reg = /guijitech.com/gi;
               let url = res.url
               if(reg.test(url)){
-                window.location.href = res.url + "?referer=" + returnUrl
+                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href.split("#")[0]+'?#' + window.location.href.split("#")[1])
               }else{
                 window.location.href = res.url
               }

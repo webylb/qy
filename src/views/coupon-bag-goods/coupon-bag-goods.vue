@@ -3,73 +3,42 @@
     <shop-header ref="shopHeader" v-if="showHeader" style="position: absolute;top:0;left: 0;z-index: 999" line-style="background:#fff" :title="title"></shop-header>
     <div :style="couponGoodsStyle" class="couponGoodsContent" ref="couponGoodsContent" v-show="!showLoad">
       <div class="goods-detail">
-        <div v-if="swiperList.length" class="goods-list" ref="goodsList" :class="[rechargeType == 1 ? 'recharge-good-list' : '']">
+        <div v-if="swiperList" class="goods-list" ref="goodsList">
           <div class="goodsList-wrapper" ref="goodsListWrapper">
             <div v-for="(item,index) in swiperList" :key="index" class="goods-item" ref="goodsItem">
-              <div @click.stop="checkGoods(index,item.id,item.settlementPrice,item.buyLimitModelStr,item.marketPrice,item.useExpireTimeLimit,item.stock,item.singleBuyAmount,item.outItemNo,item.providerId)" class="good-item-content" :class="[ index === activeIndex ? 'good-active-item-content' : '' ]">
+              <div class="good-item-content">
                 <img class="good-item-img" :src="item.cover" :alt="item.title" @load="onLoaded">
                 <p class="good-item-title" style="-webkit-box-orient: vertical">{{ item.title }}</p>
-                <p class="good-item-cashPrice">
-                  <span class="good-item-moneylable">¥</span>
-                  <span> {{ priceToFixed(item.settlementPrice) }}</span>
-                  <span class="good-item-lable">会员价</span>
+                <p class="good-item-marketPrice">
+                  <span class="marketPrice">
+                    <span class="slogn">¥</span>
+                    <span class="price">{{ priceToFixed(item.marketPrice) }}</span>
+                    <span class="text">官方价</span>
+                  </span>
                 </p>
-                <p class="good-item-oldPrice">
-                  官方价: <s>¥{{ priceToFixed(item.marketPrice) }}</s>
-                </p>
-                <div v-show="index === activeIndex" class="checkIcon">
-                  <i class="iconfont">&#xe608;</i>
-                </div>
               </div>
             </div>
           </div>
         </div>
-        <div v-if="rechargeType == 1" class="shop-num shop-recharge-wrap">
-          <div class="shop-num-hint">
-            <div class="hint-text">充值账号：</div>
-            <div class="hint-num">
-              <input type="number" v-model="rechargeNum" ref="rechargeInputItem" @click.stop="focusInput"  @blur="scrollToTop" :placeholder="rechargePlaceHolder" v-on:keyup="check_count($event)" maxlength="16" />
+        <div class="use-cont-hint">
+          <div class="use-time">
+            <div class="v-ext">
+              发货时间
             </div>
-            <div class="hint-max">
-              <span class="first-children" v-if="maxNumText">({{ maxNumText }})</span>
-              <span>3分钟内到账</span>
-            </div>
-          </div>
-        </div>
-        <div v-else class="shop-num">
-          <div class="shop-num-hint">
-            <div class="hint-text">购买数量</div>
-            <div class="hint-num">
-              {{ maxNumText }}&nbsp;3分钟内到账
-            </div>
-          </div>
-          <div v-if="stock < 1" class="shop-scoke-hint">
-            <span>已抢光</span>
-          </div>
-          <div v-else class="num-option">
-            <div class="shop-num-minus" @click="minsNum">
-              <i v-show="isMin" class="iconfont min-default">&#xe605;</i>
-              <i v-show="!isMin" class="iconfont min-active">&#xe606;</i>
-            </div>
-            <div class="shop-num-input">
-              <input type="number" v-model="shopNum" @click.stop="focusInput"  @blur="scrollToTop" readonly="readonly" class="shop-num-val">
-            </div>
-            <div class="shop-num-add" @click="addNum">
-              <i class="iconfont" :class="[ isMax === true ? 'max-active' : 'max-default' ]">&#xe604;</i>
+            <div class="v-time">
+              3分钟内发货
             </div>
           </div>
         </div>
         <div class="use-cont-hint">
-          <div v-if="rechargeType == 0" class="use-time">
+          <div class="use-time">
             <div class="v-ext">
               使用期限
             </div>
             <div class="v-time">
-              <!-- 购买后当日24:00前有效 -->
-              {{ useExpireTips  }}
+              {{ useExpireTimeLimit  }}
             </div>
           </div>
-
         </div>
         <div class="good-descript">
           <div class="good-descript-title">商品描述</div>
@@ -78,31 +47,17 @@
       </div>
     </div>
     <div class="immediate-payment fadeIn" ref="immediatePayment">
-      <div class="pay-save">
-        <span class="pay-save-priceicon">¥ </span> <span class="pay-save-goodprice">{{ allGoodsPrice }}&nbsp;</span><span class="pay-save-saveprice">(已省{{ allsingleSavePrice }}元)</span>
-      </div>
       <div class="pay-btn" @click="immediatePay">
-        特惠购买
+        立即购买
       </div>
     </div>
     <loading v-show="showLoad" style="padding-top: 50%"></loading>
-    <div class="add-like">
-      <div class="add-like-btn" @click="addLike">
-        <i class="iconfont" v-if="islike">&#xe607;</i>
-        <i class="iconfont" v-else>&#xe609;</i>
-      </div>
-    </div>
     <div class="to-service-wrap">
       <div class="to-service" @click="toServiceCall">
         <i class="iconfont">&#xe629;</i>
       </div>
     </div>
-    <popup v-show="showPopup" :showPopupTitle='showPopupTitle' :cancelCart="cancelText" :confirmCart="okText" @confirm="confirm" @cancel="cancel">
-      <p style="padding: 1.5rem 0rem; font-size: 1.125rem; color:#333; line-height: 1.3;">
-        {{ hintInformation }}
-      </p>
-    </popup>
-    <popup v-show="showCallPopup" :showPopupTitle='showPopupTitle' :defaultBtn="showPopupTitle" phoneNum='4006680091' cancelCart="我知道了" confirmCart="呼叫客服" @confirm="confirmCall" @cancel="cancel">
+    <popup v-show="showCallPopup" :showPopupTitle="false" :defaultBtn="false" phoneNum='4006680091' cancelCart="我知道了" confirmCart="呼叫客服" @confirm="confirmCall" @cancel="cancel">
       <p style="padding: 1.25rem 0.8rem;font-size: 1rem;font-weight: normal;font-stretch: normal;line-height: 1.375rem;letter-spacing: 0rem;color: #333333;text-align:left;">
         客服电话：<a href="tel:4006680091" style="letter-spacing: 0rem;color: #ff4800;">4006680091 转 2 </a>（会员权益业务），如有疑问，请致电工作人员。
       </p>
@@ -115,7 +70,7 @@
   import ShopHeader from '../../base/shop-header/shop-header'
   import Popup from '../../base/popup/popup'
   import Loading from '../../base/loading/loading'
-  import * as core from '../../api/serviceCenter'
+  import * as core from '../../api/couponBag'
   import tool from '../../common/js/util'
   import wxShareMixin from '../../common/js/wxShareMixin'
 
@@ -128,46 +83,24 @@
     mixins:[wxShareMixin],
     data () {
       return {
-        InitHeight: false,
         merchantName: window.infoData.merchantName,
+        merchantId: window.infoData.merchantId,
         loadingTitle: '加载中...',
         showLoad: true,
-        showHeader: false,
+        showHeader: true,
         title: "",
         couponGoodsStyle: "",
-        rechargeType: 0,
-        rechargePlaceHolder: '',
-        rechargeNum: null, //充值账号
-        goodsSku: "",
-        goodsPrice: 0, //当前商品新价格
-        goodsOldPrice: 0,//当前商品旧价格
         swiperList: [],
-        activeIndex: 0,
-        maxNum: 1, //最大购买数量
-        maxNumText: '',//购买数量文案
-        isMin: true,
-        isMax: false,
-        shopNum: 1, //购买数量值
-        useExpireTips: '', //使用期限提示
-        saveMoney: 0,//通宝节省
-        singleSavePrice:0,//新旧价节省
-        allsingleSavePrice: 0,
-        allGoodsPrice: 0, //商品总价
+        useExpireTimeLimit: '', //使用期限提示
         goodDescript: '',//商品描述
-        stock: 1, //商品库存
-        subscribe: false,//是否预约商品
-        islike: false,
-        outItemNo: null,
-        providerId: null,
-        isPaying: true,
-        showPopup: false,
-        showCallPopup: false,
-        showPopupTitle: false,
-        hintInformation: '很抱歉，商品已抢光',
-        cancelText: "我知道了",
-        okText:"到货提醒",
-        itemId: null,
         skuId: null,
+        providerId: null,
+        outItemNo: null,
+        count: null,
+        account: null,
+        code: null,
+        showCallPopup: false,
+        isPaying: true,
         shareUrl: location.href.split('#')[0],
         shareLink:  window.location.href.split("#")[0]+'#'+window.location.href.split("#")[1],  //分享出去的链接
         shareTitle: '',  //分享的标题
@@ -175,23 +108,8 @@
         shareImgUrl: '',
       }
     },
-    beforeCreate() {
-
-
-    },
     created () {
       document.title = this.$route.meta.title
-
-      let str = "?" + window.location.hash.split("?")[1]
-      function GetQueryString(name){
-        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
-        var r = str.substr(1).match(reg);
-        if(r!=null)return  unescape(r[2]); return null;
-      }
-
-      this.itemId = GetQueryString('itemId');
-
-      this.skuId = GetQueryString('skuId');
 
       //判断是否为微信
       let ua = navigator.userAgent.toLowerCase();
@@ -203,48 +121,13 @@
         this.showHeader=false
         this.couponGoodsStyle = "top:0rem"
       }
-      if(!this.itemId){
-        this.$toastBox.showToastBox("商品ID出错")
+      if(!this.$route.query.code){
+        this.$toastBox.showToastBox("礼品CODE出错")
         return;
+      }else{
+        this.code = this.$route.query.code
       }
-      core.vipGoodsDetail({itemId:  this.itemId}).then(res => {
-        //console.log(res)
-        if(res.code && '00' == res.code){
-
-          // this.shareTitle= res.result.title +'特权'
-          // this.shareDesc= this.merchantName +res.result.title
-          // this.shareImgUrl=res.result.cover
-          // this.getShare()
-
-          this.itemId = res.result.id
-          this.swiperList = res.result.qySkuResultList
-          this.title = res.result.title
-          this.goodDescript = res.result.content
-          this.islike = res.result.like
-          if(res.result.type && res.result.type === "直充"){
-            this.rechargeType = 1
-            this.rechargePlaceHolder = res.result.tips
-          }else{
-            this.rechargeType = 0
-          }
-          this.showLoad = false
-          this.$nextTick(() => {
-            if(this.swiperList.length < 1){
-              this.$toastBox.showToastBox("商品信息缺失...")
-              return;
-            }
-            this._initScroll()
-            this.changeTitle()
-            this.checkDefaultSku()
-          })
-        }else if(res.code && '01' === res.code && res.isLogin == 'false'){
-          if(res.url){
-            window.location.href = res.url
-          }
-        }else {
-          this.$toastBox.showToastBox(res.message)
-        }
-      })
+      this.getItemCouponSkuDetail()
     },
     mounted(){
       this.$nextTick(function(){
@@ -252,69 +135,10 @@
           this.initHeight()
         }, 1000)
       })
-      window.addEventListener('scroll', this.handleScroll)
-    },
-    watch: {
-      activeIndex(newval,oldval){
-        if(newval < oldval){
-          let li = this.$refs.goodsListWrapper.getElementsByClassName('goods-item')[newval]
-          this.GoodsListScroll.scrollToElement(li, 200, true, true)
-        }else{
-          let li = this.$refs.goodsListWrapper.getElementsByClassName('goods-item')[newval]
-          this.GoodsListScroll.scrollToElement(li, 200, true, true)
-        }
-      },
-      swiperList(newval){
-        //this.goodsSku = newval[0].id
-        //this.goodsPrice = newval[0].settlementPrice
-      },
-      goodsPrice(newval){
-        if(this.goodsOldPrice*100 > newval*100){
-          this.singleSavePrice = ((this.goodsOldPrice*100 - newval*100)/100).toFixed(2)
-          this.allsingleSavePrice = this.singleSavePrice
-        }else {
-          this.singleSavePrice = 0
-          this.allsingleSavePrice = 0
-        }
-      },
-      maxNum(newval){
-        //console.log(newval)
-        if(newval == 1){
-          this.isMin = true
-          this.isMax = true
-        }else{
-          this.isMin = true
-          this.isMax = false
-        }
-      },
-      shopNum(newval){
-        if(newval > this.maxNum){
-          this.shopNum = this.maxNum
-        }
-        this.allsingleSavePrice = (this.singleSavePrice * newval).toFixed(2)
-        this.allGoodsPrice = (this.goodsPrice * newval).toFixed(2)
-      }
-    },
-    destroyed () {
-      window.removeEventListener('scroll', this.handleScroll)
     },
     methods: {
-      handleScroll () {
-        var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
-        //console.log(scrollTop)
-        this.$refs.immediatePayment.style.top = "auto"
-        //this.$refs.immediatePayment.style.bottom = '0'
-      },
       initHeight(){
-        let winHeight
-        if (window.innerHeight)
-        winHeight = window.innerHeight;
-        else if ((document.body) && (document.body.clientHeight))
-        winHeight = document.body.clientHeight;
-
-        // document.body.clientHeight = winHeight
-        // this.$refs.immediatePayment.style.bottom = '0'
-        this.$refs.immediatePayment.style.top = winHeight - this.$refs.immediatePayment.clientHeight  + 'px';
+        this.scroll.refresh()
       },
       priceToFixed(val){
         if(val){
@@ -323,34 +147,8 @@
           return ''
         }
       },
-      initString(str){
-        let data = JSON.parse(str)
-        let str1 =''
-        for (let key in data) {
-          //console.log(data[key])
-          str1 += data[key] + '/'
-        }
-        return str1.substring(0,str1.length -1)
-      },
-      focusInput(e){
-        e.target.focus()
-      },
       scrollToTop(){
         window.scrollBy(0,1)
-      },
-      check_count(event) {
-        let value = event.target.value;
-        //console.log(value)
-        if(value.length > 16){
-          this.$toastBox.showToastBox('最多可输入16位')
-          value = value.slice(0,16)
-        }
-        if (!/^\+?[0-9]*$/.test(value)) {
-          this.$toastBox.showToastBox('请输入正确的账号')
-          event.target.value = null
-        }else{
-          event.target.value = value
-        }
       },
       changeTitle(){
         let head = document.getElementsByTagName('head');
@@ -371,247 +169,49 @@
         }, 20)
       },
       onLoaded(){
-        //this.scroll.refresh()
-      },
-      checkDefaultSku(){
-        this.goodsSku = this.swiperList[0].id;
-        this.goodsPrice = this.swiperList[0].settlementPrice
-        this.allGoodsPrice = this.swiperList[0].settlementPrice
-        this.goodsOldPrice = this.swiperList[0].marketPrice
-        this.maxNum = this.swiperList[0].singleBuyAmount || 1
-        this.maxNumText = this.swiperList[0].buyLimitModelStr
-        this.useExpireTips = this.swiperList[0].useExpireTimeLimit //商品有效期提示
-        this.stock = this.swiperList[0].stock  //默认商品的库存
-        this.outItemNo =  this.swiperList[0].outItemNo
-        this.providerId = this.swiperList[0].providerId
-
-        if(this.goodsOldPrice*100 > this.goodsPrice*100){
-          this.singleSavePrice = ((this.goodsOldPrice*100 - this.goodsPrice*100)/100).toFixed(2)
-          this.allsingleSavePrice = this.singleSavePrice
-        }else {
-          this.singleSavePrice = 0
-          this.allsingleSavePrice = 0
-        }
-
-        //设置默认按钮点击状态
-        if(this.maxNum == 1){
-          //console.log('111')
-          this.isMin = true
-          this.isMax = true
-        }
-
-        this.checkedDefault()
+        this.scroll.refresh()
       },
       _initScroll () {
         // 创建分类列表的Scroll对象
         this.$nextTick(()=>{
-          if (!this.GoodsListScroll) {
+          if (!this.scroll) {
             this.scroll = new BScroll(this.$refs.couponGoodsContent,{
               probeType: 3,
               startY: 0,
               bounce: false,
               click: true
             })
-
-            let width = 0
-            for (let i = 0, length=this.swiperList.length; i < length; i++) {
-              width+=this.$refs.goodsItem[0].getBoundingClientRect().width
-            }
-            this.$refs.goodsListWrapper.style.width = width + 0.75*16 +'px'
-
-            this.GoodsListScroll = new BScroll(this.$refs.goodsList,{
-              startX: 0,
-              scrollX: true,
-              scrollY: false,
-              probeType: 3,
-              click: true
-            })
           }else{
-            this.GoodsListScroll.refresh()
+            this.scroll.refresh()
           }
+        })
+      },
+      getItemCouponSkuDetail(){
+        core.getItemCouponSkuDetail({code: this.code, merchantId: this.merchantId}).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            this.showLoad = false
+            this.title = res.result.title
+            this.swiperList = res.result.qySkuResultList
+            this.goodDescript = res.result.content
+            this.useExpireTimeLimit = res.result.qySkuResultList[0].useExpireTimeLimit
+            this.skuId = res.result.qySkuResultList[0].id
+            this.providerId = res.result.qySkuResultList[0].providerId
+            this.outItemNo = res.result.qySkuResultList[0].outItemNo
+
+            this._initScroll()
+            this.changeTitle()
+          } else if (res.code && '2' === res.code){
+            this.$router.push('/orderForm')
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
         })
       },
       immediatePay(){
-        if(this.isPaying){
-          this.isPaying = false
-          this.toPlay()
-        }else{
-          this.$toastBox.showToastBox("请求中...")
-        }
-      },
-      toPlay(){
-        let returnUrl = window.location.href.split("#")[0]+'#/successPage'
-        let data = {}
-        if(this.$refs.rechargeInputItem){
-          if(this.rechargeNum){
-            data = {skuId: this.goodsSku,account:this.rechargeNum,returnUrl: returnUrl,outItemNo:this.outItemNo,providerId:this.providerId}
-          }else{
-            this.$toastBox.showToastBox("请输入充值账号!")
-            this.isPaying = true
-            return;
-          }
-        } else {
-          data = {skuId: this.goodsSku, count: this.shopNum,returnUrl: returnUrl,outItemNo:this.outItemNo,providerId:this.providerId}
-        }
-        core.vipGoodsPay(data).then(res => {
-          //console.log(res)
-          if(res.code && '00' == res.code){
-            if(res.result.goUrl){
-              window.location.href = res.result.goUrl
-              this.isPaying = true
-            }else{
-              this.callWxPay(res.result.weixinOrderInfo);
-            }
-          }else if(res.code && '01' === res.code && res.isLogin == 'false'){
-            if(res.url){
-              var reg = /guijitech.com/gi;
-              let url = res.url
-              if(reg.test(url)){
-                window.location.href = res.url + "?referer=" + returnUrl
-              }else{
-                window.location.href = res.url
-              }
-            }
-          }else if(res.code && '02' === res.code) {
-            this.isPaying = true
-            this.$router.push("/openMembers")
-          }else if(res.code == 'err_not_enough_stock_out' || res.code == 'err_not_enough_stock'){
-            this.stock = 0
-            this.showPopup = true
-            this.hintInformation = res.message
-            this.isPaying = true
-            for(let i in this.swiperList){
-              if(this.swiperList[i].id == data.sku){
-                this.swiperList[i].stock = 0
-              }
-            }
-          } else {
-            this.isPaying = true
-            this.$toastBox.showToastBox(res.message)
-          }
-        }).catch(err=>{
-          this.isPaying = true
-          this.$toastBox.showToastBox("网络错误")
-        })
-      },
-      callWxPay(params) {
-        if (typeof WeixinJSBridge == "undefined"){
-          if(document.addEventListener){
-            document.addEventListener('WeixinJSBridgeReady', this.jsApiCall(params), false);
-          }else if (document.attachEvent){
-            document.attachEvent('WeixinJSBridgeReady', this.jsApiCall(params));
-            document.attachEvent('onWeixinJSBridgeReady', this.jsApiCall(params));
-          }
-        }else{
-          this.jsApiCall(params);
-        }
-      },
-      jsApiCall(params) {
-        console.log(params)
-        let that = this
-        WeixinJSBridge.invoke('getBrandWCPayRequest', {
-          'appId': params.appId,
-          'timeStamp': String(params.timeStamp),
-          'nonceStr': params.nonceStr,
-          'package': params.package,
-          'signType': params.signType,
-          'paySign': params.paySign
-          },function (res) {
-            console.log(res)
-            if (res.err_msg === 'get_brand_wcpay_request:ok') {
-              //that.$toastBox.showToastBox('微信支付成功')
-              that.isPaying = true
-              that.$router.push({path:'/successPage'})
-            } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
-              //that.$toastBox.showToastBox('用户取消支付')
-              that.isPaying = true
-            } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
-              //that.$toastBox.showToastBox('网络异常，请重试')
-              that.isPaying = true
-            }
-          }
-        );
-      },
-      checkGoods(index,goodsSku,price,buyLimitModelStr,oldPrice,useExpireTimeLimit,stock,singleBuyAmount,outItemNo,providerId){
-        this.activeIndex = index
-        this.goodsSku = goodsSku
-        this.goodsPrice = price
-        this.allGoodsPrice = price
-        this.maxNum = singleBuyAmount || 1
-        this.maxNumText = buyLimitModelStr
-        this.goodsOldPrice = oldPrice
-        this.shopNum = 1
-        this.useExpireTips = useExpireTimeLimit
-        this.stock = stock
-        this.outItemNo = outItemNo
-        this.providerId = providerId
-        this.isMin = true
-        if(this.maxNum > 1){
-          this.isMax = false
-        }
-        //this.isSubscribe()
-      },
-      minsNum(){
-        if(this.maxNum == 1){
-          this.isMax = true
-        }else{
-          this.isMax = false
-        }
-        if(this.shopNum > 2){
-          this.shopNum -= 1
-          this.isMin = false
-        }else if(this.shopNum <= 2) {
-          this.shopNum = 1
-          this.isMin = true
-          //this.$toastBox.showToastBox("该商品最多可购买"+ this.maxNum +"张")
-        }
-      },
-      addNum(){
-        if(this.maxNum == 1){
-          this.isMin = true
-        }else{
-          this.isMin = false
-        }
-        if(this.shopNum < this.maxNum - 1){
-          this.shopNum += 1
-          this.isMax = false
-        }else if(this.shopNum  ==  this.maxNum) {
-          this.shopNum = this.maxNum
-          this.isMax = true
-          this.$toastBox.showToastBox("该商品最多可购买"+ this.maxNum +"张")
-        }else{
-          this.isMax = true
-          this.shopNum = this.maxNum
-        }
-      },
-      addLike(){
-        if(this.islike){
-          this.cancelFavorite(this.itemId)
-        }else{
-          this.addFavorite(this.itemId)
-        }
-      },
-      addFavorite(opts){
-        core.vipGoodsAddLike({itemId: opts}).then(res=>{
-          if(res.code && '00' == res.code){
-            this.islike = true
-          } else {
-            this.$toastBox.showToastBox(res.message)
-          }
-        }).catch(err=>{
-          this.$toastBox.showToastBox("网络错误")
-        })
-      },
-      cancelFavorite(opts){
-        core.vipGoodsDelLike({itemId: opts}).then(res=>{
-          if(res.code && '00' == res.code){
-            this.islike = false
-          } else {
-            this.$toastBox.showToastBox(res.message)
-          }
-        }).catch(err=>{
-          this.$toastBox.showToastBox("网络错误")
-        })
+        window.location.href =  window.location.href.split("#")[0]+'?#/cashier?code=' + this.code
       },
       toServiceCall(){
         this.showCallPopup = true
@@ -619,30 +219,10 @@
       confirmCall(){
         this.showCallPopup = false
       },
-      confirm(){
-        this.showPopup = false
-      },
       cancel(){
-        this.showPopup = false
         this.showCallPopup = false
-      },
-      checkedDefault(){
-        if(this.skuId && String(this.skuId).length > 0){
-          for(let item in this.swiperList){
-            if(this.swiperList[item].id == this.skuId){
-              let data = this.swiperList[item]
-              let index = parseInt(item)
-
-              this.checkGoods(index,data.id,data.settlementPrice,data.buyLimitModelStr,data.marketPrice,data.useExpireTimeLimit,data.stock,data.singleBuyAmount,data.outItemNo,data.providerId)
-              return
-            }
-          }
-        }
       }
-    },
-    updated() {
-
-    },
+    }
   }
 </script>
 
@@ -650,8 +230,7 @@
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   .coupon-goods
     background-color #fff
-    // overflow-y: scroll;
-    // -webkit-overflow-scrolling: touch;
+
     .immediate-payment
       position fixed
       left 0
@@ -668,37 +247,19 @@
       font-weight: 600;
       display flex
       align-items center
-      .pay-save
-        flex 1
-        height 3.063rem
-        padding-left 1rem
-        .pay-save-priceicon
-          font-size 0.938rem
-          color: #2d2b32
-          font-weight 600
-          //height 1.031rem
-        .pay-save-goodprice
-          font-size 1.25rem
-          font-weight 600
-          //height 1.031rem
-        .pay-save-saveprice
-          font-size 0.813rem
-          font-weight 600
-          //height 1.031rem
+
       .pay-btn
-        width 9.28125rem
-        background url('./images/paybtn.png') no-repeat center
+        width 100%
         background-size 100% 100%
         font-size 1.125rem
         font-weight 600
-        color #fcd494
-        text-align right
-        padding-right 1.438rem
+        color #2d2b32
+        text-align center
         box-sizing border-box
 
-    .add-like, .to-service-wrap
+    .to-service-wrap
       position fixed
-      bottom 11.8125rem
+      bottom 8.5rem
       right 0.75rem
       width 2.375rem
       height 2.375rem
@@ -707,24 +268,10 @@
       background-color rgb(255,255,255)
       box-shadow 0rem 0.2rem 0.35rem 0rem rgba(0, 0, 0, 0.08)
       text-align center
-      .add-like-btn
-        width 100%
-        height 100%
-        position relative
-        i
-          position absolute
-          left 50%
-          top 50%
-          transform translate(-50%,-50%)
-          color rgb(255,20,20)
-          font-size 1.2rem
-          line-height 1.15
-          height 50%
-    .to-service-wrap
-      bottom 8.5rem
       color #3992ff
       i
         font-size 1.2rem
+
     .couponGoodsContent
       position fixed
       left 0
@@ -739,37 +286,25 @@
         min-height 1px
         .goods-list
           background #fff
-          height 13rem
-          overflow: hidden;
+          overflow hidden
+          margin-bottom 0.5rem
           .goodsList-wrapper
-            height 13rem
-            padding-top 1rem
             box-sizing border-box
             .goods-item
-              height 11.813rem
-              width 10.125rem
-              float left
-              padding-left 0.75rem
+              width 100%
+              max-width 750px
               box-sizing border-box
               .good-item-content
-                height 100%
                 background-color #ffffff
-                box-shadow 0rem 0.156rem 0.313rem 0rem rgba(0, 0, 0, 0.08)
-                border 1px solid transparent
-                border-radius 0.5rem
-                box-sizing border-box
-                overflow hidden
-                position relative
                 .good-item-img
-                  height 6.25rem
+                  height auto
                   width 100%
                   display block
                 .good-item-title
-                  min-height: 2.4rem;
-                  margin-top 0.45rem
-                  font-size 0.875rem
+                  margin 0.9rem 0 0.7rem 0
+                  font-size 0.938rem
                   color #333
-                  padding 0 0.438rem
+                  padding 0 0.75rem
                   box-sizing border-box
                   line-clamp 2
                   line-height 1.188rem
@@ -779,171 +314,38 @@
                   -webkit-line-clamp 2
                   /* autoprefixer: ignore next */
                   -webkit-box-orient: vertical;
-                .good-item-cashPrice
-                  margin-top 0.32rem
-                  color #ff4800
-                  padding 0 0.438rem
-                  height 0.938rem
-                  box-sizing border-box
-                  display flex
-                  align-items center
-                  .good-item-moneylable
-                    font-size 0.813rem
-                    font-weight 600
-                    margin-right 0.2rem
-                    align-self flex-end
-                  span
-                    font-weight 600
-                    font-size 1.125rem
-                  .good-item-lable
-                    background-color: #2d2c32;
-                    border-radius: 0rem 0.563rem 0.563rem 0.563rem;
-                    font-size 0.6rem
-                    color #f1c488
-                    padding 0.25rem 0.625rem
-                    transform scale(0.8)
-                    display inline-block
-                    margin-left -0.2rem
 
-                .good-item-oldPrice
-                  padding 0 0.438rem
+                .good-item-marketPrice
+                  padding 0 0.75rem
                   font-size 0.688rem
-                  color #999999
-                  margin-top 0.3rem
+                  margin-bottom 0.7rem
                   box-sizing border-box
-                .checkIcon
-                  position absolute
-                  right 0.375rem
-                  bottom 0.8rem
-                  width 1.125rem
-                  height 1.125rem
-                  color #ff4800
-                  i
-                    font-size 1rem
+                  .marketPrice
+                    color #ff4800
+                    .slogn
+                      display inline-block
+                      font-size 0.813rem
+                      margin-right 0.2rem
+                      font-weight bold
+                    .price
+                      font-size 1.125rem
+                      display inline-block
+                      font-weight bold
+                    .text
+                      display inline-block
+                      font-size 0.9rem
+                      color #999999
+                      transform scale(0.8)
 
-              .good-active-item-content
-                box-shadow 0rem 0.156rem 0.313rem 0rem rgba(255, 72, 0, 0.23)
-                //border-color #ff4800
-                box-sizing border-box
-                border 1px solid #ff4800
-                // -webkit-animation fadeIn 0.5s
-                // animation fadeIn 0.5s
-                transition border 0.3s
-
-        .recharge-good-list
-          background #f5f5f5
-        .shop-num
-          padding 0 0.75rem
-          box-sizing border-box
-          height 3rem
-          width 100%
-          background #ffffff
-          display flex
-          justify-content space-between
-          align-items center
-          .shop-num-hint
-            display flex
-            align-items center
-            .hint-text
-              font-size 1.063rem
-              color #333
-            .hint-num
-              margin-left 0.75rem
-              font-size 0.75rem
-              color #999
-          .shop-scoke-hint
-            display flex
-            align-items center
-            span
-              font-size 0.875rem
-              color #999999
-            .add-subscribe
-              height 1.375rem
-              line-height 1
-              border-radius 0.75rem
-              font-size 0.75rem
-              color #ffffff
-              background #ff4800
-              padding 0 0.563rem
-              border 0.063rem solid transparent
-              outline none
-              margin-left 0.75rem
-            .cancel-subscribe
-              height 1.375rem
-              line-height 1
-              border-radius 0.75rem
-              font-size 0.75rem
-              color #ff4800
-              background #ffffff
-              padding 0 0.563rem
-              border 0.063rem solid #ff4800
-              outline none
-              margin-left 0.75rem
-          .num-option
-            width 4.9rem
-            display flex
-            align-items center
-            .shop-num-minus
-              width 1.188rem
-              height 1.188rem
-              .min-default
-                color #e1e1e1
-                font-size 18px
-              .min-active
-                color #ff4800
-                font-size 18px
-            .shop-num-input
-              width 2.531rem
-              height 100%
-              .shop-num-val
-                width 100%
-                text-align center
-                outline none
-                border none
-                font-size 1.063rem
-                color #1f1c1d
-            .shop-num-add
-              width 1.188rem
-              height 1.188rem
-              .max-default
-                color #ff4800
-                font-size 18px
-              .max-active
-                color #e1e1e1
-                font-size 18px
-        .shop-recharge-wrap
-          margin-top 0.7rem
-          .shop-num-hint
-            height 100%
-            width 100%
-            .hint-text
-              //width 4.5rem
-            .hint-num
-              height 100%
-              margin-left 0
-              flex 1
-              input
-                -webkit-user-select auto
-                height 100%
-                outline none
-                border none
-                font-size 1.125rem
-                width 100%
-                //font-family 'PingFang SC', 'STHeitiSC-Light', 'Helvetica-Light', arial, sans-serif, 'Droid Sans Fallback'
-            .hint-max
-              font-size 0.75rem
-              color #999
-              text-align center
-              span
-                font-size 0.75rem
-                &:first-child
-                  display block
-                  margin-bottom 0.2rem
         .use-cont-hint
-          margin-top 0.5rem
           padding 0 0.75rem
           box-sizing border-box
           background #ffffff
+          &:nth-child(3)
+            .use-time
+              border-bottom none
+              .v-time
+                color #ff1414
           .use-time
             height 3rem
             width 100%
@@ -951,12 +353,13 @@
             justify-content space-between
             align-items center
             box-sizing border-box
+            border-bottom 1px solid #e6e6e6
             .v-ext
               font-size 0.938rem
               color #333
             .v-time
               font-size 0.813rem
-              color #ff1414
+              color #999999
 
         .good-descript
           margin-top 0.5rem

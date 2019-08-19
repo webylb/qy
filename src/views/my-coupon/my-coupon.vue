@@ -111,7 +111,8 @@
         loadingTitle: '正在加载...',
         hasMore: null,
         popupClose: false,
-        showConfirmPopup: false
+        showConfirmPopup: false,
+        checkId: null,
       }
     },
     components: {
@@ -208,13 +209,43 @@
       goShop(){
         this.$router.push({path:'/member'})
       },
-      showConfirmUse(){
+      showConfirmUse(id){
         this.showConfirmPopup = true
+        this.checkId = id
       },
       cancel(){
         this.showConfirmPopup = false
       },
       confirm(){
+        if(this.checkId){
+          core.checkCoupon({id: this.checkId}).then(res => {
+            //console.log(res);
+            if (res.code && '00' === res.code) {
+              this.showConfirmPopup = false
+              this.$toastBox.showToastBox(res.message)
+              this.couponsList.forEach((item,index) => {
+                if(item.id == this.checkId){
+                  this.couponsList.splice(index,1)
+                  this.checkId = null
+                }
+              })
+            }else if(res.code && '01' === res.code && res.isLogin == 'false'){
+              if(res.url){
+                var reg = /guijitech.com/gi;
+                let url = res.url
+                if(reg.test(url)){
+                  window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href.split("#")[0]+'?#' + window.location.href.split("#")[1])
+                }else{
+                  window.location.href = res.url
+                }
+              }
+            } else {
+              this.$toastBox.showToastBox(res.message)
+            }
+          })
+        }else{
+           this.$toastBox.showToastBox('参数错误')
+        }
 
       },
       getValidCoupon(opts) {

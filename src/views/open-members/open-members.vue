@@ -93,7 +93,7 @@
           <p class="exchange-err-title">兑换失败</p>
           <p class="exchange-err-text">{{ chargeErrText }}</p>
           <p class="exchange-btnWrap">
-            <button type="button" class="exchange-btn" @click="hideSuccessPopup">我知道了</button>
+            <button type="button" class="exchange-btn" @click.prevent="hideSuccessPopup">我知道了</button>
           </p>
         </div>
         <div class="exchange-open-close" @click="hideSuccessPopup">
@@ -140,10 +140,11 @@
         chargeErrText: '',
         isPaying: true,
         shareUrl: location.href.split('#')[0],
-        shareLink:  window.location.href.split("#")[0]+'#'+window.location.href.split("#")[1],  //分享出去的链接
+        shareLink:  window.location.href.split("#")[0]+'?#'+window.location.href.split("#")[1],  //分享出去的链接
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
+        okLink: null,
       }
     },
     created () {
@@ -195,10 +196,9 @@
           this.initHeight()
         }, 1000)
       });
-      window.addEventListener('scroll', this.handleScroll)
     },
     destroyed () {
-      window.removeEventListener('scroll', this.handleScroll)
+
     },
     methods: {
       getNewShopTequan(opts) {
@@ -218,13 +218,7 @@
         this.$refs.immediatePayment.style.top = "auto"
       },
       initHeight(){
-        let winHeight
-        if (window.innerHeight)
-        winHeight = window.innerHeight;
-        else if ((document.body) && (document.body.clientHeight))
-        winHeight = document.body.clientHeight;
-
-        this.$refs.immediatePayment.style.top = winHeight - this.$refs.immediatePayment.clientHeight  + 'px';
+        this.scroll.refresh()
       },
       focusInput(e){
         e.target.focus()
@@ -246,9 +240,6 @@
               this.scroll.refresh()
             }
         })
-      },
-      goMyCoupon() {
-        this.$router.push("/validCoupon")
       },
       getVipPackageList(opts){
         core.vipPackageList(opts).then(res => {
@@ -278,7 +269,7 @@
         }else{
           data = this.vipTypeDefaultId
         }
-        let returnUrl = window.location.href.split("#")[0]+'#'+ this.$route.path + '?month='+data
+        let returnUrl = window.location.href.split("#")[0]+'?#'+ this.$route.path + '?month='+data
         core.vipPackagePay({cardType: data,returnUrl:returnUrl}).then(res => {
           //console.log(res)
           if(res.code && '00' == res.code){
@@ -293,11 +284,12 @@
               var reg = /guijitech.com/gi;
               let url = res.url
               if(reg.test(url)){
-                window.location.href = res.url + "?referer=" + window.location.href.split("#")[0]+'#'+ this.$route.path
+                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href.split("#")[0]+'?#'+ this.$route.path)
               }else{
                 window.location.href = res.url
               }
             }
+            this.isPaying = true
           } else {
             this.$toastBox.showToastBox(res.message)
             this.isPaying = true
@@ -370,7 +362,10 @@
         this.exchangeOpen = false
         this.exchangeErrOpen = false
         this.exchangeInput = null
-
+        if(this.okLink){
+          window.location.href = this.okLink + "?referer="+ encodeURIComponent(window.location.href.split("#")[0]+'?#'+ this.$route.path)
+          this.okLink = ''
+        }
         window.scrollBy(0,10)
       },
       openExcharge(){
@@ -397,6 +392,20 @@
               }else if(res.result.cardType == 'day7'){
                 this.successMonth = "七天"
               }
+            } else if(res.code && '01' === res.code && res.isLogin == 'false'){
+              if(res.url){
+                var reg = /guijitech.com/gi;
+                let url = res.url
+                if(reg.test(url)){
+                  this.okLink = res.url
+                }else{
+                  window.location.href = res.url
+                }
+              }
+              this.exchangeOpen = false
+              this.exchangeErrOpen = true
+              this.chargeErrText = res.message
+              this.exchangeInput = null
             } else {
               this.exchangeOpen = false
               this.exchangeErrOpen = true
@@ -443,10 +452,7 @@
       onLoaded(){
         this.scroll.refresh()
       },
-    },
-    updated() {
-
-    },
+    }
   }
 </script>
 

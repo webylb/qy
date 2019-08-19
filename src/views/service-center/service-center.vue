@@ -106,10 +106,6 @@
             this.serviceMenuList = res.result
             this.showLoad = false
             this._initScroll()
-          }else if(res.code && '01' === res.code && res.isLogin == 'false'){
-            if(res.url){
-              window.location.href = res.url
-            }
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -208,11 +204,9 @@
         if(!event._constructed) {
           //console.log("1",event)
         }
-        //console.log("2",event)
-        //console.log(id)
         //this.$router.push({name:'couponGoods', path:'/couponGoods', params:{itemId: id}})
         if(jumpUrl){
-          window.location.href = jumpUrl
+          window.location.href = tool.replaceUrlMerchantId(jumpUrl,this.merchantId)
         }else{
           window.location.href = window.location.href.split("#")[0] + '?#' + '/couponGoods?itemId='+ id
         }

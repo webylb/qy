@@ -28,11 +28,10 @@ if(process.env.NODE_ENV === 'development'){
     merchant: 'test',
     merchantId: 281,
     merchantName: '汪汪黑卡',
-    pageKeyName: 'new_shop_tequan',
     privilegePageUuid: '8641a752ac4c40bfa696399d9706b0df',//
     openingPageUuid: '',
   }
-  document.cookie = "QY_COOKIE_PASSPORT_NAME="+"\"sessionId=1ad8061697657497b42cf1f9b7b907fc&userId=77\""
+  document.cookie = "QY_COOKIE_PASSPORT_NAME="+"\"sessionId=5d4d7a3867bd42a2b50d98202ab80676&userId=113\""
 }
 
 //添加focus指令

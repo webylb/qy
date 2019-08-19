@@ -232,7 +232,7 @@
           }else if(res.code && '02' === res.code) {
             this.isPaying = true
             this.$router.push("/openMembers")
-          }else {
+          } else {
             this.isPaying = true
             this.$toastBox.showToastBox(res.message)
           }

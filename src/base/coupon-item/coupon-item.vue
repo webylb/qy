@@ -5,8 +5,8 @@
         <div>
           <span class="exchange-topText">兑换时间:</span><span> {{ timeFormat(coupondata.createTime) }}</span>
         </div>
-        <div v-show="false">
-          <button type="button" class="confirmUse" @click="showConfirmUse" v-if="valid">确认使用</button>
+        <div>
+          <button type="button" class="confirmUse" @click="showConfirmUse(coupondata.id)" v-if="valid">确认使用</button>
         </div>
       </div>
       <div class="coupon-info">
@@ -110,8 +110,8 @@
         this.$emit("popupStatus", true)
         this.$couponToastBox.showToastBox(url)
       },
-      showConfirmUse(){
-        this.$emit("showConfirmUse")
+      showConfirmUse(id){
+        this.$emit("showConfirmUse",id)
       }
     }
   }

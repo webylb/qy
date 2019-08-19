@@ -92,6 +92,7 @@
     data() {
       return {
         merchantName: window.infoData.merchantName || '',
+        merchantId: window.infoData.merchantId || '',
         privilegePageUuid: window.infoData.privilegePageUuid || '',
         isMember: true,
         loaded: true,
@@ -125,7 +126,7 @@
     methods: {
       jumplinkUrl(url) {
         if (url) {
-          window.location.href = url
+          window.location.href = tool.replaceUrlMerchantId(url,this.merchantId)
         }
       },
       onLoaded() {

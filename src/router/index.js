@@ -86,8 +86,8 @@ export default new Router({
       meta: {title: '礼包详情',keepAlive:false},
       component: () => import(/* webpackChunkName: "couponBag" */ '@/views/coupon-bag/coupon-bag.vue')
     },
-     //卡券包商品
-     {
+    //卡券包商品
+    {
       path: '/couponBagGoods',
       name: 'couponBagGoods',
       meta: {title: '',keepAlive:false},

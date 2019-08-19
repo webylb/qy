@@ -2,19 +2,19 @@
   <div class="coupon-goods home-page" ref="homePage">
     <shop-header ref="shopHeader" v-if="showHeader" style="position: absolute;top:0;left: 0;z-index: 999" line-style="background:#fff" :title="title"></shop-header>
     <div :style="couponGoodsStyle" class="couponGoodsContent" ref="couponGoodsContent" v-show="!showLoad">
-      <div class="goods-detail">
+      <div class="goods-detail" v-if="prodData">
         <div class="goods-cont">
           <div class="goods-img">
-            <img src="https://c9.51jujibao.com/腾讯视频VIP会员-1月.png" alt="">
+            <img :src="prodData.cover" alt="">
           </div>
           <div class="goods-attr">
             <div class="goods-name">
-              <span class="name">腾讯视频</span>
+              <span class="name">{{ prodData.title }}</span>
               <span class="num">x1</span>
             </div>
             <div class="goods-price">
               <span class="unit">¥ </span>
-              <span class="price">11.00</span>
+              <span class="price">{{ priceToFixed(prodData.marketPrice) }}</span>
               <span>官方价</span>
             </div>
           </div>
@@ -25,7 +25,7 @@
               商品原价
             </div>
             <div class="v-price">
-              ¥ {{ priceToFixed(11) }}
+              ¥ {{ priceToFixed(prodData.marketPrice) || '--' }}
             </div>
           </div>
         </div>
@@ -35,7 +35,7 @@
               抵用券
             </div>
             <div class="v-price">
-              -¥ {{ priceToFixed(11) }}
+              -¥ {{ priceToFixed(prodData.deductionPrice) || '--' }}
             </div>
           </div>
         </div>
@@ -44,7 +44,7 @@
             <div class="v-ext">
             </div>
             <div class="v-price">
-              <span class="all-price-text">总计:</span><span class="all-price"><span>¥</span>{{ priceToFixed(11) }}</span>
+              <span class="all-price-text">总计:</span><span class="all-price"><span>¥</span>{{ priceToFixed(prodData.payPrice) || '--' }}</span>
             </div>
           </div>
         </div>
@@ -53,10 +53,10 @@
         </p>
       </div>
     </div>
-    <div class="immediate-payment fadeIn" ref="immediatePayment">
+    <div class="immediate-payment fadeIn" ref="immediatePayment" v-if="prodData">
       <div class="pay-hint">
         <div class="pay-pricetext">还需支付:</div>
-        <div class="pay-goodprice"> <span> ¥ </span> {{ priceToFixed(11) }}</div>
+        <div class="pay-goodprice"> <span> ¥ </span> {{ priceToFixed(prodData.payPrice) || '--' }}</div>
       </div>
       <div class="pay-btn" @click="immediatePay">
         特惠购买
@@ -70,7 +70,7 @@
   import BScroll  from 'better-scroll'
   import ShopHeader from '../../base/shop-header/shop-header'
   import Loading from '../../base/loading/loading'
-  import * as core from '../../api/serviceCenter'
+  import * as core from '../../api/couponBag'
   import tool from '../../common/js/util'
   import wxShareMixin from '../../common/js/wxShareMixin'
 
@@ -82,13 +82,20 @@
     mixins:[wxShareMixin],
     data () {
       return {
-        InitHeight: false,
         merchantName: window.infoData.merchantName,
+        merchantId: window.infoData.merchantId,
         loadingTitle: '加载中...',
-        showLoad: false,
+        showLoad: true,
         showHeader: false,
-        title: "",
+        title: "收银台",
         couponGoodsStyle: "",
+        prodData: null,
+        cover: "",
+        code: null,
+        skuId: null,
+        providerId: null,
+        outItemNo: null,
+        isPaying: true,
         shareUrl: location.href.split('#')[0],
         shareLink:  window.location.href.split("#")[0]+'#'+window.location.href.split("#")[1],  //分享出去的链接
         shareTitle: '',  //分享的标题
@@ -109,16 +116,19 @@
         this.showHeader = true
         this.couponGoodsStyle = "top:2.75rem"
       } else {
-        let config = {};
-        config.url = window.location.href;
-        // 判断当前url是否存在?参数匹配符
-        if(!config.url.match(/\?/)) {
-          location.replace(window.location.href.split('#')[0] + '?' + window.location.hash);
-          return;
-        }
         this.showHeader = false
         this.couponGoodsStyle = "top:0rem"
       }
+
+      if(!this.$route.query.code){
+        this.$toastBox.showToastBox("礼品CODE出错")
+        return;
+      }else{
+        this.code = this.$route.query.code
+      }
+
+      this.getItemCouponSkuDetail()
+
     },
     mounted(){
       this.$nextTick(function(){
@@ -126,30 +136,13 @@
           this.initHeight()
         }, 1000)
       })
-      window.addEventListener('scroll', this.handleScroll)
     },
     watch: {
 
     },
-    destroyed () {
-      window.removeEventListener('scroll', this.handleScroll)
-    },
     methods: {
-      handleScroll () {
-        var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
-        //console.log(scrollTop)
-        this.$refs.immediatePayment.style.top = "auto"
-      },
       initHeight(){
-        let winHeight
-        if (window.innerHeight)
-        winHeight = window.innerHeight;
-        else if ((document.body) && (document.body.clientHeight))
-        winHeight = document.body.clientHeight;
-
-        // document.body.clientHeight = winHeight
-        // this.$refs.immediatePayment.style.bottom = '0'
-        this.$refs.immediatePayment.style.top = winHeight - this.$refs.immediatePayment.clientHeight  + 'px';
+        this.scroll.refresh()
       },
       priceToFixed(val){
         if(val){
@@ -170,9 +163,30 @@
       onLoaded(){
         //this.scroll.refresh()
       },
+      getItemCouponSkuDetail(){
+        core.getItemCouponSkuDetail({code: this.code, merchantId: this.merchantId}).then(res => {
+          console.log(res)
+          if(res.code && '00' == res.code){
+            this.showLoad = false
+            this.prodData = res.result.qySkuResultList[0]
+            this.cover = res.result.qySkuResultList[0].cover
+            this.skuName = res.result.qySkuResultList[0].title
+            this.skuId = res.result.qySkuResultList[0].id
+            this.providerId = res.result.qySkuResultList[0].providerId
+            this.outItemNo = res.result.qySkuResultList[0].outItemNo
+            this._initScroll()
+          } else if (res.code && '2' === res.code){
+            this.$router.push('/orderForm')
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
+      },
       _initScroll () {
         this.$nextTick(()=>{
-          if (!this.GoodsListScroll) {
+          if (!this.scroll) {
             this.scroll = new BScroll(this.$refs.couponGoodsContent,{
               probeType: 3,
               startY: 0,
@@ -193,21 +207,13 @@
         }
       },
       toPlay(){
-        let returnUrl = window.location.href.split("#")[0]+'#/successPage'
-        let data = {}
-        if(this.$refs.rechargeInputItem){
-          if(this.rechargeNum){
-            data = {skuId: this.goodsSku,account:this.rechargeNum,returnUrl: returnUrl,outItemNo:this.outItemNo,providerId:this.providerId}
-          }else{
-            this.$toastBox.showToastBox("请输入充值账号!")
-            this.isPaying = true
-            return;
-          }
-        } else {
-          data = {skuId: this.goodsSku, count: this.shopNum,returnUrl: returnUrl,outItemNo:this.outItemNo,providerId:this.providerId}
-        }
-        core.vipGoodsPay(data).then(res => {
-          //console.log(res)
+        let data  = {}
+        data.returnUrl = window.location.href.split("#")[0]+'#/successPage'
+        data.skuId = this.skuId
+        data.providerId = this.providerId,
+        data.outItemNo = this.outItemNo,
+        data.code = this.code
+        core.payItemCouponSkuOrder(data).then(res => {
           if(res.code && '00' == res.code){
             if(res.result.goUrl){
               window.location.href = res.result.goUrl
@@ -216,27 +222,21 @@
               this.callWxPay(res.result.weixinOrderInfo);
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
+            this.isPaying = true
             if(res.url){
-              window.location.href = res.url
-            }
-          }else if(res.code && '02' === res.code) {
-            this.isPaying = true
-            this.$router.push("/openMembers")
-          }else if(res.code == 'err_not_enough_stock_out' || res.code == 'err_not_enough_stock'){
-            this.stock = 0
-            this.showPopup = true
-            this.hintInformation = res.message
-            this.isPaying = true
-            for(let i in this.swiperList){
-              if(this.swiperList[i].id == data.sku){
-                this.swiperList[i].stock = 0
+              var reg = /guijitech.com/gi;
+              let url = res.url
+              if(reg.test(url)){
+                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href.split("#")[0]+'?#' + window.location.href.split("#")[1])
+              }else{
+                window.location.href = res.url
               }
             }
           } else {
             this.isPaying = true
             this.$toastBox.showToastBox(res.message)
           }
-        }).catch(err=>{
+        }).catch(error => {
           this.isPaying = true
           this.$toastBox.showToastBox("网络错误")
         })
@@ -254,7 +254,6 @@
         }
       },
       jsApiCall(params) {
-        console.log(params)
         let that = this
         WeixinJSBridge.invoke('getBrandWCPayRequest', {
           'appId': params.appId,
@@ -264,7 +263,7 @@
           'signType': params.signType,
           'paySign': params.paySign
           },function (res) {
-            console.log(res)
+            //console.log(res)
             if (res.err_msg === 'get_brand_wcpay_request:ok') {
               //that.$toastBox.showToastBox('微信支付成功')
               that.isPaying = true
@@ -279,10 +278,7 @@
           }
         );
       }
-    },
-    updated() {
-
-    },
+    }
   }
 </script>
 

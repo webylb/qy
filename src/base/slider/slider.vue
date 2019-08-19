@@ -3,7 +3,7 @@
     <div class="slider-group" ref="sliderGroup">
       <slot></slot>
     </div>
-    <div class="dots" v-show="isShowDots">
+    <div class="dots" v-show="isShowDots" v-if="dots.length > 1">
       <span class="dot" v-for="(item,index) in dots" :key="index" :class="{active:currentPageIndex === index}"></span>
     </div>
   </div>
@@ -164,12 +164,14 @@
       .dot
         display: inline-block
         margin: 0 4px
-        width: 4px
-        height: 4px
+        width: 0.438rem
+        height: 0.438rem
         border-radius: 50%
-        background: rgba(0,0,0,.1)
+        border 1px solid #b78231
+        background: rgba(255,255,255,1)
         &.active
-          width: 15px
-          border-radius: 3px
-          background: rgba(0,0,0,.2)
+          width: 0.438rem
+          height: 0.438rem
+          border-radius: 50%
+          background: #b78231
 </style>

@@ -8,14 +8,14 @@
           <div class="login-form-item">
             <div class="input-wrap">
               <i class="iconfont left-icon">&#xe615;</i>
-              <input type="text" v-model="phone"  @click.stop="focusInput"  @blur="scrollToTop($event,'phone')" placeholder="请输入手机号" v-on:keyup="check_count($event,'phone')" maxlength="11" />
+              <input type="number" v-model="phone"  @click.stop="focusInput"  @blur="scrollToTop($event,'phone')" placeholder="请输入手机号" v-on:keyup="check_count($event,'phone')" maxlength="11" />
               <i class="iconfont right-icon" v-show="showPhoneClose" @click="clearVal('phone')">&#xe641;</i>
             </div>
           </div>
           <div class="login-form-item">
               <div class="input-wrap">
                 <i class="iconfont left-icon">&#xe61e;</i>
-                <input type="text" v-model="code"  @click.stop="focusInput"  @blur="scrollToTop($event,'code')" placeholder="请输入验证码" v-on:keyup="check_count($event,'code')" maxlength="6" />
+                <input type="number" v-model="code"  @click.stop="focusInput"  @blur="scrollToTop($event,'code')" placeholder="请输入验证码" v-on:keyup="check_count($event,'code')" maxlength="6" />
                 <i class="iconfont right-icon" v-show="showCodeClose" @click="clearVal('code')">&#xe641;</i>
               </div>
               <div class="input-btn">
