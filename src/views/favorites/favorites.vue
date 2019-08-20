@@ -50,8 +50,8 @@
         packedIndex: 0,
         listLastHeight:'',
         isShowFiexd: false,
-        shareUrl: location.href.split('#')[0],
-        shareLink:  window.location.href.split("#")[0]+'#'+window.location.href.split("#")[1],  //分享出去的链接
+        shareUrl: location.href,
+        shareLink:  window.location.href,  //分享出去的链接
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
@@ -126,8 +126,8 @@
         }
         //console.log("2",event)
 
-        window.location.href = window.location.href.split("#")[0] + '?#' + '/couponGoods?itemId='+ id
-        //this.$router.push({name: 'couponGoods',params:{itemId: data}})
+        //window.location.href = window.location.href.split("#")[0] + '?#' + '/couponGoods?itemId='+ id
+        this.$router.push({path: '/couponGoods', query:{itemId: id}})
       }
     }
   }

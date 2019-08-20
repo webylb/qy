@@ -83,12 +83,27 @@ const priceStr = function (tb,rmb) {
 };
 
 const replaceUrlMerchantId = function(url,id){
-    let reg = /{merchantId}/gi;
-    if(reg.test(url)){
-      return url.replace(reg,id)
+  let reg = /{merchantId}/gi;
+  if(reg.test(url)){
+    return url.replace(reg,id)
+  }else{
+    let reg1 = /\?#\//gi;
+    let reg2 = /#\//gi;
+    if(reg1.test(url)){
+      return url.replace(reg1,'/')
+    }else if(reg2.test(url)){
+      return url.replace(reg2,'/')
     }else{
       return url
     }
+  }
+
+
+
+
+
+
+
 }
 export default {
   timeFormatting, formatDate, getPhoneModel, toWeiXinLogin, priceStr, replaceUrlMerchantId

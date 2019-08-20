@@ -4,10 +4,18 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
+  base: '/f/q/'+ window.infoData.merchantId + '.html/',
+  //base: '/f/q/281.html/',
   routes: [
     {
       path: '/',
       meta: {title: '会员特权',keepAlive:false},
+      component: () => import(/* webpackChunkName: "member" */ '../views/member/member.vue')
+    },
+    {
+      path: '*',
+      meta: {title: '404',keepAlive:false},
       component: () => import(/* webpackChunkName: "member" */ '../views/member/member.vue')
     },
     {

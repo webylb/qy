@@ -139,8 +139,8 @@
         exchangeErrOpen: false,
         chargeErrText: '',
         isPaying: true,
-        shareUrl: location.href.split('#')[0],
-        shareLink:  window.location.href.split("#")[0]+'?#'+window.location.href.split("#")[1],  //分享出去的链接
+        shareUrl: location.href,
+        shareLink:  window.location.href,  //分享出去的链接
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
@@ -156,13 +156,6 @@
         this.showHeader=false
         this.menmbersStyle = "top:0rem"
       } else {
-        let config = {};
-        config.url = window.location.href;
-        // 判断当前url是否存在?参数匹配符
-        if(!config.url.match(/\?/)) {
-          location.replace(window.location.href.split('#')[0] + '?' + window.location.hash);
-          return ;
-        }
         this.showHeader=false
         this.menmbersStyle = "top:0rem"
       }
@@ -269,7 +262,7 @@
         }else{
           data = this.vipTypeDefaultId
         }
-        let returnUrl = window.location.href.split("#")[0]+'?#'+ this.$route.path + '?month='+data
+        let returnUrl = window.location.href.split(".html")[0]+'.html'+ this.$route.path + '?month='+data
         core.vipPackagePay({cardType: data,returnUrl:returnUrl}).then(res => {
           //console.log(res)
           if(res.code && '00' == res.code){
@@ -284,7 +277,7 @@
               var reg = /guijitech.com/gi;
               let url = res.url
               if(reg.test(url)){
-                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href.split("#")[0]+'?#'+ this.$route.path)
+                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
               }else{
                 window.location.href = res.url
               }
@@ -324,18 +317,14 @@
             if (res.err_msg === 'get_brand_wcpay_request:ok') {
               //that.$toastBox.showToastBox('微信支付成功')
               that.isPaying = true
-              let str = "?" + params.returnUrl.split("#")[1].split("?")[1]
-              function GetQueryString(name){
-                var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
-                var r = str.substr(1).match(reg);
-                if(r!=null)return  unescape(r[2]); return null;
-              }
-              let data = GetQueryString('month')
+
+              let data = params.returnUrl.splice('?month=')[1]
               //wx location 跳不了
-              let returnUrl = window.location.href.split("#")[0]+'?#'+ that.$route.path + '?month='+ data;
-              let nextPage = document.createElement('a');
-              nextPage.setAttribute('href',returnUrl);
-              nextPage.click();
+              this.$router.push({path:'/openMembers', query:{month: data}})
+              // let returnUrl = window.location.href.split(".html")[0]+'.html'+ that.$route.path + '?month='+ data;
+              // let nextPage = document.createElement('a');
+              // nextPage.setAttribute('href',returnUrl);
+              // nextPage.click();
             } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
               //that.$toastBox.showToastBox('用户取消支付')
               that.isPaying = true
@@ -363,7 +352,7 @@
         this.exchangeErrOpen = false
         this.exchangeInput = null
         if(this.okLink){
-          window.location.href = this.okLink + "?referer="+ encodeURIComponent(window.location.href.split("#")[0]+'?#'+ this.$route.path)
+          window.location.href = this.okLink + "?referer="+ encodeURIComponent(window.location.href)
           this.okLink = ''
         }
         window.scrollBy(0,10)

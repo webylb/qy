@@ -120,19 +120,6 @@
     created() {
       document.title = this.$route.meta.title
 
-      //判断是否为微信
-      let ua = navigator.userAgent.toLowerCase();
-      let isWeixin = ua.indexOf('micromessenger') != -1;
-      if (isWeixin) {
-        let config = {};
-        config.url = window.location.href;
-        // 判断当前url是否存在?参数匹配符
-        if(!config.url.match(/\?/)) {
-          location.replace(window.location.href.split('#')[0] + '?' + window.location.hash);
-          return;
-        }
-      }
-
       this.selectObj = { currentPage: this.currentPage, pageSize: this.pageSize}
       this.getAllOrder(this.selectObj)
     },
@@ -164,7 +151,13 @@
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             if(res.url){
-              window.location.href = res.url
+              var reg = /guijitech.com/gi;
+              let url = res.url
+              if(reg.test(url)){
+                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
+              }else{
+                window.location.href = res.url
+              }
             }
           } else {
             this.$toastBox.showToastBox(res.message)
@@ -218,7 +211,7 @@
         }
       },
       toPay(){
-        let returnUrl = window.location.href.split("#")[0]+'#/successPage'
+        let returnUrl = window.location.href.split(".html")[0]+'.html/successPage'
         let data = {orderId: this.querenId, returnUrl: returnUrl}
         core.payOrder(data).then(res => {
           //console.log(res)

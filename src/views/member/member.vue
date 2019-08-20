@@ -53,7 +53,6 @@
                 :title="item.name"
                 @onLoaded="onLoaded"
                 @jumplinkUrl="jumplinkUrl"
-                @toDetail="toDetail"
               ></member-recommend>
             </div>
           </div>
@@ -114,7 +113,7 @@
       document.title = this.$route.meta.title
       if (this.privilegePageUuid) {
         this.loaded = false
-        this.getMemberInfo();
+        this.getMemberInfo()
         this.getNewShopTequan({pageUuid: this.privilegePageUuid})
       } else {
         this.showErrWrap = true
@@ -126,14 +125,11 @@
     methods: {
       jumplinkUrl(url) {
         if (url) {
-          window.location.href = tool.replaceUrlMerchantId(url,this.merchantId)
+          window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
         }
       },
       onLoaded() {
         this.$refs.memberScroll.refresh()
-      },
-      toDetail(url) {
-        window.location.href = url
       },
       goToCouponList() {
         this.$router.push({path: '/myCoupon'})
@@ -170,10 +166,6 @@
             } else {
               this.loaded = true
               this.isMember = false
-            }
-          } else if (res.code && '01' === res.code && res.isLogin == 'false') {
-            if (res.url) {
-              window.location.href = res.url
             }
           } else {
             this.$toastBox.showToastBox(res.message)

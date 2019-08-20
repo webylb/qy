@@ -96,8 +96,8 @@
         providerId: null,
         outItemNo: null,
         isPaying: true,
-        shareUrl: location.href.split('#')[0],
-        shareLink:  window.location.href.split("#")[0]+'#'+window.location.href.split("#")[1],  //分享出去的链接
+        shareUrl: location.href,
+        shareLink:  window.location.href,  //分享出去的链接
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
@@ -208,7 +208,7 @@
       },
       toPlay(){
         let data  = {}
-        data.returnUrl = window.location.href.split("#")[0]+'#/successPage'
+        data.returnUrl = window.location.href.split(".html")[0]+'.html/successPage'
         data.skuId = this.skuId
         data.providerId = this.providerId,
         data.outItemNo = this.outItemNo,
@@ -227,7 +227,7 @@
               var reg = /guijitech.com/gi;
               let url = res.url
               if(reg.test(url)){
-                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href.split("#")[0]+'?#' + window.location.href.split("#")[1])
+                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
               }else{
                 window.location.href = res.url
               }

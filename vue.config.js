@@ -30,12 +30,16 @@ module.exports = {
     https: false, // https:{type:Boolean}
     open: false, //配置自动启动浏览器
     proxy: {
-        '/': {
-            target: 'https://prev-vip.guijitech.com',
-            ws: false,
-            changeOrigin: true
+      '/api': {
+        target: 'https://prev-vip.guijitech.com/',
+        changeOrigin: true,
+        ws: false,
+        pathRewrite: {
+            '^/api': ''
         }
+      }
     }
+
   },
   configureWebpack: config => {
     if (process.env.NODE_ENV === 'production') {

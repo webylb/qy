@@ -77,8 +77,8 @@
         tops: [],
         scrollY: 0,
         listLastHeight:'',
-        shareUrl: location.href.split('#')[0],
-        shareLink:  window.location.href.split("#")[0]+'#'+window.location.href.split("#")[1],  //分享出去的链接
+        shareUrl: location.href,
+        shareLink:  window.location.href,  //分享出去的链接
         shareTitle: '会员特权',  //分享的标题
         shareDesc: '多达100余种会员特权，每年能帮您节省5998元，畅享世界从这里开始！', //分享的详情介绍
         shareImgUrl: 'https://c1.51jujibao.com/static/mkt/2019/05/shareImages/huiyuan.png',
@@ -204,11 +204,11 @@
         if(!event._constructed) {
           //console.log("1",event)
         }
-        //this.$router.push({name:'couponGoods', path:'/couponGoods', params:{itemId: id}})
         if(jumpUrl){
           window.location.href = tool.replaceUrlMerchantId(jumpUrl,this.merchantId)
         }else{
-          window.location.href = window.location.href.split("#")[0] + '?#' + '/couponGoods?itemId='+ id
+          this.$router.push({path:'/couponGoods', query:{itemId: id}})
+          //window.location.href = window.location.href.split("#")[0] + '?#' + '/couponGoods?itemId='+ id
         }
       },
       checkedDefault(){

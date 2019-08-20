@@ -101,8 +101,8 @@
         code: null,
         showCallPopup: false,
         isPaying: true,
-        shareUrl: location.href.split('#')[0],
-        shareLink:  window.location.href.split("#")[0]+'#'+window.location.href.split("#")[1],  //分享出去的链接
+        shareUrl: location.href,
+        shareLink:  window.location.href,  //分享出去的链接
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
@@ -211,7 +211,7 @@
         })
       },
       immediatePay(){
-        window.location.href =  window.location.href.split("#")[0]+'?#/cashier?code=' + this.code
+        this.$router.push({path: '/cashier', query: {code: this.code}})
       },
       toServiceCall(){
         this.showCallPopup = true

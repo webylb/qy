@@ -115,6 +115,7 @@
         var url = window.location.href;
         var reg=/referer=(.*?)/gi;
         if(reg.test(url)){
+          //let data = this.$route.query.referer
           let data = window.location.href.split("referer=")[1]
           this.referer = data
         }else{

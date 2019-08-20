@@ -1,5 +1,6 @@
 <template>
   <div class="coupon-bag">
+    111
     <shop-header ref="shopHeader" v-if="showHeader" style="position: absolute;top:0;left: 0;z-index: 999" line-style="background:#fff" :title="title"></shop-header>
     <div :style="couponBagStyle" class="coupon-bag-content" ref="couponBagContent">
       <div class="cont">
@@ -27,7 +28,8 @@
                     <div>
                       <p class="item-name">【{{ i.itemName }}】</p>
                       <p class="sku-name">{{ i.skuName }}</p>
-                      <p class="ticket-name">{{ i.count }}张</p>
+                      <p v-if="exchargeStatus" class="ticket-name">{{ i.count }}张</p>
+                      <p v-else class="ticket-name">共{{ i.count }}张 派发{{ i.giftPackageExpireResetNum }}次</p>
                     </div>
                   </div>
                   <div>
@@ -44,7 +46,8 @@
                       </div>
                       <p class="item-name">【{{ single.itemName }}】</p>
                       <p class="sku-name">{{ single.skuName }}</p>
-                      <p class="ticket-name">{{ single.count }}张</p>
+                      <p v-if="exchargeStatus" class="ticket-name">{{ single.count }}张</p>
+                      <p v-else class="ticket-name">共{{ single.count }}张 派发{{ single.giftPackageExpireResetNum }}次</p>
                     </div>
                   </div>
                 </slider>
@@ -56,7 +59,8 @@
                       </div>
                       <p class="item-name">【{{ single.itemName }}】</p>
                       <p class="sku-name">{{ single.skuName }}</p>
-                      <p class="ticket-name">{{ single.count }}张</p>
+                      <p v-if="exchargeStatus" class="ticket-name">{{ single.count }}张</p>
+                      <p v-else class="ticket-name">共{{ single.count }}张 派发{{ single.giftPackageExpireResetNum }}次</p>
                     </div>
                   </div>
                 </slider>
@@ -283,7 +287,7 @@
 
             const data = res.result.userCategoryDetails
             for(let i = 0, length = data.length; i < length; i++){
-              if(data[i].ticketType == 'DiJiaQuan'){
+              if(data[i].ticketType == 'DiJiaQuan' && data[i].userticketDetails && data[i].userticketDetails.length > 0){
                 if(data[i].showType == 'ShuangHangZhanShi'){
                   data[i].couponList = []
                   for (let j = 0; j < Math.ceil(data[i].userticketDetails.length / 6); j++) {
@@ -318,7 +322,7 @@
       },
       receive(type,id){
         this.activeType = type
-        this.getItemCouponDetail({merchantId: this.merchantId,ticketId: id})
+        this.getItemCouponDetail({merchantId: this.merchantId, ticketId: id, merchantGiftPackageId: this.merchantGiftPackageId})
       },
       getItemCouponDetail(opts){
         core.getItemCouponDetail(opts).then(res => {
@@ -352,7 +356,7 @@
                 var reg = /guijitech.com/gi;
                 let url = res.url
                 if(reg.test(url)){
-                  window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href.split("#")[0]+'?#' + window.location.href.split("#")[1])
+                  window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
                   clearTimeout(timer)
                 }else{
                   window.location.href = res.url
@@ -360,7 +364,7 @@
                 }
               }
             },1000)
-          } else if(res.code && '02' === res.code){
+          } else if(res.code && '100' === res.code){
             this.exchargeInfoOpen = true
             this.exchargeInfoTitle = '温馨提示'
             this.exchargeInfoText = '很遗憾，您还未拥有此券包请前去激活后再使用'
@@ -463,7 +467,7 @@
       sureExcharge(){
         this.exchargeInfoOpen = false
         if(this.okLink){
-          window.location.href = this.okLink + "?referer="+ encodeURIComponent(window.location.href.split("#")[0]+'?#'+ this.$route.path)
+          window.location.href = this.okLink + "?referer="+ encodeURIComponent(window.location.href)
           this.okLink = ''
         }else{
           this.getCouponBagDetail({merchantId: this.merchantId, merchantGiftPackageId: this.merchantGiftPackageId})
@@ -561,11 +565,15 @@
                     font-size 0.813rem
                     color #333333
                     font-weight bold
+                    height auto
+                    padding-top 0.15rem
                   .sku-name
                     font-size 1rem
                     color #f64400
-                    margin 0.5rem 0
+                    margin 0.3rem 0
                     font-weight  bold
+                    height auto
+                    padding 0.1rem 0
                   .ticket-name
                     position absolute
                     bottom 0
@@ -604,6 +612,7 @@
                 img
                   max-width 100%
                   height auto
+                  margin 0 auto
                 p
                   white-space nowrap
                   overflow hidden
@@ -613,11 +622,15 @@
                   color #333333
                   font-weight bold
                   margin-top 0.983rem
+                  height auto
+                  padding-top 0.15rem
                 .sku-name
                   font-size 1rem
                   color #f64400
-                  margin 0.5rem 0
+                  margin 0.35rem 0
                   font-weight  bold
+                  height auto
+                  padding 0.1rem 0
                 .ticket-name
                   font-size 0.875rem
                   color #b78231

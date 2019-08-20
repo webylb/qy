@@ -234,7 +234,7 @@
                 var reg = /guijitech.com/gi;
                 let url = res.url
                 if(reg.test(url)){
-                  window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href.split("#")[0]+'?#' + window.location.href.split("#")[1])
+                  window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
                 }else{
                   window.location.href = res.url
                 }
@@ -288,7 +288,13 @@
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             if(res.url){
-              window.location.href = res.url
+              var reg = /guijitech.com/gi;
+              let url = res.url
+              if(reg.test(url)){
+                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
+              }else{
+                window.location.href = res.url
+              }
             }
           } else {
             this.showLoad = false

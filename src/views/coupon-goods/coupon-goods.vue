@@ -169,31 +169,22 @@
         okText:"到货提醒",
         itemId: null,
         skuId: null,
-        shareUrl: location.href.split('#')[0],
-        shareLink:  window.location.href.split("#")[0]+'#'+window.location.href.split("#")[1],  //分享出去的链接
+        shareUrl: location.href,
+        shareLink:  window.location.href,  //分享出去的链接
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
       }
     },
-    beforeCreate() {
-
-
-    },
     created () {
       document.title = this.$route.meta.title
-
-      let str = "?" + window.location.hash.split("?")[1]
-      function GetQueryString(name){
-        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
-        var r = str.substr(1).match(reg);
-        if(r!=null)return  unescape(r[2]); return null;
+      if(this.$route.query.itemId){
+        this.itemId = this.$route.query.itemId
       }
 
-      this.itemId = GetQueryString('itemId');
-
-      this.skuId = GetQueryString('skuId');
-
+      if(this.$route.query.skuId){
+        this.skuId = this.$route.query.skuId
+      }
       //判断是否为微信
       let ua = navigator.userAgent.toLowerCase();
       let isWeixin = ua.indexOf('micromessenger') != -1;
@@ -201,13 +192,6 @@
         this.showHeader = true
         this.couponGoodsStyle = "top:2.75rem"
       } else {
-        // let config = {};
-        // config.url = window.location.href;
-        // // 判断当前url是否存在?参数匹配符
-        // if(!config.url.match(/\?/)) {
-        //   location.replace(window.location.href.split('#')[0] + '?' + window.location.hash);
-        //   return;
-        // }
         this.showHeader=false
         this.couponGoodsStyle = "top:0rem"
       }
@@ -445,7 +429,7 @@
         }
       },
       toPlay(){
-        let returnUrl = window.location.href.split("#")[0]+'#/successPage'
+        let returnUrl = window.location.href.split("html")[0]+'.html/successPage'
         let data = {}
         if(this.$refs.rechargeInputItem){
           if(this.rechargeNum){
@@ -473,7 +457,7 @@
               var reg = /guijitech.com/gi;
               let url = res.url
               if(reg.test(url)){
-                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href.split("#")[0]+'?#' + window.location.href.split("#")[1])
+                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
               }else{
                 window.location.href = res.url
               }

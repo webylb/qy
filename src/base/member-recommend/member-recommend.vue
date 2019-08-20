@@ -4,7 +4,7 @@
       {{ title }}
     </div>
     <div class="recommend-wrapper">
-      <div @click="toDetail(i.jumpUrl)" v-for="(i,index) in recommendList" :key="index" class="recommend-item-wrapper">
+      <div @click="jumplinkUrl(i.jumpUrl)" v-for="(i,index) in recommendList" :key="index" class="recommend-item-wrapper">
         <div class="img-wrapper">
           <img :src="i.skuCover" alt="">
         </div>
@@ -56,9 +56,6 @@
       },
       jumplinkUrl(url){
         this.$emit('jumplinkUrl', url)
-      },
-      toDetail(url){
-        this.$emit('toDetail', url)
       }
     },
     destroyed() {
