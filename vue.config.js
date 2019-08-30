@@ -63,6 +63,13 @@ module.exports = {
     const types = ['vue-modules', 'vue', 'normal-modules', 'normal']
     //types.forEach(type => addStyleResource(config.module.rule('stylus').oneOf(type)))
     config.resolve.alias.set('@', resolve('src')) // key,value自行定义，比如.set('@@', resolve('src/components'))
+
+    config.module
+      .rule('html-loader')
+      .test(/\.html$/)
+      .use('html-loader')
+      .loader('html-loader')
+      .end()
   }
 }
 
@@ -71,10 +78,11 @@ function addStyleResource(rule) {
     .loader('style-resources-loader')
     .options({
       patterns: [
-        path.resolve(__dirname, 'src/common/styles/variable.styl'), // 需要全局导入
-        path.resolve(__dirname, 'src/common/styles/mixin.styl'),
-        path.resolve(__dirname, 'src/common/styles/reset.styl'),
-        path.resolve(__dirname, 'src/common/styles/base.styl'),
+        path.resolve(__dirname, 'src/common/stylus/variable.styl'), // 需要全局导入
+        path.resolve(__dirname, 'src/common/stylus/mixin.styl'),
+        path.resolve(__dirname, 'src/common/stylus/reset.styl'),
+        path.resolve(__dirname, 'src/common/stylus/base.styl'),
+        path.resolve(__dirname, 'src/common/stylus/iconfont.styl')
       ],
     })
 }

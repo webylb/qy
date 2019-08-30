@@ -8,15 +8,15 @@
           <div class="login-form-item">
             <div class="input-wrap">
               <i class="iconfont left-icon">&#xe615;</i>
-              <input type="number" v-model="phone"  @click.stop="focusInput"  @blur="scrollToTop($event,'phone')" placeholder="请输入手机号" v-on:keyup="check_count($event,'phone')" maxlength="11" />
-              <i class="iconfont right-icon" v-show="showPhoneClose" @click="clearVal('phone')">&#xe641;</i>
+              <input type="number" v-model="phone" ref="phone"  @click="focusInput"  @blur="scrollToTop($event,'phone')" placeholder="请输入手机号" v-on:keyup="check_count($event,'phone')" maxlength="11" />
+              <i class="iconfont right-icon" v-show="showPhoneClose" @click.stop="clearVal('phone')">&#xe641;</i>
             </div>
           </div>
           <div class="login-form-item">
               <div class="input-wrap">
                 <i class="iconfont left-icon">&#xe61e;</i>
-                <input type="number" v-model="code"  @click.stop="focusInput"  @blur="scrollToTop($event,'code')" placeholder="请输入验证码" v-on:keyup="check_count($event,'code')" maxlength="6" />
-                <i class="iconfont right-icon" v-show="showCodeClose" @click="clearVal('code')">&#xe641;</i>
+                <input type="number" v-model="code" ref="code" @click="focusInput"  @blur="scrollToTop($event,'code')" placeholder="请输入验证码" v-on:keyup="check_count($event,'code')" maxlength="6" @input="changeSize()" />
+                <i class="iconfont right-icon" v-show="showCodeClose" @click.stop="clearVal('code')">&#xe641;</i>
               </div>
               <div class="input-btn">
                 <button type="button" @click="getCode">{{ btnText }}</button>
@@ -27,10 +27,11 @@
             <button type="button" @click="subLogin" :class="[classActive ? 'sub-active' : '']">登录</button>
           </div>
         </div>
-        <p class="customer-service">
-          客服电话: <a href="tel:4006680091">4006680091</a>
-        </p>
+
       </div>
+      <p class="customer-service">
+        客服电话: <a href="tel:4006680091">4006680091</a>
+      </p>
     </div>
     <loading v-show="showLoad" style="padding-top: 50%"></loading>
   </div>
@@ -59,8 +60,8 @@
         showHeader: false,
         title: "",
         loginStyle: "",
-        phone: null,
-        code: null,
+        phone: '',
+        code: '',
         btnText: "获取验证码",
         showPhoneClose: false,
         showCodeClose: false,
@@ -124,19 +125,20 @@
       },
       focusInput(e){
         e.target.focus()
+        let hrt = this.$refs.loginContent.offsetHeight
+        this.$refs.loginContent.style.height = hrt + 'px'
       },
       scrollToTop(event,type){
-        window.scrollBy(0,1)
-
-        this.showPhoneClose = false
-        this.showCodeClose = false
+        window.scrollBy(0,5)
       },
       check_count(event,type) {
         let value = event.target.value;
         if(value.length > 1){
           if(type == 'phone'){
             this.showPhoneClose = true
+            this.showCodeClose = false
           }else{
+            this.showPhoneClose = false
             this.showCodeClose = true
           }
         }else{
@@ -149,11 +151,18 @@
       },
       clearVal(type){
         if(type == 'phone'){
-          this.phone = null
+          this.phone = ''
           this.showPhoneClose = false
         }else{
-          this.code = null
+          this.code = ''
           this.showCodeClose = false
+        }
+      },
+      changeSize(){
+        // 要做长度判断
+        if (this.$refs.code.value.length > 6) {
+          this.$refs.code.value = this.$refs.code.value.slice(0, 6)
+          this.code = this.$refs.code.value
         }
       },
       getCode(){
@@ -187,6 +196,7 @@
               this.$toastBox.showToastBox(res.message)
               clearInterval(this.timer)
               this.btnText = "重新获取"
+              window.scrollBy(0,5)
             }
           }).catch(err=>{
             this.pengding = true
@@ -260,7 +270,6 @@
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   .login
     background-color #fff
-
     .login-Content
       position fixed
       left 0
@@ -291,12 +300,14 @@
               position relative
               input
                 height 100%
+                width 100%
                 text-indent 1.844rem
                 outline none
                 border none
                 font-size 0.938rem
-                width 100%
+                flex 1
               .left-icon
+                display block
                 position absolute
                 left 0
                 top 50%
@@ -304,13 +315,22 @@
                 font-size 1.2rem
                 color #aaaaaa
               .right-icon
-                extend-click()
+                display block
                 position absolute
                 right 0
                 top 50%
                 transform translateY(-50%)
                 font-size 1rem
                 color #dddddd
+                z-index 10
+                cursor pointer
+                &:before
+                  content ''
+                  position absolute
+                  top -10px
+                  left -10px
+                  right -10px
+                  bottom -10px
 
             .input-btn
               width 5rem
@@ -353,35 +373,35 @@
             .sub-active
               background-color #1890ff
 
-        .customer-service
-          position absolute
-          bottom 1.25rem
-          left 50%
-          transform translateX(-50%)
-          width 9.1rem
-          font-size 0.75rem
-          line-height 1.375rem
-          letter-spacing 0rem
-          color #999999
-          text-align center
-          &::before
-            content ''
-            position absolute
-            left -2.6rem
-            top 50%
-            transform translateY(-50%) scaleY(0.5)
-            height 1px
-            background #999999
-            width 2.6rem
-          &::after
-            content ''
-            position absolute
-            right -2.6rem
-            top 50%
-            transform translateY(-50%) scaleY(0.5)
-            height 1px
-            background #999999
-            width 2.6rem
+  .customer-service
+    position absolute
+    bottom 1.25rem
+    left 50%
+    transform translateX(-50%)
+    width 9.1rem
+    font-size 0.75rem
+    line-height 1.375rem
+    letter-spacing 0rem
+    color #999999
+    text-align center
+    &::before
+      content ''
+      position absolute
+      left -2.6rem
+      top 50%
+      transform translateY(-50%) scaleY(0.5)
+      height 1px
+      background #999999
+      width 2.6rem
+    &::after
+      content ''
+      position absolute
+      right -2.6rem
+      top 50%
+      transform translateY(-50%) scaleY(0.5)
+      height 1px
+      background #999999
+      width 2.6rem
 // 改变placeholder
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
   color:  #c2c2c2;

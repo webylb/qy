@@ -429,7 +429,7 @@
         }
       },
       toPlay(){
-        let returnUrl = window.location.href.split("html")[0]+'.html/successPage'
+        let returnUrl = window.location.href.split(".html")[0]+'.html/successPage'
         let data = {}
         if(this.$refs.rechargeInputItem){
           if(this.rechargeNum){
@@ -454,9 +454,9 @@
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             this.isPaying = true
             if(res.url){
-              var reg = /guijitech.com/gi;
+              let regIndex = /^\//gi;
               let url = res.url
-              if(reg.test(url)){
+              if(regIndex.test(url)){
                 window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
               }else{
                 window.location.href = res.url

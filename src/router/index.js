@@ -5,8 +5,8 @@ Vue.use(Router)
 
 export default new Router({
   mode: 'history',
-  base: '/f/q/'+ window.infoData.merchantId + '.html/',
-  //base: '/f/q/281.html/',
+  // base: '/f/q/'+ window.infoData.merchantId + '.html/',
+  base: '/f/q/281.html/',
   routes: [
     {
       path: '/',
@@ -15,8 +15,8 @@ export default new Router({
     },
     {
       path: '*',
-      meta: {title: '404',keepAlive:false},
-      component: () => import(/* webpackChunkName: "member" */ '../views/member/member.vue')
+      meta: {title: '页面找不到'},
+      component: () => import(/* webpackChunkName: "errPage" */ '../views/err-page/404.vue')
     },
     {
       path: '/login',

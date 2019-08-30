@@ -33,12 +33,12 @@ function formatNumber(n) {
 }
 
 const formatDate = function(date, type) {
-  var date = new Date(date)
-  var year = date.getFullYear()
+  var date  = new Date(date)
+  var year  = date.getFullYear()
   var month = date.getMonth() + 1
-  var day = date.getDate()
+  var day   = date.getDate()
 
-  var hour = date.getHours()
+  var hour   = date.getHours()
   var minute = date.getMinutes()
   var second = date.getSeconds()
 
@@ -82,27 +82,32 @@ const priceStr = function (tb,rmb) {
     return txt
 };
 
+/**
+ * @Description: 处理旧版本后台配置链接
+ * @param {String}: url 链接
+ * @param {Number}: id 商户号
+ * @return {String}: url
+ */
 const replaceUrlMerchantId = function(url,id){
   let reg = /{merchantId}/gi;
-  if(reg.test(url)){
-    return url.replace(reg,id)
+  if(reg.test(url)){ //判断是不是承接页
+    return url.replace(reg, id)
   }else{
-    let reg1 = /\?#\//gi;
-    let reg2 = /#\//gi;
-    if(reg1.test(url)){
-      return url.replace(reg1,'/')
-    }else if(reg2.test(url)){
-      return url.replace(reg2,'/')
-    }else{
+    let regIndex = /^\//gi;
+    if(regIndex.test(url)){ //判断是不是相对路径
       return url
+    }else{ //绝对路径
+      let reg1 = /\?#\//gi;
+      let reg2 = /#\//gi;
+      if(reg1.test(url)){ //兼容hash模式的支付链接
+        return url.replace(reg1, '/')
+      }else if(reg2.test(url)){ //兼容hash模式普通链接
+        return url.replace(reg2, '/')
+      }else{
+        return url
+      }
     }
   }
-
-
-
-
-
-
 
 }
 export default {

@@ -208,7 +208,6 @@
           window.location.href = tool.replaceUrlMerchantId(jumpUrl,this.merchantId)
         }else{
           this.$router.push({path:'/couponGoods', query:{itemId: id}})
-          //window.location.href = window.location.href.split("#")[0] + '?#' + '/couponGoods?itemId='+ id
         }
       },
       checkedDefault(){

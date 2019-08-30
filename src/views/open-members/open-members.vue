@@ -274,9 +274,9 @@
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             if(res.url){
-              var reg = /guijitech.com/gi;
+              let regIndex = /^\//gi;
               let url = res.url
-              if(reg.test(url)){
+              if(regIndex.test(url)){
                 window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
               }else{
                 window.location.href = res.url
@@ -383,9 +383,9 @@
               }
             } else if(res.code && '01' === res.code && res.isLogin == 'false'){
               if(res.url){
-                var reg = /guijitech.com/gi;
+                let regIndex = /^\//gi;
                 let url = res.url
-                if(reg.test(url)){
+                if(regIndex.test(url)){
                   this.okLink = res.url
                 }else{
                   window.location.href = res.url

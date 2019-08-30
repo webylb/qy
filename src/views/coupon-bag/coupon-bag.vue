@@ -28,8 +28,7 @@
                     <div>
                       <p class="item-name">【{{ i.itemName }}】</p>
                       <p class="sku-name">{{ i.skuName }}</p>
-                      <p v-if="exchargeStatus" class="ticket-name">{{ i.count }}张</p>
-                      <p v-else class="ticket-name">共{{ i.count }}张 派发{{ i.giftPackageExpireResetNum }}次</p>
+                      <p class="ticket-name">{{ i.count }}张</p>
                     </div>
                   </div>
                   <div>
@@ -46,8 +45,7 @@
                       </div>
                       <p class="item-name">【{{ single.itemName }}】</p>
                       <p class="sku-name">{{ single.skuName }}</p>
-                      <p v-if="exchargeStatus" class="ticket-name">{{ single.count }}张</p>
-                      <p v-else class="ticket-name">共{{ single.count }}张 派发{{ single.giftPackageExpireResetNum }}次</p>
+                      <p class="ticket-name">{{ single.count }}张</p>
                     </div>
                   </div>
                 </slider>
@@ -59,8 +57,7 @@
                       </div>
                       <p class="item-name">【{{ single.itemName }}】</p>
                       <p class="sku-name">{{ single.skuName }}</p>
-                      <p v-if="exchargeStatus" class="ticket-name">{{ single.count }}张</p>
-                      <p v-else class="ticket-name">共{{ single.count }}张 派发{{ single.giftPackageExpireResetNum }}次</p>
+                      <p class="ticket-name">{{ single.count }}张</p>
                     </div>
                   </div>
                 </slider>
@@ -100,21 +97,21 @@
             {{ itemCouponDetail.skuName }}
           </div>
         </div>
-        <div class="coupon-bag-toast-sub-title">
+        <div class="coupon-bag-toast-sub-title coupon-bag-toast-sub-title2">
           <div class="title-text">
             {{ itemCouponDetail.ticketName }}
           </div>
         </div>
         <div class="img-list">
           <div v-if="itemCouponDetail.count > 1">
-            <slider class="slider-toast-warp" :loop="false" :auto-play="false">
+            <slider class="slider-toast-warp" :loop="false" :auto-play="false" ref="toastSlider">
               <div class="slider-toast-page" v-for="(item, index) in itemCouponDetail.couponList" :key="index">
-                <div class="slider-toast-item" v-for="(i, index) in item" :key="index">
-                  <div class="default-coupon" :class="[index == useIndex ? 'actice-coupon' : '']">
+                <div class="slider-toast-item" v-for="(i, index2) in item" :key="index2">
+                  <div class="default-coupon" :class="[index2 == useIndex && index == usePageIndex ? 'actice-coupon' : '']">
                     <div class="used" v-if="i.isUsed == 'Y'">
                         <div class="used-text">已使用</div>
                         <div class="used-time">
-                          {{ formatDate(i.expireTime) }}
+                          {{ formatDate(i.useTime) }}
                         </div>
                     </div>
                     <img :src="itemCouponDetail.ticketImageUrl" alt="">
@@ -130,9 +127,9 @@
           </div>
         </div>
         <div class="instructions" v-html="itemCouponDetail.instructions">
-          <p><span>※</span>使用说明</p>
+          <!-- <p><span>※</span>使用说明</p>
           <p>1.本商品使用过后将无法二次使用</p>
-          <p>2.单抵扣券只能购买单个商品，购买过后将在卡券中展示。</p>
+          <p>2.单抵扣券只能购买单个商品，购买过后将在卡券中展示。</p> -->
         </div>
         <div class="use-btn">
           <button  v-if="itemCouponDetail.count > 1" type="button" @click="goUse()">前去使用</button>
@@ -199,6 +196,7 @@
         toastSkuname: '',
         toastTicketName: '',
         useIndex: 0,
+        usePageIndex: 0,
         useCode: null,
         couponBagToast: false,
         showHeader: false,
@@ -325,11 +323,13 @@
         this.getItemCouponDetail({merchantId: this.merchantId, ticketId: id, merchantGiftPackageId: this.merchantGiftPackageId})
       },
       getItemCouponDetail(opts){
+        this.itemCouponDetail = null
         core.getItemCouponDetail(opts).then(res => {
           //console.log(res)
           if(res.code && '00' == res.code){
             const data = res.result
             let activeIndex = 0
+            let pageIndex = 0
             if(data.count > 1 && data.ticketType == 'DiJiaQuan'){
               data.couponList = []
               for (let j = 0; j < Math.ceil(data.recordResults.length / 6); j++) {
@@ -341,21 +341,34 @@
                   activeIndex += 1
                 }
               }
+              if(activeIndex > 6){
+                pageIndex = Math.ceil(activeIndex / 6)
+              }
             }
 
-            this.itemCouponDetail =  data
+            this.itemCouponDetail = data
             this.useIndex = activeIndex
-            this.useCode = data.recordResults[activeIndex].code
+            this.usePageIndex = pageIndex
+            if(data.recordResults[activeIndex]){
+              this.useCode = data.recordResults[activeIndex].code
+            }
             this.openCouponBagToast()
+            if(pageIndex > 1){
+              let timer = null
+              clearTimeout(timer)
+              timer = setTimeout(() => {
+                this.$refs.toastSlider.goToPage(pageIndex)
+              }, 20)
+            }
           } else if(res.code && '01' === res.code && res.isLogin == 'false'){
             this.$toastBox.showToastBox('未登录用户')
             let timer = null
             clearTimeout(timer)
             timer = setTimeout(()=>{
               if(res.url){
-                var reg = /guijitech.com/gi;
+                let regIndex = /^\//gi;
                 let url = res.url
-                if(reg.test(url)){
+                if(regIndex.test(url)){
                   window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
                   clearTimeout(timer)
                 }else{
@@ -372,20 +385,26 @@
             this.$toastBox.showToastBox(res.message)
           }
         }).catch(error => {
+          console.log(error)
           this.$toastBox.showToastBox("网络错误")
         })
       },
       goUse(url){
-        console.log(this.activeType,url)
         if(this.activeType == 'DiJiaQuan'){
           if(this.useCode){
-            this.$router.push({path:"/couponBagGoods",query:{code: this.useCode}})
+            this.$router.push({path:"/couponBagGoods",query:{code: this.useCode, merchantGiftPackageId: this.merchantGiftPackageId}})
           }else{
-            this.$toastBox.showToastBox("网络错误")
+            this.$toastBox.showToastBox("已使用")
           }
         }else{
           if (url) {
-            window.location.href = tool.replaceUrlMerchantId(url,this.merchantId)
+            let reg = /\?/
+            if(reg.test(url)){
+              window.location.href = tool.replaceUrlMerchantId(url + "&code=" + this.useCode, this.merchantId)
+            }else{
+              window.location.href = tool.replaceUrlMerchantId(url + "?code=" + this.useCode, this.merchantId)
+            }
+
           }
         }
       },
@@ -433,10 +452,10 @@
               this.exchargeInput = null
             } else if(res.code && '01' === res.code && res.isLogin == 'false'){
               if(res.url){
-                var reg = /guijitech.com/gi;
+                let regIndex = /^\//gi;
                 let url = res.url
-                if(reg.test(url)){
-                  this.okLink = res.url
+                if(regIndex.test(url)){
+                  window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
                 }else{
                   window.location.href = res.url
                 }
@@ -527,17 +546,18 @@
               height auto
             .top-title
               position absolute
-              left 1.219rem
+              left 1.25rem
               top 50%
               transform translateY(-50%)
-              font-size 1.5rem
+              font-size 1.3125rem
               color #ffffff
+              font-weight 600
 
           .prod-wrap
             min-height 1rem
             padding-top 0.25rem
             .prod-item
-              padding 1.25rem 0.75rem
+              padding 1.25rem 0.938rem
               box-sizing border-box
               border-bottom 0.031rem solid #eeeeee
               display flex
@@ -550,36 +570,41 @@
                 flex 1
                 display flex
                 justify-content flex-start
+                margin-right 0.594rem
                 img
-                  border-radius 0.25rem
-                  max-width 6.969rem
-                  background-color: #e7e7e7
+                  width 4.375rem
+                  height 4.375rem
                   margin-right 0.594rem
                 div
                   position relative
+                  width 9.9rem
                   p
                     white-space nowrap
                     overflow hidden
                     text-overflow ellipsis
                   .item-name
+                    position relative
                     font-size 0.813rem
-                    color #333333
+                    color #666666
                     font-weight bold
                     height auto
-                    padding-top 0.15rem
+                    padding-top 0.281rem
+                    left -0.4rem
                   .sku-name
-                    font-size 1rem
-                    color #f64400
+                    font-size 0.9375rem
+                    color #fea100
                     margin 0.3rem 0
                     font-weight  bold
                     height auto
                     padding 0.1rem 0
+                    line-height 1.2
                   .ticket-name
                     position absolute
-                    bottom 0
+                    bottom 0.219rem
                     left 0
                     font-size 0.875rem
                     color #b78231
+                    padding-top 0.1rem
 
               button
                 min-width 4.5rem
@@ -590,7 +615,6 @@
                 font-size 0.813rem
                 letter-spacing 0.02rem
                 height 1.625rem
-                line-height 1
                 padding 0 0.625rem
                 box-sizing border-box
                 background-color #b78231
@@ -611,7 +635,8 @@
                 text-align center
                 img
                   max-width 100%
-                  height auto
+                  height 4.375rem
+                  width auto
                   margin 0 auto
                 p
                   white-space nowrap
@@ -619,21 +644,23 @@
                   text-overflow ellipsis
                 .item-name
                   font-size 0.813rem
-                  color #333333
+                  color #666666
                   font-weight bold
                   margin-top 0.983rem
                   height auto
                   padding-top 0.15rem
                 .sku-name
-                  font-size 1rem
-                  color #f64400
+                  font-size 0.9375rem
+                  color #fea100
                   margin 0.35rem 0
                   font-weight  bold
                   height auto
                   padding 0.1rem 0
+                  line-height 1.2
                 .ticket-name
                   font-size 0.875rem
                   color #b78231
+                  padding-top 0.1rem
       .customer-service
         width 100%
         padding 0 0.75rem
@@ -654,8 +681,9 @@
     top 0.983rem
     right 0
     background-color #ffffff
-    border-radius 1.125rem 0.125rem 0.125rem 1.125rem
+    border-radius 1.125rem 0 0 1.125rem
     border solid 0.125rem #b78231
+    border-right none
     display flex
     justify-content center
     align-items center
@@ -719,6 +747,7 @@
           background #b78231
         .title-text
           font-size 1rem
+          font-weight bold
           line-height 1.375rem
           letter-spacing 0rem
           color #b78231
@@ -727,8 +756,14 @@
       .coupon-bag-toast-sub-title
         margin-bottom 0.625rem
 
+      .coupon-bag-toast-sub-title2
+        color #999999
+        font-size 0.875rem
+
       .img-list
         margin-top 1.128rem
+        position relative
+        padding 0.5rem 0
         .actice-coupon
           border: solid 0.063rem #feac36;
           span
@@ -742,11 +777,13 @@
         .single-coupon
           margin 0 auto
           text-align center
-          max-width: 6.594rem;
-          height: auto
-          background-color: #e7e7e7;
+          height 4.406rem
+          width 6.594rem
           border-radius: 0.25rem;
           position relative
+          img
+            width auto
+            height 4.406rem
 
         .slider-toast-warp
           .slider-toast-page
@@ -754,20 +791,25 @@
             display flex
             justify-content flex-start
             flex-wrap wrap
-            padding 0 0.75rem
             box-sizing border-box
+            padding 0 0.75rem
             .slider-toast-item
-              width 33.3%
+              margin 0 0.26rem
               margin-bottom 0.9rem
+              height 4.406rem
+              width 6.594rem
               .default-coupon
-                width 6.594rem
-                border-radius: 0.25rem;
+                border-radius 0.25rem
                 margin 0 auto
                 overflow hidden
                 position relative
+                height 4.406rem
+                width 6.594rem
+                text-align center
                 img
-                  width 100%
-                  height auto
+                  width auto
+                  height 4.406rem
+                  margin 0 auto
                 .used
                   position absolute
                   left 0
@@ -802,6 +844,7 @@
               .actice-coupon
                 position relative
                 border: solid 0.063rem #feac36;
+                box-sizing border-box
                 span
                   position absolute
                   right 0.313rem
@@ -815,10 +858,11 @@
         margin-top 1.875rem
         box-sizing border-box
         padding 0 0.75rem
+        text-align left
         p
+          line-height 1.375rem
           text-align left
           font-size 0.938rem
-          line-height 1.438rem
           color #333333
           &:first-child
             font-size 1rem
@@ -912,6 +956,18 @@
       i
         color rgb(188,188,188)
         font-size 1.75rem
+
+
+.instructions >>> p
+  line-height 1.375rem
+  text-align left
+  font-size 1rem
+
+.instructions >>> b
+  font-weight bold !important
+
+.instructions >>> strong
+  font-weight bold
 
 
 

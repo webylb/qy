@@ -106,6 +106,7 @@
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
+        codeStatus: null
       }
     },
     created () {
@@ -125,21 +126,15 @@
         this.$toastBox.showToastBox("礼品CODE出错")
         return;
       }else{
+        this.merchantGiftPackageId = this.$route.query.merchantGiftPackageId
         this.code = this.$route.query.code
       }
       this.getItemCouponSkuDetail()
     },
     mounted(){
-      this.$nextTick(function(){
-        setTimeout(() => {
-          this.initHeight()
-        }, 1000)
-      })
+
     },
     methods: {
-      initHeight(){
-        this.scroll.refresh()
-      },
       priceToFixed(val){
         if(val){
           return (val).toFixed(2)
@@ -201,8 +196,15 @@
 
             this._initScroll()
             this.changeTitle()
-          } else if (res.code && '2' === res.code){
-            this.$router.push('/orderForm')
+          } else if (res.code && '02' === res.code){
+            this.$toastBox.showToastBox(res.message)
+            //this.$router.push('/orderForm')
+            this.codeStatus = 'used'
+            let timer = null
+            clearTimeout(timer)
+            timer = setTimeout(() => {
+              this.$router.push({path: '/couponBag', query:{merchantGiftPackageId: this.merchantGiftPackageId}})
+            }, 1500)
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -211,7 +213,16 @@
         })
       },
       immediatePay(){
-        this.$router.push({path: '/cashier', query: {code: this.code}})
+        if(this.codeStatus == 'used'){
+          this.$toastBox.showToastBox("券码已经使用")
+          let timer = null
+          clearTimeout(timer)
+          timer = setTimeout(() => {
+            this.$router.push({path: '/couponBag', query:{merchantGiftPackageId: this.merchantGiftPackageId}})
+          }, 1500)
+        }else{
+          this.$router.push({path: '/cashier', query: {code: this.code, merchantGiftPackageId: this.merchantGiftPackageId}})
+        }
       },
       toServiceCall(){
         this.showCallPopup = true

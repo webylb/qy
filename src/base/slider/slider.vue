@@ -11,7 +11,7 @@
 
 <script>
   import BScroll from 'better-scroll'
-  import {addClass} from '../../common/js/dom.js'
+  import { addClass } from '../../common/js/dom.js'
   export default {
     data() {
       return {
@@ -73,6 +73,7 @@
     beforeUpdate() {
       setTimeout(() => {
         this._setSliderWidth(true)
+        // this._initDots()
         this.slider.refresh()
       }, 20)//
     },
@@ -126,7 +127,10 @@
           // this.slider.goToPage(pageIndex, 0, 400)// 封装的方法
           this.slider.next() // 直接跳转到下一页，解决最后一页无法跳转bug
         }, this.interval)
-      }
+      },
+      goToPage() {
+        this.slider && this.slider.goToPage.apply(this.slider, arguments)
+      },
     },
     destroyed() {
       clearTimeout(this.timer)

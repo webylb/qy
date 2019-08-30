@@ -53,13 +53,14 @@
         </p>
       </div>
     </div>
+
     <div class="immediate-payment fadeIn" ref="immediatePayment" v-if="prodData">
       <div class="pay-hint">
         <div class="pay-pricetext">还需支付:</div>
         <div class="pay-goodprice"> <span> ¥ </span> {{ priceToFixed(prodData.payPrice) || '--' }}</div>
       </div>
       <div class="pay-btn" @click="immediatePay">
-        特惠购买
+        去支付
       </div>
     </div>
     <loading v-show="showLoad" style="padding-top: 50%"></loading>
@@ -101,6 +102,7 @@
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
+        codeStatus: null
       }
     },
     beforeCreate() {
@@ -119,11 +121,11 @@
         this.showHeader = false
         this.couponGoodsStyle = "top:0rem"
       }
-
       if(!this.$route.query.code){
         this.$toastBox.showToastBox("礼品CODE出错")
         return;
       }else{
+        this.merchantGiftPackageId = this.$route.query.merchantGiftPackageId
         this.code = this.$route.query.code
       }
 
@@ -131,19 +133,9 @@
 
     },
     mounted(){
-      this.$nextTick(function(){
-        setTimeout(() => {
-          this.initHeight()
-        }, 1000)
-      })
-    },
-    watch: {
 
     },
     methods: {
-      initHeight(){
-        this.scroll.refresh()
-      },
       priceToFixed(val){
         if(val){
           return (val).toFixed(2)
@@ -165,7 +157,7 @@
       },
       getItemCouponSkuDetail(){
         core.getItemCouponSkuDetail({code: this.code, merchantId: this.merchantId}).then(res => {
-          console.log(res)
+          //console.log(res)
           if(res.code && '00' == res.code){
             this.showLoad = false
             this.prodData = res.result.qySkuResultList[0]
@@ -174,9 +166,16 @@
             this.skuId = res.result.qySkuResultList[0].id
             this.providerId = res.result.qySkuResultList[0].providerId
             this.outItemNo = res.result.qySkuResultList[0].outItemNo
-            this._initScroll()
-          } else if (res.code && '2' === res.code){
-            this.$router.push('/orderForm')
+            //this._initScroll()
+          } else if (res.code && '02' === res.code){
+            this.$toastBox.showToastBox(res.message)
+            //this.$router.push('/orderForm')
+            this.codeStatus = 'used'
+            let timer = null
+            clearTimeout(timer)
+            timer = setTimeout(() => {
+              this.$router.push({path: '/couponBag', query:{merchantGiftPackageId: this.merchantGiftPackageId}})
+            }, 1500)
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -185,25 +184,34 @@
         })
       },
       _initScroll () {
-        this.$nextTick(()=>{
-          if (!this.scroll) {
-            this.scroll = new BScroll(this.$refs.couponGoodsContent,{
-              probeType: 3,
-              startY: 0,
-              bounce: false,
-              click: true
-            })
-          }else{
-            this.scroll.refresh()
-          }
-        })
+
+        if (!this.scroll) {
+          this.scroll = new BScroll(this.$refs.couponGoodsContent,{
+            probeType: 3,
+            startY: 0,
+            bounce: false,
+            click: true
+          })
+        }else{
+          this.scroll.refresh()
+        }
+
       },
       immediatePay(){
-        if(this.isPaying){
-          this.isPaying = false
-          this.toPlay()
+        if(this.codeStatus == 'used'){
+          this.$toastBox.showToastBox("券码已经使用")
+          let timer = null
+          clearTimeout(timer)
+          timer = setTimeout(() => {
+            this.$router.push({path: '/couponBag', query:{merchantGiftPackageId: this.merchantGiftPackageId}})
+          }, 1500)
         }else{
-          this.$toastBox.showToastBox("请求中...")
+          if(this.isPaying){
+            this.isPaying = false
+            this.toPlay()
+          }else{
+            this.$toastBox.showToastBox("请求中...")
+          }
         }
       },
       toPlay(){
@@ -224,9 +232,9 @@
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             this.isPaying = true
             if(res.url){
-              var reg = /guijitech.com/gi;
+              let regIndex = /^\//gi;
               let url = res.url
-              if(reg.test(url)){
+              if(regIndex.test(url)){
                 window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
               }else{
                 window.location.href = res.url
