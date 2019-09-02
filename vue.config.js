@@ -25,6 +25,7 @@ module.exports = {
   productionSourceMap: false,
 
   devServer: {
+    disableHostCheck: true,
     port: 8089, // 端口号
     host: '0.0.0.0',
     https: false, // https:{type:Boolean}

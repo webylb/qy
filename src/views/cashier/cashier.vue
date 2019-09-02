@@ -102,7 +102,8 @@
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
-        codeStatus: null
+        codeStatus: null,
+        account: null
       }
     },
     beforeCreate() {
@@ -122,11 +123,13 @@
         this.couponGoodsStyle = "top:0rem"
       }
       if(!this.$route.query.code){
-        this.$toastBox.showToastBox("礼品CODE出错")
+        this.$toastBox.showToastBox("无效礼品码")
+        this.$router.push({path: '/couponBag', query:{merchantGiftPackageId: this.merchantGiftPackageId}})
         return;
       }else{
         this.merchantGiftPackageId = this.$route.query.merchantGiftPackageId
         this.code = this.$route.query.code
+        this.account = this.$route.query.account
       }
 
       this.getItemCouponSkuDetail()
@@ -168,7 +171,7 @@
             this.outItemNo = res.result.qySkuResultList[0].outItemNo
             //this._initScroll()
           } else if (res.code && '02' === res.code){
-            this.$toastBox.showToastBox(res.message)
+            //this.$toastBox.showToastBox(res.message)
             //this.$router.push('/orderForm')
             this.codeStatus = 'used'
             let timer = null
@@ -215,12 +218,15 @@
         }
       },
       toPlay(){
-        let data  = {}
-        data.returnUrl = window.location.href.split(".html")[0]+'.html/successPage'
-        data.skuId = this.skuId
+        let data = {}
+        if(this.account){
+          data.account = this.account
+        }
+        data.returnUrl  = window.location.href.split(".html")[0]+'.html/successPage'
+        data.skuId      = this.skuId
         data.providerId = this.providerId,
-        data.outItemNo = this.outItemNo,
-        data.code = this.code
+        data.outItemNo  = this.outItemNo,
+        data.code       = this.code
         core.payItemCouponSkuOrder(data).then(res => {
           if(res.code && '00' == res.code){
             if(res.result.goUrl){

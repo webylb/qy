@@ -20,6 +20,14 @@
             </div>
           </div>
         </div>
+        <div v-if="rechargeType == 1" class="shop-num shop-recharge-wrap">
+          <div class="shop-num-hint">
+            <div class="hint-text">充值账号：</div>
+            <div class="hint-num">
+              <input type="number" v-model="rechargeNum" ref="rechargeInputItem" @click.stop="focusInput"  @blur="scrollToTop" :placeholder="rechargePlaceHolder" v-on:keyup="check_count($event)" maxlength="16" />
+            </div>
+          </div>
+        </div>
         <div class="use-cont-hint">
           <div class="use-time">
             <div class="v-ext">
@@ -106,7 +114,10 @@
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
-        codeStatus: null
+        codeStatus: null,
+        rechargeType: null,
+        rechargeNum: null,
+        rechargePlaceHolder: null
       }
     },
     created () {
@@ -123,7 +134,8 @@
         this.couponGoodsStyle = "top:0rem"
       }
       if(!this.$route.query.code){
-        this.$toastBox.showToastBox("礼品CODE出错")
+        this.$toastBox.showToastBox("无效礼品码")
+        this.$router.go(-1)
         return;
       }else{
         this.merchantGiftPackageId = this.$route.query.merchantGiftPackageId
@@ -142,8 +154,25 @@
           return ''
         }
       },
+      focusInput(e){
+        e.target.focus()
+      },
       scrollToTop(){
         window.scrollBy(0,1)
+      },
+      check_count(event) {
+        let value = event.target.value;
+        //console.log(value)
+        if(value.length > 16){
+          this.$toastBox.showToastBox('最多可输入16位')
+          value = value.slice(0,16)
+        }
+        if (!/^\+?[0-9]*$/.test(value)) {
+          this.$toastBox.showToastBox('请输入正确的账号')
+          event.target.value = null
+        }else{
+          event.target.value = value
+        }
       },
       changeTitle(){
         let head = document.getElementsByTagName('head');
@@ -185,7 +214,6 @@
         core.getItemCouponSkuDetail({code: this.code, merchantId: this.merchantId}).then(res => {
           //console.log(res)
           if(res.code && '00' == res.code){
-            this.showLoad = false
             this.title = res.result.title
             this.swiperList = res.result.qySkuResultList
             this.goodDescript = res.result.content
@@ -193,11 +221,18 @@
             this.skuId = res.result.qySkuResultList[0].id
             this.providerId = res.result.qySkuResultList[0].providerId
             this.outItemNo = res.result.qySkuResultList[0].outItemNo
+            if(res.result.type && res.result.type === "直充"){
+              this.rechargeType = 1
+              this.rechargePlaceHolder = res.result.tips
+            }else{
+              this.rechargeType = 0
+            }
 
+            this.showLoad = false
             this._initScroll()
             this.changeTitle()
           } else if (res.code && '02' === res.code){
-            this.$toastBox.showToastBox(res.message)
+            this.$toastBox.showToastBox("券码已经使用,请到订单中查看")
             //this.$router.push('/orderForm')
             this.codeStatus = 'used'
             let timer = null
@@ -214,14 +249,24 @@
       },
       immediatePay(){
         if(this.codeStatus == 'used'){
-          this.$toastBox.showToastBox("券码已经使用")
+          this.$toastBox.showToastBox("券码已经使用,请到订单中查看")
           let timer = null
           clearTimeout(timer)
           timer = setTimeout(() => {
             this.$router.push({path: '/couponBag', query:{merchantGiftPackageId: this.merchantGiftPackageId}})
           }, 1500)
         }else{
-          this.$router.push({path: '/cashier', query: {code: this.code, merchantGiftPackageId: this.merchantGiftPackageId}})
+          let data = {}
+          if(this.$refs.rechargeInputItem){
+            if(this.rechargeNum){
+              this.$router.push({path: '/cashier', name: 'cashier', query: {code: this.code, merchantGiftPackageId: this.merchantGiftPackageId,account:this.rechargeNum}})
+            }else{
+              this.$toastBox.showToastBox("请输入充值账号!")
+              return;
+            }
+          } else {
+            this.$router.push({path: '/cashier', query: {code: this.code, merchantGiftPackageId: this.merchantGiftPackageId}})
+          }
         }
       },
       toServiceCall(){
@@ -347,6 +392,45 @@
                       font-size 0.9rem
                       color #999999
                       transform scale(0.8)
+        .shop-num
+          padding 0 0.75rem
+          box-sizing border-box
+          height 3rem
+          width 100%
+          background #ffffff
+          display flex
+          justify-content space-between
+          align-items center
+          .shop-num-hint
+            display flex
+            align-items center
+            .hint-text
+              font-size 1.063rem
+              color #333
+            .hint-num
+              margin-left 0.75rem
+              font-size 0.75rem
+              color #999
+
+        .shop-recharge-wrap
+          margin 0.5rem 0
+          .shop-num-hint
+            height 100%
+            width 100%
+            .hint-text
+              //width 4.5rem
+            .hint-num
+              height 100%
+              margin-left 0
+              flex 1
+              input
+                -webkit-user-select auto
+                height 100%
+                outline none
+                border none
+                font-size 1.125rem
+                width 100%
+                //font-family 'PingFang SC', 'STHeitiSC-Light', 'Helvetica-Light', arial, sans-serif, 'Droid Sans Fallback'
 
         .use-cont-hint
           padding 0 0.75rem
