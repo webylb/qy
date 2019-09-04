@@ -238,7 +238,7 @@
             let timer = null
             clearTimeout(timer)
             timer = setTimeout(() => {
-              this.$router.push({path: '/couponBag', query:{merchantGiftPackageId: this.merchantGiftPackageId}})
+              this.$router.go(-1)
             }, 1500)
           } else {
             this.$toastBox.showToastBox(res.message)
@@ -253,7 +253,7 @@
           let timer = null
           clearTimeout(timer)
           timer = setTimeout(() => {
-            this.$router.push({path: '/couponBag', query:{merchantGiftPackageId: this.merchantGiftPackageId}})
+            this.$router.go(-1)
           }, 1500)
         }else{
           let data = {}

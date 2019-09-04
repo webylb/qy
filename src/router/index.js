@@ -15,7 +15,7 @@ export default new Router({
     },
     {
       path: '*',
-      meta: {title: '页面找不到'},
+      meta: {title: '页面找不到',keepAlive:true},
       component: () => import(/* webpackChunkName: "errPage" */ '../views/err-page/404.vue')
     },
     {

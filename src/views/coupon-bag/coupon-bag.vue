@@ -1,6 +1,5 @@
 <template>
   <div class="coupon-bag">
-    111
     <shop-header ref="shopHeader" v-if="showHeader" style="position: absolute;top:0;left: 0;z-index: 999" line-style="background:#fff" :title="title"></shop-header>
     <div :style="couponBagStyle" class="coupon-bag-content" ref="couponBagContent">
       <div class="cont">

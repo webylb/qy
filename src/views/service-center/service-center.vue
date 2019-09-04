@@ -165,7 +165,7 @@
                 this.scrollY = Math.abs(pos.y)
               })
 
-              this.servicesScroll.once('refresh', (pos) => {
+              this.servicesScroll.on('refresh', (pos) => {
                 this.checkedDefault()
               })
 
@@ -174,6 +174,7 @@
 
             }else{
               this.scroll.refresh()
+              this.menuBottomScroll.refresh()
               this.servicesScroll.refresh()
             }
         })
@@ -211,11 +212,12 @@
         }
       },
       checkedDefault(){
-        if(this.$route.query.categoryId && String(this.$route.query.categoryId).length > 0){
+        if(this.$route.query.categoryId && String(this.$route.query.categoryId).length > 0 && this.$route.query.categoryId > 0){
           for(let item in this.serviceMenuList){
             if(this.serviceMenuList[item].id == this.$route.query.categoryId){
               let index = parseInt(item)
               this.clickMenuItem(index,event)
+              this.$router.replace({path:'/serviceCenter',query:{categoryId: 0}})
               return
             }
           }
@@ -256,7 +258,9 @@
       }
     },
     activated(){
-
+      this.scroll.refresh()
+      this.menuBottomScroll.refresh()
+      this.servicesScroll.refresh()
     }
   }
 </script>

@@ -34,8 +34,6 @@ FastClick.prototype.focus = function (targetElement) {
   }
 };
 
-
-
 FastClick.attach(document.body);
 
 //dev数据
@@ -61,7 +59,7 @@ Vue.directive('focus', {
 router.beforeEach((to, from, next) => {
   if (to.path) {
     try {
-      window._hmt.push(['_trackPageview', '/f/q/' + window.infoData.merchantId + '.html' + to.fullPath]);
+      window._hmt && window._hmt.push(['_trackPageview', '/f/q/' + window.infoData.merchantId + '.html' + to.fullPath]);
     } catch (e) {
       console.log(e)
     }

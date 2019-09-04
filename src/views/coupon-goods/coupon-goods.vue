@@ -199,7 +199,7 @@
         this.$toastBox.showToastBox("商品ID出错")
         return;
       }
-      core.vipGoodsDetail({itemId:  this.itemId, merchantId: this.merchantId}).then(res => {
+      core.vipGoodsDetail({itemId: this.itemId, merchantId: this.merchantId}).then(res => {
         //console.log(res)
         if(res.code && '00' == res.code){
 
