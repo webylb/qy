@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div style="padding: 0.5rem 0" class="banner">
-      <slider :is-show-dots="false" class="slider-wrapper" :loop="false" :auto-play="false">
+    <div style="padding: 0.75rem 0" class="banner" v-if="bannerList.length > 0">
+      <slider class="slider-wrapper" :loop="true">
         <div v-for="(item, index) in bannerList" :key="index">
           <a @click.stop="jumplinkUrl(item.jumpUrl)"><img @load="onLoaded" class="needsclick" :src="item.img_url" ></a>
         </div>
@@ -53,5 +53,9 @@
    .banner
       .slider-wrapper
         overflow hidden
+        position relative
+        img
+          width 100%
+          height auto
 </style>
 

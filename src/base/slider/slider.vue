@@ -3,8 +3,11 @@
     <div class="slider-group" ref="sliderGroup">
       <slot></slot>
     </div>
-    <div class="dots" v-show="isShowDots" v-if="dots.length > 1">
+    <div v-if="dotsStyle == 'dot' && dots.length > 1" class="dots" v-show="isShowDots">
       <span class="dot" v-for="(item,index) in dots" :key="index" :class="{active:currentPageIndex === index}"></span>
+    </div>
+    <div v-if="dotsStyle == 'line' && dots.length > 1" class="dots" v-show="isShowDots">
+      <span class="line-dot" v-for="(item,index) in dots" :key="index" :class="{active:currentPageIndex === index}"></span>
     </div>
   </div>
 </template>
@@ -39,6 +42,10 @@
       isShowDots: {
         type: Boolean,
         default: true
+      },
+      dotsStyle: {
+        type: String,
+        default: 'dot'
       }
     },
     mounted() {
@@ -162,20 +169,29 @@
       position absolute
       right 0
       left 0
-      bottom 0.5rem
+      bottom 0.625rem
       text-align center
       font-size 0
       .dot
         display: inline-block
-        margin: 0 4px
-        width: 0.438rem
-        height: 0.438rem
+        margin-right: 0.32rem
+        width: 0.32rem
+        height: 0.32rem
         border-radius: 50%
-        border 1px solid #b78231
-        background: rgba(255,255,255,1)
+        background: rgba(0,0,0,0.1);
+        &:last-child
+          margin-right 0
         &.active
-          width: 0.438rem
-          height: 0.438rem
-          border-radius: 50%
-          background: #b78231
+          background: rgba(255,255,255,1);
+
+      .line-dot
+        display: inline-block
+        margin-right:0.25rem
+        width: 0.5rem
+        height: 0.0625rem
+        background: rgba(221,221,221,1)
+        &:last-child
+          margin-right 0
+        &.active
+          background: rgba(255,46,0,1);
 </style>

@@ -32,25 +32,27 @@
               ></member-banner>
             </div>
             <div v-if="item.moduleType === 'classify'">
+              <member-title :titleText="item.name"></member-title>
               <member-classify
                 :privilegeList="item.configJson.class_entry"
-                :title="item.name"
+                showStyle="single"
                 @onLoaded="onLoaded"
                 @jumplinkUrl="jumplinkUrl"
               ></member-classify>
             </div>
             <div v-if="item.moduleType === 'hotTopic'">
+              <member-title :titleText="item.name"></member-title>
               <member-hot
                 :hotList="item.configJson.hot_entry"
-                :title="item.name"
                 @onLoaded="onLoaded"
                 @jumplinkUrl="jumplinkUrl"
               ></member-hot>
             </div>
             <div v-if="item.moduleType === 'recommend'">
+              <member-title :titleText="item.name"></member-title>
               <member-recommend
                 :recommendList="item.configJson.recommed_entry"
-                :title="item.name"
+                type="single"
                 @onLoaded="onLoaded"
                 @jumplinkUrl="jumplinkUrl"
               ></member-recommend>
@@ -70,6 +72,7 @@
   import Scroll from '../../base/scroll/scroll'
   import Loading from '../../base/loading/loading'
   import MemberHeader from '../../base/member-header/member-header'
+  import MemberTitle from '../../base/member-title/member-title'
   import MemberBanner from '../../base/member-banner/member-banner'
   import MemberClassify from '../../base/member-classify/member-classify'
   import MemberHot from '../../base/member-hot/member-hot'
@@ -83,6 +86,7 @@
       Scroll,
       Loading,
       MemberHeader,
+      MemberTitle,
       MemberBanner,
       MemberClassify,
       MemberHot,
@@ -95,11 +99,7 @@
         privilegePageUuid: window.infoData.privilegePageUuid || '',
         isMember: true,
         loaded: true,
-        saveMoney: 0,
-        useVipCount: 0,
         isHaveFavorite: false,
-        num: 0,
-        progressBarWidth: "width:0%",
         expireTime: '0000-00-00',
         privilegeList: [],
         bannerList: [],
@@ -147,7 +147,9 @@
             if (res.result.data) {
               this.allData = JSON.parse(res.result.data)
             }
-            this.loaded = true
+            this.$nextTick(() => {
+              this.loaded = true
+            })
           } else {
             this.loaded = true
             this.$toastBox.showToastBox(res.message)
@@ -162,10 +164,8 @@
             if (res.result.vipUser) {
               this.isHaveFavorite = res.result.like
               this.expireTime = tool.formatDate(res.result.cardExpireTime, "YYYY-MM-DD")
-              this.loaded = true
             } else {
               this.loaded = true
-              this.isMember = false
             }
           } else {
             this.$toastBox.showToastBox(res.message)

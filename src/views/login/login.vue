@@ -405,15 +405,23 @@
 // 改变placeholder
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
   color:  #c2c2c2;
+  //line-height: 1.2
+  font-size 0.8rem
 }
 :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
   color: #c2c2c2;
+  //line-height: 1.2
+  font-size 0.8rem
 }
 ::-moz-placeholder { /* Mozilla Firefox 19+ */
   color:  #c2c2c2;
+  //line-height: 1.2
+  font-size 0.8rem
 }
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
   color:  #c2c2c2;
+  //line-height: 1.2
+  font-size 0.8rem
 }
 
 @-webkit-keyframes fadeIn {
