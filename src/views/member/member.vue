@@ -58,6 +58,9 @@
               ></member-recommend>
             </div>
           </div>
+          <div>
+            <member-line></member-line>
+          </div>
         </div>
         <loading v-if="!loaded" style="padding-top: 50%"></loading>
       </div>
@@ -77,6 +80,7 @@
   import MemberClassify from '../../base/member-classify/member-classify'
   import MemberHot from '../../base/member-hot/member-hot'
   import MemberRecommend from '../../base/member-recommend/member-recommend'
+  import MemberLine from '../../base/member-line/member-line'
   import * as core from '../../api/member'
   import tool from '../../common/js/util'
 
@@ -90,7 +94,8 @@
       MemberBanner,
       MemberClassify,
       MemberHot,
-      MemberRecommend
+      MemberRecommend,
+      MemberLine
     },
     data() {
       return {

@@ -139,14 +139,20 @@
         .name
           color #333
           font-size 1rem
+          overflow: hidden;
+          text-overflow:ellipsis;
+          white-space: nowrap;
 
         .price
-          margin 0.62rem 0
+          margin 0.75rem 0 0.5rem 0
           color rgba(102,102,102,1)
           font-size: 0.875rem
           line-height 1
           display flex
           align-items center
+          overflow: hidden;
+          text-overflow:ellipsis;
+          white-space: nowrap;
           span:last-child
             font-size: 0.75rem
             margin-left 0.1rem
@@ -232,6 +238,9 @@
           margin 0.25rem 0
           color rgba(102,102,102,1)
           font-size 0.8125rem
+          overflow: hidden;
+          text-overflow:ellipsis;
+          white-space: nowrap;
           span
             display inline-block
             margin-left 0.4rem
@@ -295,6 +304,9 @@
           margin 0.25rem 0
           color rgba(102,102,102,1)
           font-size 0.8125rem
+          overflow: hidden;
+          text-overflow:ellipsis;
+          white-space: nowrap;
           span
             display inline-block
             margin-left 0.4rem

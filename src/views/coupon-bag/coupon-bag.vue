@@ -106,7 +106,7 @@
             <slider class="slider-toast-warp" :loop="false" :auto-play="false" ref="toastSlider">
               <div class="slider-toast-page" v-for="(item, index) in itemCouponDetail.couponList" :key="index">
                 <div class="slider-toast-item" v-for="(i, index2) in item" :key="index2">
-                  <div class="default-coupon" :class="[index2 == useIndex && index == usePageIndex ? 'actice-coupon' : '']">
+                  <div class="default-coupon" :class="[index2 == useIndex && index == usePageIndex ? 'actice-coupon' : '',i.isUsed == 'N' ? '' : 'used-coupon']">
                     <div class="used" v-if="i.isUsed == 'Y'">
                         <div class="used-text">已使用</div>
                         <div class="used-time">
@@ -120,7 +120,13 @@
               </div>
             </slider>
           </div>
-          <div v-else class="single-coupon actice-coupon">
+          <div v-else class="single-coupon" :class="[itemCouponDetail.recordResults[0].isUsed == 'N' ? 'actice-coupon' : 'used-coupon']">
+            <div class="used" v-if="itemCouponDetail.recordResults[0].isUsed == 'Y'">
+                <div class="used-text">已使用</div>
+                <div class="used-time">
+                  {{ formatDate(itemCouponDetail.recordResults[0].useTime) }}
+                </div>
+            </div>
             <img :src="itemCouponDetail.ticketImageUrl" alt="">
             <span></span>
           </div>
@@ -343,6 +349,13 @@
               if(activeIndex > 6){
                 pageIndex = Math.ceil(activeIndex / 6)
               }
+            }else if(data.count == 1 && data.ticketType == 'DiJiaQuan'){
+              if(data.recordResults[0].isUsed == 'Y'){
+                activeIndex = null
+              }else{
+                activeIndex = 0
+              }
+              pageIndex = 1
             }
 
             this.itemCouponDetail = data
@@ -763,6 +776,48 @@
         margin-top 1.128rem
         position relative
         padding 0.5rem 0
+        .single-coupon
+          border: solid 0.063rem #eee;
+          margin 0 auto
+          text-align center
+          height 4.406rem
+          width 6.594rem
+          border-radius: 0.25rem;
+          position relative
+          overflow hidden
+          img
+            width auto
+            height 4.406rem
+          .used
+            position absolute
+            left 0
+            top 0
+            width 100%
+            height 100%
+            z-index 1
+            .used-text
+              position absolute
+              left 50%
+              top 0.469rem
+              width 2.5rem
+              height 2.5rem
+              line-height 2.5rem
+              text-align center
+              transform translateX(-50%)
+              color #fff
+              background rgba(0,0,0,0.5)
+              border-radius 50%
+              font-size 0.688rem
+            .used-time
+              position absolute
+              left 0
+              bottom 0
+              height 1rem
+              line-height 1rem
+              width 100%
+              color #fff
+              background rgba(0,0,0,0.5)
+              font-size  0.625rem
         .actice-coupon
           border: solid 0.063rem #feac36;
           span
@@ -773,17 +828,8 @@
             height 1.156rem
             background url('./images/check.png') no-repeat center
             background-size 100% 100%
-        .single-coupon
-          margin 0 auto
-          text-align center
-          height 4.406rem
-          width 6.594rem
-          border-radius: 0.25rem;
-          position relative
-          img
-            width auto
-            height 4.406rem
-
+        .used-coupon
+          opacity 0.5
         .slider-toast-warp
           .slider-toast-page
             width 100%
@@ -798,6 +844,7 @@
               height 4.406rem
               width 6.594rem
               .default-coupon
+                border: solid 0.063rem #eee;
                 border-radius 0.25rem
                 margin 0 auto
                 overflow hidden

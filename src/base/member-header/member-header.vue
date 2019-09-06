@@ -207,7 +207,7 @@
       min-height 10rem
       border-radius 1.2rem
       box-shadow 0 0.1875rem 0.5rem rgba(49, 46, 54, 0.65)
-
+      overflow hidden
       img
         width 100%
     width 93.6%
