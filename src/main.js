@@ -41,7 +41,7 @@ if(process.env.NODE_ENV === 'development'){
   window.infoData = {
     merchantId: 281,
     merchantName: '汪汪黑卡',
-    privilegePageUuid: '8641a752ac4c40bfa696399d9706b0df',//
+    privilegePageUuid: '77edb035b1c04e2fac1658c7081d1423',//
     openingPageUuid: '',
   }
   // document.cookie = "QY_COOKIE_PASSPORT_NAME="+"\"sessionId=5d4d7a3867bd42a2b50d98202ab80676&userId=113\""

@@ -39,7 +39,7 @@
       },
       showStyle: {
         type: String,
-        default: 'double'
+        default: 'single'
       }
     },
     components: {

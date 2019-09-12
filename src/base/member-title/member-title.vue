@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="padding: 0.74rem" class="title">
-      <p>{{ titleText }}</p>
+      <p :style="{textAlign: textCss}">{{ titleText }}</p>
     </div>
   </div>
 </template>
@@ -14,12 +14,13 @@
       }
     },
     props: {
-      bannerList: {
-        type: Array
-      },
       titleText: {
         type: String
-      }
+      },
+      textCss: {
+        type: String,
+        default: 'left'
+      },
     },
     mounted() {
 

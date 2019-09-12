@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="recommend-wrapper" v-if="type == 'single'">
+    <div class="recommend-wrapper" v-if="type == 'listFile'">
       <div v-for="(i,index) in recommendList" :key="index" class="recommend-item-wrapper">
         <div class="img-wrapper">
           <img :src="i.skuCover" alt="">
@@ -72,7 +72,7 @@
       },
       type: {
         type: String,
-        default: 'single'
+        default: 'listFile'
       }
     },
     mounted() {
@@ -179,7 +179,7 @@
                 margin-left 0.2rem
             img
               width 2rem
-              height 0.75rem
+              height auto
               margin-top 0rem
               margin-left 0.2rem
 
@@ -260,7 +260,7 @@
               margin-left 0.2rem
           img
             width 2rem
-            height 0.75rem
+            height auto
             margin-top 0rem
             margin-left 0.2rem
 
@@ -327,7 +327,7 @@
                 margin-left 0.2rem
             img
               width 2rem
-              height 0.75rem
+              height auto
               margin-top 0rem
               margin-left 0.2rem
 

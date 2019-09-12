@@ -32,16 +32,15 @@
               ></member-banner>
             </div>
             <div v-if="item.moduleType === 'classify'">
-              <member-title :titleText="item.name"></member-title>
+              <!-- <member-title :titleText="item.name"></member-title> -->
               <member-classify
                 :privilegeList="item.configJson.class_entry"
-                showStyle="single"
+                :showStyle="item.configJson.optionsValue"
                 @onLoaded="onLoaded"
                 @jumplinkUrl="jumplinkUrl"
               ></member-classify>
             </div>
             <div v-if="item.moduleType === 'hotTopic'">
-              <member-title :titleText="item.name"></member-title>
               <member-hot
                 :hotList="item.configJson.hot_entry"
                 @onLoaded="onLoaded"
@@ -49,13 +48,15 @@
               ></member-hot>
             </div>
             <div v-if="item.moduleType === 'recommend'">
-              <member-title :titleText="item.name"></member-title>
               <member-recommend
                 :recommendList="item.configJson.recommed_entry"
-                type="single"
+                :type="item.configJson.optionsValue"
                 @onLoaded="onLoaded"
                 @jumplinkUrl="jumplinkUrl"
               ></member-recommend>
+            </div>
+            <div v-if="item.moduleType === 'Top'">
+              <member-title :titleText="item.name" :textCss="item.configJson.optionsValue"></member-title>
             </div>
           </div>
           <div>

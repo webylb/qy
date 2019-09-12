@@ -18,10 +18,10 @@
           <div class="coupon-vaild-date">有效期至 {{ timeFormat(coupondata.expireTime) }}</div>
           <div class="coupon-centent">
             <div>
-              <div v-if="coupondata.card" class="coupon-num">卡号: {{ coupondata.card }}</div>
-              <div v-if="coupondata.card && coupondata.pwd" class="coupon-pwd">密码: {{ coupondata.pwd }}</div>
-              <div v-if="(!coupondata.card) && coupondata.pwd" class="coupon-camilo">卡密: {{ coupondata.pwd }}</div>
-              <div v-if="coupondata.qrCode ? true : false" class="coupon-qrcode">
+              <div v-if="coupondata.card && (!coupondata.qrCode)" class="coupon-num">卡号: {{ coupondata.card }}</div>
+              <div v-if="coupondata.card && coupondata.pwd && (!coupondata.qrCode)" class="coupon-pwd">密码: {{ coupondata.pwd }}</div>
+              <div v-if="(!coupondata.card) && coupondata.pwd && (!coupondata.qrCode)" class="coupon-camilo">卡密: {{ coupondata.pwd }}</div>
+              <div v-if="coupondata.qrCode" class="coupon-qrcode">
                 <span @click="showQrcode(coupondata.qrCode)">点击查看卡券</span>
               </div>
             </div>
