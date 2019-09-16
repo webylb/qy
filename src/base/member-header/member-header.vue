@@ -9,7 +9,7 @@
       </div>
       <div class="unlock" @click="unlockMember">{{ btnText ? btnText : '卡开立享折扣'}}</div>
       <div class="merchantNames-info">
-        <div class="merchantNames-logo" v-if="logo"><img :src="logo" alt=""></div>
+        <div class="merchantNames-logo" v-if="logo"><img :src="logo" alt="logo"></div>
         <p class="merchantNames-name">{{ logoCase }}</p>
       </div>
       <div class="merchantNames-text">
@@ -17,12 +17,12 @@
         <p class="merchantNames-subtitle">{{ subhead }}</p>
       </div>
     </div>
-    <div v-if="isMember" style="width: 100%;height: 1rem"></div>
+    <div v-if="isMember" style="width: 100%;height: 0.25rem"></div>
     <div v-if="isMember" class="member-car">
       <div class="car-bg-img"><img :src="plotBGImage" alt=""></div>
       <dir class="member-title">
         <img src="./images/vip.png" alt="">
-        <span>{{ logoCase ? logoCase : merchantName }}</span>
+        <span>{{ vipName ? vipName : merchantName }}</span>
       </dir>
       <span class="validity">有效期至{{ expireTime }}</span>
       <div class="member-info-wrapper">
@@ -47,6 +47,7 @@
 </template>
 
 <script>
+  import tool from '../../common/js/util'
   export default {
     data() {
       return {
@@ -72,6 +73,10 @@
         default: ''
       },
       plotBGImage: { //大背景
+        type: String,
+        default: ''
+      },
+      vipName: {
         type: String,
         default: ''
       },
@@ -106,6 +111,11 @@
 
     },
     methods: {
+      formatDate(val){
+        if(val){
+          return tool.formatDate(val)
+        }
+      },
       onLoaded(){
         this.$emit('onLoaded')
       },
@@ -133,7 +143,7 @@
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
   .car
-    padding 1rem 0.75rem 0 0.75rem
+    padding 1rem 0.75rem 0.75rem 0.75rem
     position relative
     .car-gb
       width 100%
@@ -203,6 +213,7 @@
         font-size 0.813rem
 
   .member-car
+    padding 0.75rem 0
     .car-bg-img
       min-height 10rem
       border-radius 1.2rem

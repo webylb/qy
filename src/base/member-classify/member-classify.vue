@@ -6,10 +6,10 @@
 
           <div class="item-wrapper" v-for="(item,index) in privilegeListData" :key="index">
             <div class="item" v-for="(i,index) in item" :key="index" @click.stop="jumplinkUrl(i.jumpUrl)">
-              <img :src="i.flag ? i.icon : i.cover" alt="">
+              <img :src="i.icon" alt="">
               <div>
-                <p class="title">{{ i.flag ? i.name : i.title }}</p>
-                <p class="subhead">{{i.flag ? i.subtitle : i.subTitle}}</p>
+                <p class="title">{{ i.title }}</p>
+                <p class="subhead">{{ i.subtitle }}</p>
               </div>
             </div>
           </div>

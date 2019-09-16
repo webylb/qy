@@ -11,6 +11,7 @@
                 :isHaveFavorite="isHaveFavorite"
                 :expireTime="expireTime"
                 :logo="item.configJson.logo"
+                :vipName="item.configJson.vipName"
                 :plotBGImage="item.configJson.plotBGImage"
                 :logoCase="item.configJson.logoCase"
                 :mainTitle="item.configJson.mainTitle"
@@ -56,11 +57,11 @@
               ></member-recommend>
             </div>
             <div v-if="item.moduleType === 'Top'">
-              <member-title :titleText="item.name" :textCss="item.configJson.optionsValue"></member-title>
+              <member-title :titleText="item.configJson.title" :textCss="item.configJson.optionsValue"></member-title>
             </div>
-          </div>
-          <div>
-            <member-line></member-line>
+            <div v-if="item.moduleType === 'line'">
+              <member-line></member-line>
+            </div>
           </div>
         </div>
         <loading v-if="!loaded" style="padding-top: 50%"></loading>
@@ -168,10 +169,11 @@
         core.memberInfo().then(res => {
           if (res.code && '00' === res.code) {
             if (res.result.vipUser) {
+              this.isMember = res.result.vipUser
               this.isHaveFavorite = res.result.like
               this.expireTime = tool.formatDate(res.result.cardExpireTime, "YYYY-MM-DD")
-            } else {
-              this.loaded = true
+            }else{
+              this.isMember = res.result.vipUser
             }
           } else {
             this.$toastBox.showToastBox(res.message)

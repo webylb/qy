@@ -126,9 +126,10 @@
         overflow hidden
         width 7.75rem
         height 5.16rem
+        text-align center
         img
           height 100%
-          width 100%
+          width auto
 
       .info-wrapper
         width 100%
@@ -209,8 +210,9 @@
         height 7.1875rem
         overflow hidden
         position relative
+        text-align center
         img
-          width 100%
+          width atuo
           height 100%
 
       .info-wrapper
@@ -275,8 +277,9 @@
         overflow hidden
         width 100%
         height 14.625rem
+        text-align center
         img
-          width 100%
+          width auto
           height auto
 
       .info-wrapper
