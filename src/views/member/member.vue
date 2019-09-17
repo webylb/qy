@@ -3,7 +3,7 @@
     <scroll ref="memberScroll" class="member-scroll">
       <div>
         <div v-if="loaded" class="main-wrapper">
-          <div v-for="item in allData" :key="item.sort">
+          <div v-for="item in allData" :key="item.uid">
             <div v-if="item.moduleType === 'themes'">
               <member-header
                 :isMember="isMember"

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="recommend-wrapper" v-if="type == 'listFile'">
-      <div v-for="(i,index) in recommendList" :key="index" class="recommend-item-wrapper">
+      <div v-for="(i,index) in recommendList" :key="index" @click="jumplinkUrl(i.jumpUrl)" class="recommend-item-wrapper">
         <div class="img-wrapper">
           <img :src="i.skuCover" alt="">
         </div>
@@ -14,13 +14,13 @@
               <span>¥<span>{{ priceToFixed(i.settlementPrice) }}</span></span>
               <img src="./images/label.png" alt="会员价">
             </span>
-            <button type="button" @click="jumplinkUrl(i.jumpUrl)">购买</button>
+            <button type="button">购买</button>
           </p>
         </div>
       </div>
     </div>
     <div class="recommend-wrapper double-wrap" v-else-if="type == 'double'">
-      <div @click="jumplinkUrl(i.jumpUrl)" v-for="(i,index) in recommendList" :key="index" class="recommend-item-wrapper">
+      <div v-for="(i,index) in recommendList" :key="index" @click="jumplinkUrl(i.jumpUrl)" class="recommend-item-wrapper">
         <div class="img-wrapper">
           <img :src="i.skuCover" alt="">
         </div>
@@ -38,7 +38,7 @@
       </div>
     </div>
     <div class="recommend-wrapper single-big-wrap" v-else-if="type == 'singleBig'">
-      <div v-for="(i,index) in recommendList" :key="index" class="recommend-item-wrapper">
+      <div v-for="(i,index) in recommendList" :key="index" @click="jumplinkUrl(i.jumpUrl)" class="recommend-item-wrapper">
         <div class="img-wrapper">
           <img :src="i.skuCover" alt="">
         </div>
@@ -50,7 +50,7 @@
           <p class="now-price">
             <span class="left"><span>¥<span>{{ priceToFixed(i.settlementPrice) }}</span></span>
             <img src="./images/label.png" alt="会员价"></span>
-            <button type="button" @click="jumplinkUrl(i.jumpUrl)">立即购买</button>
+            <button type="button">立即购买</button>
           </p>
         </div>
       </div>
@@ -134,20 +134,21 @@
       .info-wrapper
         width 100%
         height 100%
-        padding 0.28rem 0 0.28rem 8.45rem
+        padding 0.18rem 0 0.28rem 8.45rem
         box-sizing border-box
 
         .name
-          color #333
+          color rgba(33,33,33,1)
           font-size 1rem
           overflow: hidden;
           text-overflow:ellipsis;
           white-space: nowrap;
+          line-height 1.5
 
         .price
-          margin 0.75rem 0 0.5rem 0
-          color rgba(102,102,102,1)
-          font-size: 0.875rem
+          margin 0.55rem 0 0.5rem 0
+          color #999
+          font-size: 0.8125rem
           line-height 1
           display flex
           align-items center
@@ -202,7 +203,8 @@
     flex-wrap wrap
 
     .recommend-item-wrapper
-      width 10.8125rem
+      // width 10.8125rem
+      width 49.29%
       height auto
 
       .img-wrapper
@@ -238,7 +240,7 @@
 
         .price
           margin 0.25rem 0
-          color rgba(102,102,102,1)
+          color #999
           font-size 0.8125rem
           overflow: hidden;
           text-overflow:ellipsis;
@@ -305,7 +307,7 @@
 
         .price
           margin 0.25rem 0
-          color rgba(102,102,102,1)
+          color #999
           font-size 0.8125rem
           overflow: hidden;
           text-overflow:ellipsis;

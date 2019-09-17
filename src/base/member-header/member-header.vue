@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding: 1rem 0.75rem 0.75rem 0.75rem;">
     <div v-if="!isMember" class="car">
       <div class="car-gb">
         <img @load="onLoaded" :src="plotBGImage" alt="">
@@ -17,7 +17,6 @@
         <p class="merchantNames-subtitle">{{ subhead }}</p>
       </div>
     </div>
-    <div v-if="isMember" style="width: 100%;height: 0.25rem"></div>
     <div v-if="isMember" class="member-car">
       <div class="car-bg-img"><img :src="plotBGImage" alt=""></div>
       <dir class="member-title">
@@ -143,7 +142,7 @@
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
   .car
-    padding 1rem 0.75rem 0.75rem 0.75rem
+    // padding 1rem 0.75rem 0.75rem 0.75rem
     position relative
     .car-gb
       width 100%
@@ -200,8 +199,8 @@
 
     .merchantNames-text
       position absolute
-      left 1.875rem
-      top 2.594rem
+      left 1.125rem
+      top 1.594rem
       display flex
       flex-direction column
       .merchantNames-title
@@ -213,15 +212,14 @@
         font-size 0.813rem
 
   .member-car
-    padding 0.75rem 0
     .car-bg-img
       min-height 10rem
-      border-radius 1.2rem
+      border-radius 0.75rem
       box-shadow 0 0.1875rem 0.5rem rgba(49, 46, 54, 0.65)
       overflow hidden
       img
         width 100%
-    width 93.6%
+    width 100%
     margin 0 auto
     position relative
 
@@ -312,10 +310,9 @@
           margin-right 0.375rem
 
   .my-like
-    width 87.2%
+    margin 0 0.75rem
     height 2.03125rem
     background-color #ecd3a5
-    margin 0 auto
     border-radius 0 0 0.75rem 0.75rem
     box-shadow 0 0.1rem 0.1rem #ecd3a5
     display flex
@@ -327,7 +324,6 @@
     font-size 0.75rem
     color #d59960
     vertical-align middle
-    margin-bottom 0.875rem
     span
       i
         vertical-align baseline

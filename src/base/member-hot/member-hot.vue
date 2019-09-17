@@ -80,7 +80,8 @@
         justify-content space-between
 
         div
-          width 10.8125rem
+          // width 10.8125rem
+          width 49.29%
           overflow hidden
           border-radius 0.25rem
           a
@@ -95,7 +96,8 @@
         justify-content space-between
 
         .left-img
-          width 10.8125rem
+          // width 10.8125rem
+          width 49.29%
           height 8.9375rem
           overflow hidden
           border-radius 0.25rem
@@ -108,11 +110,12 @@
               height 100%
 
         .right-wrap
-          width 10.8125rem
+          // width 10.8125rem
+          width 49.29%
           overflow hidden
 
           div
-            width 10.8125rem
+            width 100%
             height 4.3125rem
             border-radius 0.25rem
             overflow hidden
@@ -131,8 +134,9 @@
         justify-content space-between
 
         div
-          width 10.8125rem
-          height 4.3125rem
+          // width 10.8125rem
+          width 49.29%
+          height 8.9375rem
           overflow hidden
           border-radius 0.25rem
           a
@@ -149,7 +153,8 @@
         justify-content space-between
 
         div
-          width 7.0625rem
+          // width 7.0625rem
+          width 32.50%
           overflow hidden
           border-radius 0.25rem
           a
