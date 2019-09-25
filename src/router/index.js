@@ -5,8 +5,8 @@ Vue.use(Router)
 
 export default new Router({
   mode: 'history',
-  base: '/f/q/'+ window.infoData.merchantId + '.html/',
-  // base: '/f/q/281.html/',
+  // base: '/f/q/'+ window.infoData.merchantId + '.html/',
+  base: '/f/q/281.html/',
   routes: [
     {
       path: '/',
@@ -107,6 +107,27 @@ export default new Router({
       name: 'cashier',
       meta: {title: '收银台',keepAlive:false},
       component: () => import(/* webpackChunkName: "couponBag" */ '@/views/cashier/cashier.vue')
-    }
+    },
+    //优加开通会员
+    {
+      path: '/openMerchantMembers',
+      name: 'openMerchantMembers',
+      meta: {title: '开通会员',keepAlive:false},
+      component: () => import(/* webpackChunkName: "openMembers" */ '@/views/open-merchant-members/open-members.vue')
+    },
+    //新人礼包
+    {
+      path: '/newUserCouponBag',
+      name: 'newUserCouponBag',
+      meta: {title: '新人礼包',keepAlive:false},
+      component: () => import(/* webpackChunkName: "couponBag" */ '@/views/coupon-bag-new-user/coupon-bag.vue')
+    },
+    //vip礼包
+    {
+      path: '/vipUserCouponBag',
+      name: 'vipUserCouponBag',
+      meta: {title: '年卡礼包',keepAlive:false},
+      component: () => import(/* webpackChunkName: "couponBag" */ '@/views/coupon-bag-vip-user/coupon-bag.vue')
+    },
   ]
 })

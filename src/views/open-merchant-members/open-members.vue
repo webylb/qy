@@ -3,12 +3,12 @@
     <shop-header ref="shopHeader" v-if="showHeader" style="position: absolute;top:0;left: 0;z-index: 999" line-style="background:#fff" :title="title"></shop-header>
     <div :style="menmbersStyle" class="menmbersContent" ref="menmbersContent">
       <div class="img-list">
-        <div v-show="hasImg">
+        <div v-if="hasImg">
           <div v-if="allData">
             <img v-for="(i,index) in allData.img" :key="index" :src="i"  alt="" @load="onLoaded">
           </div>
         </div>
-        <div v-show="!hasImg">
+        <div v-else>
           <img src="./images/open-member1.png" alt="" @load="onLoaded">
           <img src="./images/open-member2.png" alt="" @load="onLoaded">
           <img src="./images/open-member3.png" alt="" @load="onLoaded">
@@ -20,36 +20,21 @@
       </div>
     </div>
     <div class="click-subAddVip" ref="immediatePayment">
-      <!-- <button type="button" @click="openServeList">立即开通</button> -->
       <div class="left" @click="openExcharge" v-if="allData.isEnable !== 'N'">兑换码激活</div>
-      <div class="right" @click="openServeList">立即开通</div>
+      <div class="right" @click="immediatePay"  :class="[ vipTypeList && vipTypeList[0].discountMoney ? '' : 'right-center' ]">立即开通
+        <span class="price-wrap" v-if="vipTypeList">
+          <span class="icon">¥</span>
+          <span class="num">{{ vipTypeList[0].salePrice }}</span>/年
+          <span class="old-price" v-if="vipTypeList[0].discountMoney">(<s>原价¥{{ vipTypeList[0].originalPrice }}</s>)
+          </span>
+        </span>
+      </div>
     </div>
-    <div class="addVipWrap fade" v-show="showServeList"></div>
-    <div class="addVip" ref="addVip">
-      <div class="addvip-toast">
-        <div class="addvip-toast-wrap">
-          <div class="addvip-toast-title">
-            <div class="title-text">
-              选择服务类型
-            </div>
-            <div class="title-close" @click="closeServeList">
-              <i class="iconfont">&#xe63a;</i>
-            </div>
-          </div>
-          <div class="addvip-toast-content">
-            <div class="addvip-type-list">
-              <div v-for="(item,index) in vipTypeList" :key="index" class="addvip-item" :class="[index == activeIndex ? 'addvip-item-active' : '']" @click="changeActiveIndex(index,item.cardType)">
-                <div class="center-text">
-                  <div class="center-text-title">{{ item.name }}</div>
-                  <div class="center-text-sp"><span>￥</span>{{ avg(item.salePrice) }}</div>
-                </div>
-              </div>
-            </div>
-            <div class="addvip-excharge-btn">
-              <div class="left" @click="openExcharge" v-if="allData.isEnable !== 'N'">兑换码激活</div>
-              <div class="right" @click="immediatePay">立即开通</div>
-            </div>
-          </div>
+    <div class="open-member-toast" v-show="openMemberToast">
+      <div class="open-toast" @click="immediatePay">
+        <img src="./images/toast.png" alt="">
+        <div class="toast-off" @click.stop="closeToast">
+          <img src="./images/toast-off.png" alt="">
         </div>
       </div>
     </div>
@@ -58,13 +43,16 @@
         <div class="success-open-top">
           <div class="success-open-topImg">
             <p class="success-title">{{ successTitle }}成功</p>
-            <p class="success-month">{{ successMonth }}会员</p>
           </div>
           <div class="success-open-btmImg">
-            <p class="success-mon-info" v-show="!isExcharge">恭喜您成功开通会员</p>
+            <p class="success-mon-info" v-show="!isExcharge">恭喜您成为我们尊贵的会员</p>
             <p class="success-mon-info" style="margin: 2rem 0;" v-show="isExcharge">恭喜您,兑换成功{{ successMonth }}会员</p>
-            <p class="success-text-info" v-show="!isExcharge">开始享受您精彩的会员之旅吧!</p>
-            <p class="success-btnWrap">
+            <p class="success-text-info" v-show="!isExcharge">开启省钱之路吧！</p>
+            <p class="success-btnWrap success-btnGroup" v-show="!isExcharge">
+              <button type="button" class="look-btn" @click="goCouponBag">查看券包</button>
+              <button type="button" class="buy-btn" @click="goBack">购买商品</button>
+            </p>
+            <p class="success-btnWrap" v-show="isExcharge">
               <button type="button" class="success-btn" @click="goBack">立即体验</button>
             </p>
           </div>
@@ -123,7 +111,6 @@
         openingPageUuid: window.infoData.openingPageUuid || '',
         hasImg: true,
         allData: {},
-        showServeList: false,
         showHeader: false,
         backUrl: '',
         vipTypeList: null,
@@ -145,6 +132,7 @@
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
         okLink: null,
+        openMemberToast: false
       }
     },
     created () {
@@ -164,12 +152,17 @@
       }else{
         this.hasImg = false
       }
+      if(this.$route.query.openStatus == 0){
+        this.$toastBox.showToastBox('新人限时优惠已结束,价格恢复原价')
+      }
       //微信分享
       this.getShare();
       //价格列表
       this.getVipPackageList({merchantId: this.merchantId});
       //开通成功返回
-      this.isSuccess()
+      if(this.$route.query.month && this.$route.query.month != 0){
+        this.isSuccess()
+      }
     },
     watch:{
       successOpen(){
@@ -240,6 +233,11 @@
           if(res.code && '00' == res.code){
             this.vipTypeList = res.result
             this.vipTypeDefaultId = res.result[0].cardType
+            if(res.result[0].discountMoney){
+              this.openMemberToast = true
+            }else{
+              this.openMemberToast = false
+            }
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -269,6 +267,9 @@
             if(res.result.goUrl){
               window.location.href = res.result.goUrl
               this.isPaying = true
+            }else{
+              this.$toastBox.showToastBox('支付方式错误')
+              this.isPaying = true
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             if(res.url){
@@ -294,12 +295,11 @@
         let res= (a).toFixed(2)
         return res
       },
-      changeActiveIndex(index,cardType){
-        this.activeIndex = index
-        this.checkType = cardType
-      },
       goBack(){
         this.$router.push('/member')
+      },
+      goCouponBag(){
+
       },
       hideSuccessPopup(){
         this.successOpen = false
@@ -310,11 +310,13 @@
           window.location.href = this.okLink + "?referer="+ encodeURIComponent(window.location.href)
           this.okLink = ''
         }
+        if(this.$route.query.month && this.$route.query.month != 0){
+          this.$router.replace({path:'/openUrpassMembers', query:{month: 0}})
+        }
         window.scrollBy(0,10)
       },
       openExcharge(){
         this.exchangeOpen = true
-        this.closeServeList()
       },
       goExcharge(){
         if(this.exchangeInput){
@@ -369,7 +371,7 @@
       },
       isSuccess(){
         let month = this.$route.query.month
-        if(month){
+        if(month && month != 0){
           this.successTitle = '开通'
           this.isExcharge = false
           this.successOpen = true
@@ -380,22 +382,15 @@
           }else if(month == 'month12'){
             this.successMonth = "十二个月"
           }
+          this.$router.replace({path:'/openUrpassMembers', query:{month: 0}})
         }
-      },
-      openServeList(){
-        this.hideSuccessPopup()
-        this.showServeList = true
-        this.$refs.addVip.style.bottom = "0"
-        this.$refs.addVip.style.transition = "bottom 0.5s ease"
-      },
-      closeServeList(){
-        this.$refs.addVip.style.bottom = "-19.3125rem"
-        this.$refs.addVip.style.transition = "bottom 0.5s ease"
-        this.showServeList = false
       },
       onLoaded(){
         this.scroll.refresh()
       },
+      closeToast() {
+        this.openMemberToast = false
+      }
     }
   }
 </script>
@@ -428,136 +423,25 @@
     width 8.406rem
     height 2.875rem
 
-  // 弹窗遮罩
-  .addVipWrap
+  .open-member-toast
     position fixed
-    left 0
-    top 0
-    right 0
-    bottom 0
-    max-width 750px
-    z-index 100
-    background rgba(0,0,0,.4)
-
-  //底部弹出content
-  .addvip-toast
-    .addvip-toast-wrap
+    bottom 6.81rem
+    left 0.75rem
+    height 4.69rem
+    width 5rem
+    .open-toast
+      width 100%
       height 100%
-      width 100%
-      max-width 750px
-      background #fff
-      border-radius 0.5rem 0.5rem 0rem 0rem
-      padding-top 1.75rem
-      .addvip-toast-title
-        height 1rem
-        padding 0 0.78rem
-        display flex
-        justify-content space-between
-        .title-text
-          font-weight bold
-          -moz-box-shadow:0px 0.25rem 0px #fbf2d9;
-          -webkit-box-shadow:0px 0.25rem 0px #fbf2d9;
-          box-shadow:0px 0.25rem 0px #fbf2d9;
-          background linear-gradient(to bottom, #fff 0%, #fbf2d9 100%);
-        .title-close
-          extend-click()
-          i
-            font-size 0.75rem
-            height 0.75rem
-            width 0.75rem
-            color #cacaca
-      .addvip-toast-content
-        display inline-block
-        position relative
-        text-align center
+      position relative
+      img
         width 100%
-        /*height 13.5625rem*/
-        .addvip-type-list
-          margin-top 1.75rem
-          margin-bottom 2rem
-          padding 0 0.78rem
-          display flex
-          justify-content space-between
-          .addvip-item
-            height 7.8125rem
-            box-sizing border-box
-            width 6.75rem
-            position relative
-            .center-text
-              width 100%
-              height 100%
-              text-align center
-              box-sizing border-box
-              padding-top 2.25rem
-              background url('./images/default.png') no-repeat center
-              background-size 100% 100%
-              .center-text-title
-                color #2d2b32
-                font-size 1.125rem
-                font-weight 600
-                width 100%
-              .center-text-sp
-                color #bf9228
-                font-size 1.875rem
-                width 100%
-                margin-top 0.75rem
-                font-weight 900
-                span
-                  font-size 1rem
-                  font-weight 900
-
-          .addvip-item-active
-            box-shadow: 0rem 0.25rem 0.75rem 0rem rgba(255, 189, 58, 0.4);
-            .center-text
-              background rgba(255, 189, 58, 0.2) url('./images/active.png') no-repeat center
-              background-size 100% 100%
-              .center-text-title
-                color #2d2b32
-              .center-text-sp
-                color #bf9228
-
-        .addvip-excharge-btn
-          width 100%
-          height 3rem
-          line-height 3rem
-          background-color: #2d2b32;
-          display flex
-          .left, .right {
-            flex 1
-            text-align center
-            font-weight bold
-          }
-          .right{
-            background-color #2d2b32
-            color #fcd494
-          }
-          .left{
-            background url("./images/code_btn.png") no-repeat center center
-            background-size 100% 100%
-          }
-
-  //底部弹出定位按钮
-  .addVip
-    position fixed
-    bottom -19.3125rem
-    left 0
-    /*height 19.3125rem*/
-    text-align center
-    width 100%
-    max-width 750px
-    z-index 101
-    button
-      flex 1
-      border none
-      box-sizing border-box
-      background: #2d2b32;
-      width 100%
-      height 3rem
-      line-height 3rem
-      outline none
-      font-size 1.125rem
-      color #fcd494
-      font-weight bold
+        height auto
+      .toast-off
+        position absolute
+        right -0.5rem
+        top -0.28rem
+        width 1.25rem
+        height 1.25rem
 
   .click-subAddVip
     position fixed
@@ -572,17 +456,36 @@
     justify-content flex-start
     line-height 3rem
     .left, .right
-      flex 1
-      text-align center
       font-weight bold
 
     .right
+      width 13.59rem
       background-color #2d2b32
       color #fcd494
+      text-align center
+      // padding-right 1.5rem
+      box-sizing border-box
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      .price-wrap
+        font-size 0.8125rem
+        .icon
+          font-size 0.625rem
+        .num
+          font-size 0.875rem
+        .old-price
+          font-size 0.75rem
+    .right-center
+      text-align center
 
     .left
+      flex 1
+      padding-left 1.5rem
+      box-sizing border-box
       background url("./images/code_btn.png") no-repeat center center
       background-size 100% 100%
+      font-size 1.125rem
 
   .success-open-popup
     position fixed
@@ -601,12 +504,12 @@
       transform translate(-50%,-50%)
       .success-open-top
         width 100%
-        height 19.72rem
+        height 18.469rem
         font-size 0
         .success-open-topImg
           background url('./images/success-open.png') no-repeat center
           background-size 100%,100%
-          height 11.25rem
+          height 8.688rem
           display flex
           flex-direction column
           .success-title
@@ -615,13 +518,7 @@
             text-align center
             margin-bottom 1.3125rem
             font-size 1.125rem
-            margin-top 4.25rem
-            font-weight 600
-          .success-month
-            color rgb(245,217,166)
-            width 100%
-            text-align center
-            font-size 1.5625rem
+            margin-top 4.625rem
             font-weight 600
 
         .success-open-btmImg
@@ -629,30 +526,31 @@
           background -moz-linear-gradient(top, #fae6c6, #f0cd9d)
           background -webkit-gradient(linear,top,from(#fae6c6),to(#f0cd9d))
           background -webkit-linear-gradient(top, #fae6c6, #f0cd9d)
-          height 8.47rem
-          margin-top -2px
+          min-height 8.47rem
+          margin-top -0.0625rem
           display flex
           flex-direction column
           border-bottom-left-radius 0.45rem
           border-bottom-right-radius 0.45rem
+          line-height: 1.438rem;
           .success-mon-info
             width 100%
             text-align center
-            color rgb(45,43,50)
-            margin-bottom 0.75rem
+            color #2d2b32
             font-size 0.9375rem
-            margin-top 1rem
+            margin-top 1.6rem
             font-weight 500
           .success-text-info
-            color rgb(45,43,50)
+            color #2d2b32
             width 100%
             text-align center
             font-size 0.9375rem
             font-weight 500
-            margin-bottom 1.34rem
+            margin-bottom 1.59rem
           .success-btnWrap
             width 18.3125rem
             margin  0 auto
+            margin-bottom 1.5rem
             .success-btn
               width 100%
               height 2.75rem
@@ -665,6 +563,24 @@
               outline none
               border none
               border-radius 0.3125rem
+          .success-btnGroup
+            display flex
+            justify-content center
+            button
+              width: 8.906rem;
+              height: 2.75rem;
+              line-height: 2.75rem;
+              border-radius: 0.313rem;
+              font-size: 1.125rem;
+              outline: none;
+              border: none;
+            .look-btn
+              background-color: #e5b473;
+              color: #975d11;
+            .buy-btn
+              background-color: #2d2b32;
+              color: #f5d9a6;
+              margin-left: 0.5rem;
       .success-open-close
         margin-top 1.25rem
         width 100%

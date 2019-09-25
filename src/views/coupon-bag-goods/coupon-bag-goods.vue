@@ -248,25 +248,16 @@
         })
       },
       immediatePay(){
-        if(this.codeStatus == 'used'){
-          this.$toastBox.showToastBox("券码已经使用,请到订单中查看")
-          let timer = null
-          clearTimeout(timer)
-          timer = setTimeout(() => {
-            this.$router.go(-1)
-          }, 1500)
-        }else{
-          let data = {}
-          if(this.$refs.rechargeInputItem){
-            if(this.rechargeNum){
-              this.$router.push({path: '/cashier', name: 'cashier', query: {code: this.code, merchantGiftPackageId: this.merchantGiftPackageId,account:this.rechargeNum}})
-            }else{
-              this.$toastBox.showToastBox("请输入充值账号!")
-              return;
-            }
-          } else {
-            this.$router.push({path: '/cashier', query: {code: this.code, merchantGiftPackageId: this.merchantGiftPackageId}})
+        let data = {}
+        if(this.$refs.rechargeInputItem){
+          if(this.rechargeNum){
+            this.$router.push({path: '/cashier', name: 'cashier', query: {code: this.code, merchantGiftPackageId: this.merchantGiftPackageId,account:this.rechargeNum}})
+          }else{
+            this.$toastBox.showToastBox("请输入充值账号!")
+            return;
           }
+        } else {
+          this.$router.push({path: '/cashier', query: {code: this.code, merchantGiftPackageId: this.merchantGiftPackageId}})
         }
       },
       toServiceCall(){

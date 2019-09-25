@@ -124,7 +124,7 @@
       }
       if(!this.$route.query.code){
         this.$toastBox.showToastBox("无效礼品码")
-        this.$router.push({path: '/couponBag', query:{merchantGiftPackageId: this.merchantGiftPackageId}})
+        this.$router.go(-1)
         return;
       }else{
         this.merchantGiftPackageId = this.$route.query.merchantGiftPackageId
@@ -177,7 +177,7 @@
             let timer = null
             clearTimeout(timer)
             timer = setTimeout(() => {
-              this.$router.push({path: '/couponBag', query:{merchantGiftPackageId: this.merchantGiftPackageId}})
+              this.$router.go(-1)
             }, 1500)
           } else {
             this.$toastBox.showToastBox(res.message)
@@ -201,20 +201,11 @@
 
       },
       immediatePay(){
-        if(this.codeStatus == 'used'){
-          this.$toastBox.showToastBox("券码已经使用")
-          let timer = null
-          clearTimeout(timer)
-          timer = setTimeout(() => {
-            this.$router.push({path: '/couponBag', query:{merchantGiftPackageId: this.merchantGiftPackageId}})
-          }, 1500)
+        if(this.isPaying){
+          this.isPaying = false
+          this.toPlay()
         }else{
-          if(this.isPaying){
-            this.isPaying = false
-            this.toPlay()
-          }else{
-            this.$toastBox.showToastBox("请求中...")
-          }
+          this.$toastBox.showToastBox("请求中...")
         }
       },
       toPlay(){
@@ -232,8 +223,6 @@
             if(res.result.goUrl){
               window.location.href = res.result.goUrl
               this.isPaying = true
-            }else{
-              this.callWxPay(res.result.weixinOrderInfo);
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             this.isPaying = true
@@ -254,43 +243,6 @@
           this.isPaying = true
           this.$toastBox.showToastBox("网络错误")
         })
-      },
-      callWxPay(params) {
-        if (typeof WeixinJSBridge == "undefined"){
-          if(document.addEventListener){
-            document.addEventListener('WeixinJSBridgeReady', this.jsApiCall(params), false);
-          }else if (document.attachEvent){
-            document.attachEvent('WeixinJSBridgeReady', this.jsApiCall(params));
-            document.attachEvent('onWeixinJSBridgeReady', this.jsApiCall(params));
-          }
-        }else{
-          this.jsApiCall(params);
-        }
-      },
-      jsApiCall(params) {
-        let that = this
-        WeixinJSBridge.invoke('getBrandWCPayRequest', {
-          'appId': params.appId,
-          'timeStamp': String(params.timeStamp),
-          'nonceStr': params.nonceStr,
-          'package': params.package,
-          'signType': params.signType,
-          'paySign': params.paySign
-          },function (res) {
-            //console.log(res)
-            if (res.err_msg === 'get_brand_wcpay_request:ok') {
-              //that.$toastBox.showToastBox('微信支付成功')
-              that.isPaying = true
-              that.$router.push({path:'/successPage'})
-            } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
-              //that.$toastBox.showToastBox('用户取消支付')
-              that.isPaying = true
-            } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
-              //that.$toastBox.showToastBox('网络异常，请重试')
-              that.isPaying = true
-            }
-          }
-        );
       }
     }
   }

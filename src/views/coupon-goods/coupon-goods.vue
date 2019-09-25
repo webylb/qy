@@ -107,6 +107,7 @@
         客服电话：<a href="tel:4006680091" style="letter-spacing: 0rem;color: #ff4800;">4006680091 转 2 </a>（会员权益业务），如有疑问，请致电工作人员。
       </p>
     </popup>
+    <not-vip-popup v-show="notVip" @hidePopup="hidePopup" @openMember="openMember"></not-vip-popup>
   </div>
 </template>
 
@@ -115,6 +116,7 @@
   import ShopHeader from '../../base/shop-header/shop-header'
   import Popup from '../../base/popup/popup'
   import Loading from '../../base/loading/loading'
+  import NotVipPopup from '../../base/notvip-popup/popup'
   import * as core from '../../api/serviceCenter'
   import tool from '../../common/js/util'
   import wxShareMixin from '../../common/js/wxShareMixin'
@@ -123,7 +125,8 @@
     components: {
       ShopHeader,
       Loading,
-      Popup
+      Popup,
+      NotVipPopup
     },
     mixins:[wxShareMixin],
     data () {
@@ -174,6 +177,8 @@
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
+        notVip: false,
+        openVipUrl: ''
       }
     },
     created () {
@@ -240,7 +245,6 @@
           this.initHeight()
         }, 1000)
       })
-      //window.addEventListener('scroll', this.handleScroll)
     },
     watch: {
       activeIndex(newval,oldval){
@@ -284,24 +288,10 @@
       }
     },
     destroyed () {
-      window.removeEventListener('scroll', this.handleScroll)
+
     },
     methods: {
-      handleScroll () {
-        var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
-        //console.log(scrollTop)
-        this.$refs.immediatePayment.style.top = "auto"
-        //this.$refs.immediatePayment.style.bottom = '0'
-      },
       initHeight(){
-        // let winHeight
-        // if (window.innerHeight)
-        // winHeight = window.innerHeight;
-        // else if ((document.body) && (document.body.clientHeight))
-        // winHeight = document.body.clientHeight;
-
-        //this.$refs.immediatePayment.style.top = winHeight - this.$refs.immediatePayment.clientHeight  + 'px';
-
         this.scroll.refresh()
       },
       priceToFixed(val){
@@ -448,8 +438,6 @@
             if(res.result.goUrl){
               window.location.href = res.result.goUrl
               this.isPaying = true
-            }else{
-              this.callWxPay(res.result.weixinOrderInfo);
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             this.isPaying = true
@@ -464,7 +452,7 @@
             }
           }else if(res.code && '02' === res.code) {
             this.isPaying = true
-            this.$router.push("/openMembers")
+            this.notVip = true
           }else if(res.code == 'err_not_enough_stock_out' || res.code == 'err_not_enough_stock'){
             this.stock = 0
             this.showPopup = true
@@ -483,44 +471,6 @@
           this.isPaying = true
           this.$toastBox.showToastBox("网络错误")
         })
-      },
-      callWxPay(params) {
-        if (typeof WeixinJSBridge == "undefined"){
-          if(document.addEventListener){
-            document.addEventListener('WeixinJSBridgeReady', this.jsApiCall(params), false);
-          }else if (document.attachEvent){
-            document.attachEvent('WeixinJSBridgeReady', this.jsApiCall(params));
-            document.attachEvent('onWeixinJSBridgeReady', this.jsApiCall(params));
-          }
-        }else{
-          this.jsApiCall(params);
-        }
-      },
-      jsApiCall(params) {
-        console.log(params)
-        let that = this
-        WeixinJSBridge.invoke('getBrandWCPayRequest', {
-          'appId': params.appId,
-          'timeStamp': String(params.timeStamp),
-          'nonceStr': params.nonceStr,
-          'package': params.package,
-          'signType': params.signType,
-          'paySign': params.paySign
-          },function (res) {
-            console.log(res)
-            if (res.err_msg === 'get_brand_wcpay_request:ok') {
-              //that.$toastBox.showToastBox('微信支付成功')
-              that.isPaying = true
-              that.$router.push({path:'/successPage'})
-            } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
-              //that.$toastBox.showToastBox('用户取消支付')
-              that.isPaying = true
-            } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
-              //that.$toastBox.showToastBox('网络异常，请重试')
-              that.isPaying = true
-            }
-          }
-        );
       },
       checkGoods(index,goodsSku,price,buyLimitModelStr,oldPrice,useExpireTimeLimit,stock,singleBuyAmount,outItemNo,providerId){
         this.activeIndex = index
@@ -615,6 +565,25 @@
       cancel(){
         this.showPopup = false
         this.showCallPopup = false
+      },
+      openMember(){
+        this.goOpenMember()
+      },
+      hidePopup(){
+        this.notVip = false
+      },
+      goOpenMember() {
+        core.getOpenMemberUrl({merchantId: this.merchantId}).then(res => {
+          if(res.code && '00' == res.code){
+            if(res.result){
+              window.location.href = res.result
+            }
+          }else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
       },
       checkedDefault(){
         if(this.skuId && String(this.skuId).length > 0){
@@ -971,7 +940,7 @@
 	            border-radius 0.094rem
           .good-descript-text
             padding-bottom 0.5rem
-            font-size 0.813rem
+            // font-size 0.813rem
             text-align justify
             text-justify newspaper
             word-break normal
