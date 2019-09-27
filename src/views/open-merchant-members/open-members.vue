@@ -273,12 +273,13 @@
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             if(res.url){
-              let regIndex = /^\//gi;
-              let url = res.url
-              if(regIndex.test(url)){
-                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
+              var index = res.url.lastIndexOf("\/");
+              var str = res.url.substring(index, res.url.length);
+              let regIndex = /\?/gi;
+              if(str && regIndex.test(str)){
+                window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
               }else{
-                window.location.href = res.url
+                window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
               }
             }
             this.isPaying = true
@@ -299,7 +300,11 @@
         this.$router.push('/member')
       },
       goCouponBag(){
-
+        if(this.$route.query.merchantGiftPackageId){
+          this.$router.push({path:'/vipUserCouponBag', query:{merchantGiftPackageId: this.$route.query.merchantGiftPackageId}})
+        }else{
+          this.$toastBox.showToastBox('礼包未配置')
+        }
       },
       hideSuccessPopup(){
         this.successOpen = false
@@ -311,7 +316,7 @@
           this.okLink = ''
         }
         if(this.$route.query.month && this.$route.query.month != 0){
-          this.$router.replace({path:'/openUrpassMembers', query:{month: 0}})
+          this.$router.replace({path:'/openMerchantMembers', query:{month: 0,merchantGiftPackageId: this.$route.query.merchantGiftPackageId}})
         }
         window.scrollBy(0,10)
       },
@@ -340,12 +345,13 @@
               }
             } else if(res.code && '01' === res.code && res.isLogin == 'false'){
               if(res.url){
-                let regIndex = /^\//gi;
-                let url = res.url
-                if(regIndex.test(url)){
-                  this.okLink = res.url
+                var index = res.url.lastIndexOf("\/");
+                var str = res.url.substring(index, res.url.length);
+                let regIndex = /\?/gi;
+                if(str && regIndex.test(str)){
+                  window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
                 }else{
-                  window.location.href = res.url
+                  window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
                 }
               }
               this.exchangeOpen = false
@@ -382,7 +388,7 @@
           }else if(month == 'month12'){
             this.successMonth = "十二个月"
           }
-          this.$router.replace({path:'/openUrpassMembers', query:{month: 0}})
+          this.$router.replace({path:'/openMerchantMembers', query:{month: 0,merchantGiftPackageId:this.$route.query.merchantGiftPackageId}})
         }
       },
       onLoaded(){

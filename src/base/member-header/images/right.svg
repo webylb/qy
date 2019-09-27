@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #f1c488;
+        stroke-width: 2px;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path id="箭头_icon" class="cls-1" d="M684.89,363.847l6.364,6.364a1,1,0,0,1-1.414,1.414l-6.364-6.364A1,1,0,1,1,684.89,363.847Zm6.364,6.364a1,1,0,0,1,0,1.414l-6.364,6.364a1,1,0,0,1-1.414-1.414l6.364-6.364A1,1,0,0,1,691.254,370.211Z" transform="translate(-675.375 -358.922)"/>
+</svg>

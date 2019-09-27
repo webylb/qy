@@ -32,8 +32,13 @@
           <span class="member-info-right-icon"><img src="./images/member_order-icon.png" /><span>我的订单</span></span>
         </div>
       </div>
-      <div class="vt-renew" @click="vtRenew">立即续费</div>
-      <div class="merchantNames-info">
+      <div class="vt-renew" :class="[merchantId == '100000' ? 'urp-vt-renew' : '']" @click="vtRenew">
+        <p>立即续费</p>
+      </div>
+      <div class="card-security" v-if="merchantId == '100000'" @click="goCardSecurity">
+        <div>退卡保障<img src="./images/right.svg" alt=""></div>
+      </div>
+      <div class="merchantNames-info" v-if="merchantId != '100000'">
         <div class="merchantNames-logo" v-if="logo"><img :src="logo" alt=""></div>
         <p class="merchantNames-name">{{ logoCase }}</p>
       </div>
@@ -55,6 +60,10 @@
       }
     },
     props: {
+      merchantId: {
+        type: Number,
+        default: 0
+      },
       isMember: {
         type: Boolean,
         default: false
@@ -132,6 +141,9 @@
       },
       toMyLike(){
         this.$emit('toMyLike')
+      },
+      goCardSecurity(){
+        window.location.href = 'https://tb.53kf.com/code/client/10187208/1'
       }
     },
     destroyed() {
@@ -242,15 +254,42 @@
       position absolute
       top 46.35%
       right 3.7%
-      width 18.95%
+      width 4.5rem
       height: 1.375rem;
       background-image: linear-gradient(90deg, #f1c488 0%, #f5dcad 100%);
       border-radius: 0.688rem;
       font-size: 0.813rem;
-      color: #2d2b32;
-      font-weight 600
       text-align center
       line-height 1.375rem
+      p
+        width 9rem
+        height 2.75rem
+        line-height 2.75rem
+        font-size: 1.625rem;
+        font-weight bold
+        color: #2d2b32;
+        transform: scale(0.5);
+        transform-origin:left top;
+    .urp-vt-renew
+      top 3.906rem
+
+    .card-security
+      position absolute
+      top 6.219rem
+      right 3.7%
+      width 4.5rem
+      font-size: 0.75rem;
+      color: #f1c488;
+      text-align center
+      &::before
+        content ''
+        position absolute
+        top -10px
+        left -10px
+        right -10px
+        bottom -10px
+      img
+        width 0.75rem
 
     .merchantNames-info
       position absolute

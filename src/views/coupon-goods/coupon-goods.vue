@@ -204,40 +204,7 @@
         this.$toastBox.showToastBox("商品ID出错")
         return;
       }
-      core.vipGoodsDetail({itemId: this.itemId, merchantId: this.merchantId}).then(res => {
-        //console.log(res)
-        if(res.code && '00' == res.code){
-
-          // this.shareTitle= res.result.title +'特权'
-          // this.shareDesc= this.merchantName +res.result.title
-          // this.shareImgUrl=res.result.cover
-          // this.getShare()
-
-          this.itemId = res.result.id
-          this.swiperList = res.result.qySkuResultList
-          this.title = res.result.title
-          this.goodDescript = res.result.content
-          this.islike = res.result.like
-          if(res.result.type && res.result.type === "直充"){
-            this.rechargeType = 1
-            this.rechargePlaceHolder = res.result.tips
-          }else{
-            this.rechargeType = 0
-          }
-          this.showLoad = false
-          this.$nextTick(() => {
-            if(this.swiperList.length < 1){
-              this.$toastBox.showToastBox("商品信息缺失...")
-              return;
-            }
-            this._initScroll()
-            this.changeTitle()
-            this.checkDefaultSku()
-          })
-        } else {
-          this.$toastBox.showToastBox(res.message)
-        }
-      })
+      this.getPassId({merchantId: this.merchantId})
     },
     mounted(){
       this.$nextTick(function(){
@@ -351,6 +318,68 @@
       onLoaded(){
         //this.scroll.refresh()
       },
+      getPassId(opts){
+        core.getPassId(opts).then(res => {
+          //console.log(res)
+          if (res.code && '00' === res.code) {
+            if (res.result.length > 0) {
+              this.passIdList = res.result
+            }
+            this.getVipGoodsDetail({itemId: this.itemId, merchantId: this.merchantId})
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(e => {
+          this.$toastBox.showToastBox(e)
+        })
+      },
+      getVipGoodsDetail(opts){
+        core.vipGoodsDetail(opts).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            // this.shareTitle= res.result.title +'特权'
+            // this.shareDesc= this.merchantName +res.result.title
+            // this.shareImgUrl=res.result.cover
+            // this.getShare()
+            this.itemId = res.result.id
+
+            if(res.result.qySkuResultList){
+              let data = res.result.qySkuResultList
+              if (this.passIdList){
+                for(let k=0, length3 = this.passIdList.length; k<length3; k++){
+                  for(let j = data.length - 1; j>= 0; j--){
+                    if(data[j].id == this.passIdList[k]){
+                      data.splice(j, 1);
+                    }
+                  }
+                }
+              }
+              this.swiperList = data
+            }
+            this.title = res.result.title
+            this.goodDescript = res.result.content
+            this.islike = res.result.like
+            if(res.result.type && res.result.type === "直充"){
+              this.rechargeType = 1
+              this.rechargePlaceHolder = res.result.tips
+            }else{
+              this.rechargeType = 0
+            }
+            this.showLoad = false
+            this.$nextTick(() => {
+              if(this.swiperList.length < 1){
+                this.$toastBox.showToastBox("商品信息缺失...")
+                return;
+              }
+              this._initScroll()
+              this.changeTitle()
+              this.checkDefaultSku()
+            })
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        })
+      },
       checkDefaultSku(){
         this.goodsSku = this.swiperList[0].id;
         this.goodsPrice = this.swiperList[0].settlementPrice
@@ -442,12 +471,13 @@
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             this.isPaying = true
             if(res.url){
-              let regIndex = /^\//gi;
-              let url = res.url
-              if(regIndex.test(url)){
-                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
+              var index = res.url.lastIndexOf("\/");
+              var str = res.url.substring(index, res.url.length);
+              let regIndex = /\?/gi;
+              if(str && regIndex.test(str)){
+                window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
               }else{
-                window.location.href = res.url
+                window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
               }
             }
           }else if(res.code && '02' === res.code) {

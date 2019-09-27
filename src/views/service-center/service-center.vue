@@ -82,6 +82,7 @@
         shareTitle: '会员特权',  //分享的标题
         shareDesc: '多达100余种会员特权，每年能帮您节省5998元，畅享世界从这里开始！', //分享的详情介绍
         shareImgUrl: 'https://c1.51jujibao.com/static/mkt/2019/05/shareImages/huiyuan.png',
+        passIdList: null //要过滤掉的商品id
       }
     },
     created () {
@@ -97,26 +98,55 @@
         this.showHeader=false
         this.serviceCenterStyle = "top:0rem"
       }
-
-      core.getServiceCenter({merchantId: this.merchantId}).then(res => {
-        this.showLoad = true;
-        this.$nextTick(() => {
-          //console.log(res)
-          if(res.code && '00' == res.code){
-            this.serviceMenuList = res.result
-            this.showLoad = false
-            this._initScroll()
-          } else {
-            this.$toastBox.showToastBox(res.message)
-          }
-        })
-      })
-
+      this.getPassId({merchantId: this.merchantId})
     },
     mounted(){
 
     },
     methods: {
+      getPassId(opts){
+        core.getPassId(opts).then(res => {
+          //console.log(res)
+          if (res.code && '00' === res.code) {
+            if (res.result.length > 0) {
+              this.passIdList = res.result
+            }
+            this.getServideCenterData({merchantId: this.merchantId})
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(e => {
+          this.$toastBox.showToastBox(e)
+        })
+      },
+      getServideCenterData(opts){
+        core.getServiceCenter(opts).then(res => {
+          this.$nextTick(() => {
+            //console.log(res)
+            if(res.code && '00' == res.code){
+              if(res.result){
+                let data = res.result
+                if (this.passIdList){
+                  for(let i=0, length = data.length; i<length; i++){
+                    for(let k=0, length3 = this.passIdList.length; k<length3; k++){
+                      for(let j = data[i].qyItemResultList.length - 1; j>= 0; j--){
+                        if(data[i].qyItemResultList[j].id == this.passIdList[k]){
+                          data[i].qyItemResultList.splice(j, 1);
+                        }
+                      }
+                    }
+                  }
+                }
+                this.serviceMenuList = data
+                this.showLoad = false
+                this._initScroll()
+              }
+            } else {
+              this.$toastBox.showToastBox(res.message)
+            }
+          })
+        })
+      },
       _initScroll () {
         // 创建分类列表的Scroll对象
         this.$nextTick(()=>{
@@ -252,15 +282,15 @@
         this.menuBottomScroll.scrollToElement(li, 200)
       },
       listLastHeight(newval){
-        console.log(newval)
+        //console.log(newval)
         //this.servicesScroll.refresh()
         //this.checkedDefault()
       }
     },
     activated(){
-      this.scroll.refresh()
-      this.menuBottomScroll.refresh()
-      this.servicesScroll.refresh()
+      if(this.scroll) this.scroll.refresh();
+      if(this.menuBottomScroll) this.menuBottomScroll.refresh();
+      if(this.servicesScroll) this.servicesScroll.refresh();
     }
   }
 </script>

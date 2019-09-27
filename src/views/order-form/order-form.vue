@@ -151,12 +151,13 @@
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             if(res.url){
-              let regIndex = /^\//gi;
-              let url = res.url
-              if(regIndex.test(url)){
-                window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
+              var index = res.url.lastIndexOf("\/");
+              var str = res.url.substring(index, res.url.length);
+              let regIndex = /\?/gi;
+              if(str && regIndex.test(str)){
+                window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
               }else{
-                window.location.href = res.url
+                window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
               }
             }
           } else {

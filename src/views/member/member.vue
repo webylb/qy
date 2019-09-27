@@ -6,6 +6,7 @@
           <div v-for="item in allData" :key="item.uid">
             <div v-if="item.moduleType === 'themes'">
               <member-header
+                :merchantId="merchantId"
                 :isMember="isMember"
                 :merchantName="merchantName"
                 :isHaveFavorite="isHaveFavorite"
@@ -137,7 +138,7 @@
       document.title = this.$route.meta.title
       if (this.privilegePageUuid) {
         this.loaded = false
-        this.getMemberInfo()
+        this.getMemberInfo({merchantId: this.merchantId})
         this.getPassId({merchantId: this.merchantId})
       } else {
         this.showErrWrap = true
@@ -189,16 +190,16 @@
               if (this.passIdList){
                 for(let i=0, length = data.length; i<length; i++){
                   if(data[i].moduleType == 'classify' && data[i].configJson.class_entry.length > 0){
-                    for(let j= data[i].configJson.class_entry.length - 1; j>= 0; j--){
-                      for(let k=0, length3 = this.passIdList.length; k<length3; k++){
+                    for(let k=0, length3 = this.passIdList.length; k<length3; k++){
+                      for(let j = data[i].configJson.class_entry.length - 1; j>= 0; j--){
                         if(data[i].configJson.class_entry[j].id == this.passIdList[k]){
-                          data[i].configJson.class_entry.splice(j, 1)
+                          data[i].configJson.class_entry.splice(j, 1);
                         }
                       }
                     }
                   }else if(data[i].moduleType == 'recommend' && data[i].configJson.recommed_entry.length > 0){
-                    for(let j= data[i].configJson.recommed_entry.length - 1; j>= 0; j--){
-                      for(let k=0, length3 = this.passIdList.length; k<length3; k++){
+                    for(let k=0, length3 = this.passIdList.length; k<length3; k++){
+                      for(let j = data[i].configJson.recommed_entry.length - 1; j>= 0; j--){
                         if(data[i].configJson.recommed_entry[j].id == this.passIdList[k]){
                           data[i].configJson.recommed_entry.splice(j, 1)
                         }
@@ -217,11 +218,12 @@
             this.$toastBox.showToastBox(res.message)
           }
         }).catch(e => {
+          console.log(e)
           this.$toastBox.showToastBox(e)
         })
       },
-      getMemberInfo() {
-        core.memberInfo().then(res => {
+      getMemberInfo(opts) {
+        core.memberInfo(opts).then(res => {
           if (res.code && '00' === res.code) {
             if (res.result.vipUser) {
               this.isMember = res.result.vipUser
@@ -237,12 +239,8 @@
                 this.showGiftPopup = false //礼包popup
                 this.showGiftCont = true
               }else{ //未领取新人礼包
-                // this.showGiftPopup = true
-                // this.showGiftCont = false
-                this.$nextTick(() => {
-                  this.showGiftPopup = true
-                  this.showGiftCont = false
-                })
+                this.showGiftPopup = true
+                this.showGiftCont = false
               }
             }else{
               if(res.result.recriveXinShouLiBao){ //已领取新人礼包
@@ -292,12 +290,13 @@
               this.$router.push({path: '/newUserCouponBag', query: {merchantGiftPackageId:this.merchantGiftPackageId, packageConfigId:this.packageConfigId}})
             } else if(res.code && '01' === res.code && res.isLogin == 'false'){
               if(res.url){
-                let regIndex = /^\//gi;
-                let url = res.url
-                if(regIndex.test(url)){
-                  window.location.href = res.url + "?referer=" + encodeURIComponent(window.location.href)
+                var index = res.url.lastIndexOf("\/");
+                var str = res.url.substring(index, res.url.length);
+                let regIndex = /\?/gi;
+                if(str && regIndex.test(str)){
+                  window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
                 }else{
-                  window.location.href = res.url
+                  window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
                 }
               }
             } else {
@@ -344,6 +343,7 @@
       max-width 750px
       margin 0 auto
       background rgba(0, 0, 0, 0.6)
+      z-index: 11;
 
       p
         color #fff
@@ -360,6 +360,7 @@
       bottom 13.75rem
       width 4.875rem
       height 4.875rem
+      z-index: 11;
 
       .gift
         width 100%

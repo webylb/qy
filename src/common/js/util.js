@@ -108,8 +108,21 @@ const replaceUrlMerchantId = function(url,id){
       }
     }
   }
+}
 
+/**
+ * @Description: 处理旧版本后台配置链接
+ * @param {String}: url 链接
+ * @return {String}: url
+ */
+const replaceUrlForUrpass = function(url){
+  let reg = /vip.guijitech.com/gi;
+  if(reg.test(url)){ //判断是不是承接页
+    return url.replace(reg, 'v.urpass.cn')
+  }else{
+    return url
+  }
 }
 export default {
-  timeFormatting, formatDate, getPhoneModel, toWeiXinLogin, priceStr, replaceUrlMerchantId
+  timeFormatting, formatDate, getPhoneModel, toWeiXinLogin, priceStr, replaceUrlMerchantId, replaceUrlForUrpass
 }

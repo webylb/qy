@@ -132,7 +132,14 @@
             this.noGet = res.result
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             if(res.url){
-              window.location.href = res.url
+              var index = res.url.lastIndexOf("\/");
+              var str = res.url.substring(index, res.url.length);
+              let regIndex = /\?/gi;
+              if(str && regIndex.test(str)){
+                window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+              }else{
+                window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+              }
             }
           } else {
             this.$toastBox.showToastBox(res.message)
