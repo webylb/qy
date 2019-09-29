@@ -30,7 +30,7 @@
               <member-banner
                 :bannerList="item.configJson.sub_entry"
                 @onLoaded="onLoaded"
-                @jumplinkUrl="jumplinkUrl"
+                @jumplinkUrl="jumpChecklinkUrl"
               ></member-banner>
             </div>
             <div v-if="item.moduleType === 'classify'">
@@ -79,7 +79,7 @@
         <img src="./images/my-gift.gif" alt="myGift">
       </div>
     </div>
-    <gift-popup v-if="showGiftPopup" @receiveGift="receiveGift" @hidePopup="hidePopup"></gift-popup>
+    <gift-popup v-show="showGiftPopup" @receiveGift="receiveGift" @hidePopup="hidePopup"></gift-popup>
   </div>
 </template>
 
@@ -150,6 +150,27 @@
     methods: {
       jumplinkUrl(url) {
         if (url) {
+          window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+        }
+      },
+      jumpChecklinkUrl(url){
+        if(this.merchantId == '100000'){
+          core.getPassMerchantUser({merchantId: this.merchantId}).then(res => {
+          //console.log(res)
+            if (res.code && '00' === res.code) {
+              if (res.result) {
+                window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+              }else{
+                this.goOpenMember()
+              }
+            } else {
+              this.loaded = true
+              this.$toastBox.showToastBox(res.message)
+            }
+          }).catch(e => {
+            this.$toastBox.showToastBox(e)
+          })
+        }else{
           window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
         }
       },

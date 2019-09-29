@@ -1,6 +1,6 @@
 <template>
   <div class="notvip-popup">
-    <div class="content fade">
+    <div class="content zoomIn">
       <div class="top">
         <p class="btnWrap">
           <button type="button" class="btn" @click.prevent="receiveGift">立即领取</button>
@@ -45,14 +45,17 @@
     right 0
     top 0
     background rgba(0,0,0,0.6)
+    max-width 750px
     z-index 10000
     .content
       min-height 1rem
-      width 20rem
+      width 16.91rem
       position absolute
-      left 50%
-      top 50%
-      transform translate(-50%,-50%)
+      left 3.28rem
+      top 9.84rem
+      // left 50%
+      // top 50%
+      // transform translate(-50%,-50%)
       .top
         width 16.91rem
         height 18.97rem
@@ -63,8 +66,8 @@
         position relative
         .btnWrap
           position absolute
-          left 50%
-          transform translateX(-50%)
+          left 1.89rem
+          //transform translateX(-50%)
           bottom 1rem
           width 13.13rem
           .btn
@@ -88,9 +91,26 @@
           font-size 1.75rem
 
   .fade  {
-    -webkit-animation: fade 2s;
-            animation: fade 2s;
+    -webkit-animation: scale 1s;
+            animation: scale 1s;
   }
+  .zoomIn {
+    -webkit-animation: zoomIn 0.2s;
+            animation: zoomIn 0.2s;
+  }
+
+  @keyframes zoomIn {
+    from {
+      opacity: 0;
+      -webkit-transform: scale3d(0.3, 0.3, 0.3);
+      transform: scale3d(0.3, 0.3, 0.3);
+    }
+
+    50% {
+      opacity: 1;
+    }
+  }
+
 
   @-webkit-keyframes fade {
     from {
@@ -108,6 +128,10 @@
     to {
       opacity 1
     }
+  }
+  @keyframes scale {
+    0% {transform: scale(0.5)}
+    100% {transform: scale(1.0)}
   }
   .fade-enter-active, .fade-leave-active {
     transition: opacity .5s;
