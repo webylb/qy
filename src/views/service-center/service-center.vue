@@ -126,17 +126,17 @@
             if(res.code && '00' == res.code){
               if(res.result){
                 let data = res.result
-                if (this.passIdList){
-                  for(let i=0, length = data.length; i<length; i++){
-                    for(let k=0, length3 = this.passIdList.length; k<length3; k++){
-                      for(let j = data[i].qyItemResultList.length - 1; j>= 0; j--){
-                        if(data[i].qyItemResultList[j].id == this.passIdList[k]){
-                          data[i].qyItemResultList.splice(j, 1);
-                        }
-                      }
-                    }
-                  }
-                }
+                // if (this.passIdList){
+                //   for(let i=0, length = data.length; i<length; i++){
+                //     for(let k=0, length3 = this.passIdList.length; k<length3; k++){
+                //       for(let j = data[i].qyItemResultList.length - 1; j>= 0; j--){
+                //         if(data[i].qyItemResultList[j].id == this.passIdList[k]){
+                //           data[i].qyItemResultList.splice(j, 1);
+                //         }
+                //       }
+                //     }
+                //   }
+                // }
                 this.serviceMenuList = data
                 this.showLoad = false
                 this._initScroll()
