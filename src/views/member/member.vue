@@ -210,15 +210,7 @@
               let data = JSON.parse(res.result.data)
               if (this.passIdList){
                 for(let i=0, length = data.length; i<length; i++){
-                  if(data[i].moduleType == 'classify' && data[i].configJson.class_entry.length > 0){
-                    for(let k=0, length3 = this.passIdList.length; k<length3; k++){
-                      for(let j = data[i].configJson.class_entry.length - 1; j>= 0; j--){
-                        if(data[i].configJson.class_entry[j].id == this.passIdList[k]){
-                          data[i].configJson.class_entry.splice(j, 1);
-                        }
-                      }
-                    }
-                  }else if(data[i].moduleType == 'recommend' && data[i].configJson.recommed_entry.length > 0){
+                  if(data[i].moduleType == 'recommend' && data[i].configJson.recommed_entry.length > 0){
                     for(let k=0, length3 = this.passIdList.length; k<length3; k++){
                       for(let j = data[i].configJson.recommed_entry.length - 1; j>= 0; j--){
                         if(data[i].configJson.recommed_entry[j].id == this.passIdList[k]){
