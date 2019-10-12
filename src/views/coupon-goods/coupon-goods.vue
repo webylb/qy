@@ -1013,6 +1013,8 @@
   padding 0.4rem
   box-sizing border-box
 
+.good-descript-text >>> img
+  vertical-align bottom
 
 .good-descript-text >>> b
   font-weight bold !important
