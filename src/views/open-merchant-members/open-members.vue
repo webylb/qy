@@ -465,7 +465,8 @@
       font-weight bold
 
     .right
-      width 13.59rem
+      flex 1
+      // width 13.59rem
       background-color #2d2b32
       color #fcd494
       text-align center
@@ -486,7 +487,8 @@
       text-align center
 
     .left
-      flex 1
+      // flex 1
+      width 9.84rem
       padding-left 1.5rem
       box-sizing border-box
       background url("./images/code_btn.png") no-repeat center center
