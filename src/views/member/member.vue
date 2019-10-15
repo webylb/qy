@@ -344,7 +344,7 @@
       right 0
       bottom 0
       max-width 750px
-      margin 0 auto
+      // margin 0 auto
       z-index 10
 
     .error-wrap
