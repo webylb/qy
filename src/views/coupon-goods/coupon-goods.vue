@@ -584,7 +584,8 @@
         })
       },
       toServiceCall(){
-        this.showCallPopup = true
+        // this.showCallPopup = true
+        window.location.href = 'https://tb.53kf.com/code/client/10187208/1'
       },
       confirmCall(){
         this.showCallPopup = false
