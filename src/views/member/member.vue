@@ -208,19 +208,19 @@
           if (res.code && '00' === res.code) {
             if (res.result.data) {
               let data = JSON.parse(res.result.data)
-              if (this.passIdList){
-                for(let i=0, length = data.length; i<length; i++){
-                  if(data[i].moduleType == 'recommend' && data[i].configJson.recommed_entry.length > 0){
-                    for(let k=0, length3 = this.passIdList.length; k<length3; k++){
-                      for(let j = data[i].configJson.recommed_entry.length - 1; j>= 0; j--){
-                        if(data[i].configJson.recommed_entry[j].id == this.passIdList[k]){
-                          data[i].configJson.recommed_entry.splice(j, 1)
-                        }
-                      }
-                    }
-                  }
-                }
-              }
+              // if (this.passIdList){
+              //   for(let i=0, length = data.length; i<length; i++){
+              //     if(data[i].moduleType == 'recommend' && data[i].configJson.recommed_entry.length > 0){
+              //       for(let k=0, length3 = this.passIdList.length; k<length3; k++){
+              //         for(let j = data[i].configJson.recommed_entry.length - 1; j>= 0; j--){
+              //           if(data[i].configJson.recommed_entry[j].id == this.passIdList[k]){
+              //             data[i].configJson.recommed_entry.splice(j, 1)
+              //           }
+              //         }
+              //       }
+              //     }
+              //   }
+              // }
               this.allData = data
             }
             this.$nextTick(() => {

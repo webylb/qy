@@ -345,15 +345,15 @@
 
             if(res.result.qySkuResultList){
               let data = res.result.qySkuResultList
-              if (this.passIdList){
-                for(let k=0, length3 = this.passIdList.length; k<length3; k++){
-                  for(let j = data.length - 1; j>= 0; j--){
-                    if(data[j].id == this.passIdList[k]){
-                      data.splice(j, 1);
-                    }
-                  }
-                }
-              }
+              // if (this.passIdList){
+              //   for(let k=0, length3 = this.passIdList.length; k<length3; k++){
+              //     for(let j = data.length - 1; j>= 0; j--){
+              //       if(data[j].id == this.passIdList[k]){
+              //         data.splice(j, 1);
+              //       }
+              //     }
+              //   }
+              // }
               this.swiperList = data
             }
             this.title = res.result.title
