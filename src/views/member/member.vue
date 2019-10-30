@@ -68,6 +68,27 @@
         <loading v-if="!loaded" style="padding-top: 50%"></loading>
       </div>
     </scroll>
+    <div class="float-wrap">
+      <div v-for="item in allData" :key="item.uid">
+        <div v-if="item.moduleType === 'bottomFloat'">
+          <member-btmfloat
+            :title="item.configJson.title"
+            :btnText="item.configJson.btnText"
+            :urlValue="item.configJson.urlSelectOptionsValue || item.configJson.urlInputValue"
+            :merchantId="merchantId"
+            @onLoaded="onLoaded"
+            @jumplinkUrl="jumplinkUrl"
+          ></member-btmfloat>
+        </div>
+        <div v-if="item.moduleType === 'Menu'">
+          <member-menu
+            :menuList="item.configJson.menu_entry"
+            :merchantId="merchantId"
+            @jumplinkUrl="jumplinkUrl"
+          ></member-menu>
+        </div>
+      </div>
+    </div>
     <div class='error-wrap' v-show="showErrWrap">
       <p>页面未配置,请前往配置</p>
     </div>
@@ -93,6 +114,8 @@
   import MemberHot from '../../base/member-hot/member-hot'
   import MemberRecommend from '../../base/member-recommend/member-recommend'
   import MemberLine from '../../base/member-line/member-line'
+  import MemberBtmfloat from '../../base/member-btmfloat/member-btmfloat'
+  import MemberMenu from '../../base/member-menu/member-menu'
   import GiftPopup from '../../base/gift-popup/popup'
   import * as core from '../../api/member'
   import tool from '../../common/js/util'
@@ -109,7 +132,9 @@
       MemberHot,
       MemberRecommend,
       MemberLine,
-      GiftPopup
+      GiftPopup,
+      MemberBtmfloat,
+      MemberMenu
     },
     data() {
       return {
@@ -136,6 +161,9 @@
     },
     created() {
       document.title = this.$route.meta.title
+      if(this.$route.query.pageUuid){
+        this.privilegePageUuid = this.$route.query.pageUuid
+      }
       if (this.privilegePageUuid) {
         this.loaded = false
         this.getMemberInfo({merchantId: this.merchantId})
@@ -154,24 +182,26 @@
         }
       },
       jumpChecklinkUrl(url){
-        if(this.merchantId == '100000'){
-          core.getPassMerchantUser({merchantId: this.merchantId}).then(res => {
-          //console.log(res)
-            if (res.code && '00' === res.code) {
-              if (res.result) {
-                window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
-              }else{
-                this.goOpenMember()
+        if(url){
+          if(this.merchantId == '100000'){
+            core.getPassMerchantUser({merchantId: this.merchantId}).then(res => {
+            //console.log(res)
+              if (res.code && '00' === res.code) {
+                if (res.result) {
+                  window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+                }else{
+                  this.goOpenMember()
+                }
+              } else {
+                this.loaded = true
+                this.$toastBox.showToastBox(res.message)
               }
-            } else {
-              this.loaded = true
-              this.$toastBox.showToastBox(res.message)
-            }
-          }).catch(e => {
-            this.$toastBox.showToastBox(e)
-          })
-        }else{
-          window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+            }).catch(e => {
+              this.$toastBox.showToastBox(e)
+            })
+          }else{
+            window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+          }
         }
       },
       onLoaded() {
@@ -370,7 +400,7 @@
     .gift-wrap
       position absolute
       right 0.66rem
-      bottom 13.75rem
+      top 13.75rem
       width 4.875rem
       height 4.875rem
       z-index: 11;

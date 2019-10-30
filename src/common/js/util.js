@@ -97,14 +97,20 @@ const replaceUrlMerchantId = function(url,id){
     if(regIndex.test(url)){ //判断是不是相对路径
       return url
     }else{ //绝对路径
-      let reg1 = /\?#\//gi;
-      let reg2 = /#\//gi;
-      if(reg1.test(url)){ //兼容hash模式的支付链接
-        return url.replace(reg1, '/')
-      }else if(reg2.test(url)){ //兼容hash模式普通链接
-        return url.replace(reg2, '/')
-      }else{
+       //判断是否外链
+      let regUrl = /^http/gi;
+      if(regUrl.test(url)){
         return url
+      }else{
+        let reg1 = /\?#\//gi;
+        let reg2 = /#\//gi;
+        if(reg1.test(url)){ //兼容hash模式的支付链接
+          return url.replace(reg1, '/')
+        }else if(reg2.test(url)){ //兼容hash模式普通链接
+          return url.replace(reg2, '/')
+        }else{
+          return url
+        }
       }
     }
   }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div style="padding: 0.74rem" class="title">
+    <div style="padding: 0.75rem 0.75rem 0.25rem 0.75rem" class="title">
       <p :style="{textAlign: textCss}">{{ titleText }}</p>
     </div>
   </div>
