@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div style="padding: 0.75rem 0.75rem 0.25rem 0.75rem" class="title">
+    <div style="padding: 0.75rem 0.75rem 0 0.75rem" class="title">
       <p :style="{textAlign: textCss}">{{ titleText }}</p>
     </div>
   </div>
@@ -41,7 +41,7 @@
       p
         margin 0
         overflow hidden
-        font-size 1.125rem
+        font-size 1.25rem
         font-weight bold
         color #212121
         line-height 1.2

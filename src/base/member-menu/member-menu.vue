@@ -144,7 +144,7 @@
       padding: 0;
       color #fff
       i {
-        font-size: 0.5rem;
+        font-size: 1rem;
       }
     }
   }

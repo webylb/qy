@@ -643,7 +643,7 @@
     right 0
     background #ff855e
     overflow hidden
-    max-width 750px
+    max-width 750PX
     .cont
       .coupon-top-img
         position relative
@@ -908,7 +908,7 @@
     top 0
     right 0
     bottom 0
-    max-width 750px
+    max-width 750PX
     z-index 100
     background rgba(0,0,0,.4)
 
@@ -919,13 +919,13 @@
     left 0
     text-align center
     width 100%
-    max-width 750px
+    max-width 750PX
     z-index 101
 
     .coupon-bag-toast-wrap
       height 100%
       width 100%
-      max-width 750px
+      max-width 750PX
       background #fff
       border-radius 0.5rem 0.5rem 0rem 0rem
       padding-top 1.25rem

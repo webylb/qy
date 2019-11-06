@@ -45,7 +45,7 @@
     right 0
     top 0
     background rgba(0,0,0,0.6)
-    max-width 750px
+    max-width 750PX
     z-index 10000
     .content
       min-height 1rem

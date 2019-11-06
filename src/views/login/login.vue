@@ -277,7 +277,7 @@
       right 0
       bottom 0
       width 100%
-      max-width 750px
+      max-width 750PX
       background-color #fff
 
       .login-detail

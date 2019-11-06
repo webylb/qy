@@ -14,7 +14,7 @@
               <span>¥<span>{{ priceToFixed(i.settlementPrice) }}</span></span>
               <img src="./images/label.png" alt="会员价">
             </span>
-            <button type="button">购买</button>
+            <!-- <button type="button">购买</button> -->
           </p>
         </div>
       </div>
@@ -112,9 +112,9 @@
     padding 0.75rem
 
     .recommend-item-wrapper
-      margin-bottom 1.656rem
+      margin-bottom 1rem
       width 100%
-      height 5.16rem
+      height 6.25rem
       position relative
       &:last-child
         margin-bottom 0
@@ -124,29 +124,31 @@
         height 100%
         border-radius 0.25rem
         overflow hidden
-        width 7.75rem
-        height 5.16rem
+        width 9.38rem
+        height 6.25rem
         text-align center
+        overflow hidden
         img
           height 100%
           width auto
+          border-radius 0.25rem
 
       .info-wrapper
         width 100%
         height 100%
-        padding 0.18rem 0 0.28rem 8.45rem
+        padding 0.75rem 0 0.75rem 10.125rem
         box-sizing border-box
 
         .name
-          color rgba(33,33,33,1)
+          color rgba(61,58,57,1)
           font-size 1rem
           overflow: hidden;
           text-overflow:ellipsis;
           white-space: nowrap;
-          line-height 1.5
+          line-height 1
 
         .price
-          margin 0.55rem 0 0.5rem 0
+          margin 1.35rem 0 0.5875rem 0
           color #999
           font-size: 0.8125rem
           line-height 1
@@ -174,7 +176,7 @@
               padding-left: 0;
               font-weight: bold;
               font-size: 0.75rem;
-              color: rgba(255,46,0,1);
+              color: rgba(179,151,93,1)
               span
                 font-weight 600
                 font-size 1rem
@@ -216,6 +218,7 @@
         img
           width atuo
           height 100%
+          border-radius 0.25rem
 
       .info-wrapper
         display block
@@ -229,7 +232,7 @@
           padding-top 0.5rem
           line-height 1.5
           font-size 1rem
-          color rgba(33,33,33,1)
+          color rgba(61,58,57,1)
           line-clamp 2
           overflow hidden
           display -webkit-box
@@ -257,7 +260,7 @@
             padding-left: 0;
             font-weight: bold;
             font-size: 0.75rem;
-            color: rgba(255,46,0,1);
+            color: rgba(179,151,93,1)
             span
               font-weight 600
               font-size 1rem
@@ -296,7 +299,7 @@
           padding-top 0.5rem
           line-height 1.5
           font-size 1rem
-          color rgba(33,33,33,1)
+          color rgba(61,58,57,1)
           line-clamp 2
           overflow hidden
           display -webkit-box
@@ -325,7 +328,7 @@
               padding-left: 0;
               font-weight: bold;
               font-size: 0.75rem;
-              color: rgba(255,46,0,1);
+              color: rgba(179,151,93,1)
               span
                 font-weight 600
                 font-size 1rem

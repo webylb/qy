@@ -17,7 +17,7 @@
     bottom 0
     background-color #fff
     width 100%
-    max-width 750px
+    max-width 750PX
     .main-wrap
       text-align center
       position absolute

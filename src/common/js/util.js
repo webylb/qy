@@ -129,6 +129,15 @@ const replaceUrlForUrpass = function(url){
     return url
   }
 }
+
+/**
+ * @description: 未登录跳转登陆页
+ * @param {type} url 链接
+ * @return: url
+ */
+// const toLogin = function(url)) {
+//   window.location.href = '/mp/weixin/jjbqb/autoLogin?sendURL=' + encodeURIComponent('https://m.51jujibao.com/v2/v3/index.html/#/middlePage?redirect=' + encodeURIComponent(event))
+// }
 export default {
   timeFormatting, formatDate, getPhoneModel, toWeiXinLogin, priceStr, replaceUrlMerchantId, replaceUrlForUrpass
 }

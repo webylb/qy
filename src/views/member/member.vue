@@ -1,8 +1,8 @@
 <template>
-  <div class="member home-page" ref="homePage">
+  <div class="member home-page">
     <scroll ref="memberScroll" class="member-scroll">
       <div>
-        <div v-if="loaded" class="main-wrapper">
+        <div v-if="loaded" class="main-wrapper" :style="mainWrapperStyle">
           <div v-for="item in allData" :key="item.uid">
             <div v-if="item.moduleType === 'themes'">
               <member-header
@@ -156,7 +156,8 @@
         showGiftCont: false,
         packageConfigId: null ,//礼包配置的id
         merchantGiftPackageId: null ,//礼包id,
-        passIdList: null //要过滤掉的商品id
+        passIdList: null ,//要过滤掉的商品id
+        mainWrapperStyle: 'pading-bottom:0;'
       }
     },
     created() {
@@ -251,7 +252,13 @@
               //     }
               //   }
               // }
+              for(let i=0, length = data.length; i<length; i++){
+                if(data[i].moduleType == 'bottomFloat'){
+                  this.mainWrapperStyle = 'padding-bottom:3.125rem'
+                }
+              }
               this.allData = data
+
             }
             this.$nextTick(() => {
               this.loaded = true
@@ -373,17 +380,16 @@
       left 0
       right 0
       bottom 0
-      max-width 750px
+      max-width 750PX
       // margin 0 auto
       z-index 10
-
     .error-wrap
       position absolute
       top 0
       left 0
       right 0
       bottom 0
-      max-width 750px
+      max-width 750PX
       margin 0 auto
       background rgba(0, 0, 0, 0.6)
       z-index: 11;
@@ -395,7 +401,7 @@
         top 50%
         left 50%
         transform translate(-50%, -50%)
-        max-width 750px
+        max-width 750PX
 
     .gift-wrap
       position absolute

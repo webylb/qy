@@ -379,7 +379,7 @@
       top 0
       bottom 0
       right 0
-      max-width 750px
+      max-width 750PX
       .all-service
         min-height 1px
         // height 100vh
@@ -390,7 +390,7 @@
           bottom 0
           right 0
           overflow hidden
-          max-width 750px
+          max-width 750PX
           //padding 0 1rem 0rem 1rem
           .service-list
             padding-top 1rem

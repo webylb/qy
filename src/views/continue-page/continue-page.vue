@@ -1,6 +1,6 @@
 <template>
   <div class="menmbers ">
-    <shop-header ref="shopHeader" v-if="showHeader" style="position: absolute;top:0;left: 0;z-index: 999;max-width:750px" line-style="background:#fff" title="会员特权"></shop-header>
+    <shop-header ref="shopHeader" v-if="showHeader" style="position: absolute;top:0;left: 0;z-index: 999;max-width:750PX" line-style="background:#fff" title="会员特权"></shop-header>
     <div :style="menmbersStyle" class="menmbersContent" ref="menmbersContent">
       <div class="addvip-toast">
         <div class="addvip-toast-wrap">
@@ -186,7 +186,7 @@
     bottom 3rem
     right 0
     overflow hidden
-    max-width 750px
+    max-width 750PX
     .addvip-toast
       position relative
       .goMyCoupon
@@ -225,7 +225,7 @@
   height 3.05rem
   text-align center
   width 100%
-  max-width 750px
+  max-width 750PX
   background-color #44b471
   button
     border none

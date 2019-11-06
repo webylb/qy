@@ -31,12 +31,25 @@ export default new Router({
       meta: {title: '开通会员',keepAlive:false},
       component: () => import(/* webpackChunkName: "openMembers" */ '@/views/open-members/open-members.vue')
     },
-    //会员个人中心
+    //优加开通会员
+    {
+      path: '/openMerchantMembers',
+      name: 'openMerchantMembers',
+      meta: {title: '开通会员',keepAlive:false},
+      component: () => import(/* webpackChunkName: "openMembers" */ '@/views/open-merchant-members/open-members.vue')
+    },
+    //首页
     {
       path: '/member',
       name: 'member',
       meta: {title: '会员特权',keepAlive:false},
       component: () => import(/* webpackChunkName: "member" */ '@/views/member/member.vue')
+    },
+    //会员个人中心
+    {
+      path: '/myCenter',
+      meta: {title: '个人中心',keepAlive:false},
+      component: () => import(/* webpackChunkName: "member" */ '../views/my-center/my-center.vue')
     },
     //我喜欢
     {
@@ -65,6 +78,12 @@ export default new Router({
       name: 'couponGoods',
       meta: {title: '',keepAlive:false},
       component: () => import(/* webpackChunkName: "couponGoods" */ '@/views/coupon-goods/coupon-goods.vue')
+    },
+    //账单
+    {
+      path: '/myBill',
+      meta: {title: '我的优惠',keepAlive:false},
+      component: () => import(/* webpackChunkName: "member" */ '../views/my-bill/my-bill.vue')
     },
     //订单
     {
@@ -107,13 +126,6 @@ export default new Router({
       name: 'cashier',
       meta: {title: '收银台',keepAlive:false},
       component: () => import(/* webpackChunkName: "couponBag" */ '@/views/cashier/cashier.vue')
-    },
-    //优加开通会员
-    {
-      path: '/openMerchantMembers',
-      name: 'openMerchantMembers',
-      meta: {title: '开通会员',keepAlive:false},
-      component: () => import(/* webpackChunkName: "openMembers" */ '@/views/open-merchant-members/open-members.vue')
     },
     //新人礼包
     {

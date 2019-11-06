@@ -142,7 +142,7 @@
             font-size 0.688rem
             padding-bottom 1rem
             color #999
-            padding-top 0.2345rem
+            padding-top 0.2rem
             text-align center
 
           img

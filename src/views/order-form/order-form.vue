@@ -7,6 +7,7 @@
             ref="orderForm"
             class="order-scroll">
       <div style="overflow: hidden;">
+        <div v-if="!showLoad">
         <div v-for="item in orderList" class="order-item-wrapper"
              :key="item.id">
           <div class="title-wrapper">
@@ -38,7 +39,7 @@
           </div>
         </div>
 
-        <div v-if="orderList&&orderList.length < 1" class="no-order">
+        <div v-if="orderList && orderList.length < 1" class="no-order">
           <div class="no-coupon">
             <div class="no-coupon-content fadeIn">
               <img src="../order-form/images/no-coupon.png" alt="no coupon"
@@ -47,8 +48,8 @@
             </div>
           </div>
         </div>
-
-        <loading v-show="showLoad" class="loading" :title="loadingTitle"></loading>
+        </div>
+        <loading v-show="showLoad" :title="loadingTitle" style="padding-top:40%;"></loading>
       </div>
     </scroll>
     <div class="order-customer-service">
@@ -75,6 +76,7 @@
   import Loading from '../../base/loading/loading'
   import * as core from '../../api/orderForm'
   import Popup from '../../base/popup/popup'
+import { parse } from 'path'
 
   export default {
     name: 'order-form',
@@ -82,7 +84,7 @@
       return {
         merchantName: window.infoData.merchantName,
         activeIndex: 0,
-        orderList: [],
+        orderList: null,
         showLoad: true,
         loadingTitle: '正在加载...',
         currentPage: 1,
@@ -119,9 +121,15 @@
     },
     created() {
       document.title = this.$route.meta.title
-
+      
       this.selectObj = { currentPage: this.currentPage, pageSize: this.pageSize}
-      this.getAllOrder(this.selectObj)
+
+      if(this.$route.query.index){
+        this.showLoad = false;
+        this.handleNav(parseInt(this.$route.query.index), true)
+      }else{
+        this.getAllOrder(this.selectObj)
+      }
     },
     methods: {
       formatDateing(e) {
@@ -275,12 +283,21 @@
             this.selectObj = {
               currentPage: this.currentPage,
               pageSize: this.pageSize,
-              status: 'SUCCESS',
+              status: 'WAIT',
               isShip: 'N'
             }
             this.getAllOrder(this.selectObj)
           }
           if (e === 3) {
+            this.selectObj = {
+              currentPage: this.currentPage,
+              pageSize: this.pageSize,
+              status: 'SUCCESS',
+              isShip: 'N'
+            }
+            this.getAllOrder(this.selectObj)
+          }
+          if (e === 4) {
             this.selectObj = {
               currentPage: this.currentPage,
               pageSize: this.pageSize,
@@ -315,10 +332,7 @@
       .no-order
         height 16.875rem
       .no-coupon
-        position fixed
-        top 0
-        left 0
-        right 0
+        position relative
         .no-coupon-content
           position absolute
           top 6rem

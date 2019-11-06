@@ -7,7 +7,7 @@
            :class="numData.unpaidOrderCount>9?'num1':'num'">
         {{numData.unpaidOrderCount}}
       </div>
-      <div v-show="item==='待发货' && numData.unShipOrderCount!==0"
+      <div v-show="item==='待激活' && numData.unShipOrderCount!==0"
            :class="numData.unShipOrderCount>9?'num1':'num'">
         {{numData.unShipOrderCount}}
       </div>
@@ -20,7 +20,7 @@
     name: 'order-nav',
     data() {
       return {
-        navList: ['全部', '待付款', '待发货', '已完成']
+        navList: ['全部', '待付款', '待激活', '待发货', '已完成']
       }
     },
     props: {

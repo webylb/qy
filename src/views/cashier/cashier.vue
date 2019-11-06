@@ -259,7 +259,7 @@
       bottom 0
       right 0
       width 100%
-      max-width 750px
+      max-width 750PX
       height 3.063rem
       line-height 3.063rem
       background-color #fff
@@ -301,7 +301,7 @@
       right 0
       bottom 3.063rem
       width 100%
-      max-width 750px
+      max-width 750PX
       background-color rgb(245,245,245)
       padding-bottom 0.063rem
       .goods-detail
@@ -385,7 +385,7 @@
           position absolute
           bottom 2rem
           width 100%
-          max-width 750px
+          max-width 750PX
           text-align center
           color #999
           font-size 0.875rem

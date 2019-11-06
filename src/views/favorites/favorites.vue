@@ -1,6 +1,6 @@
 <template>
   <div class="service-center">
-    <shop-header ref="shopHeader" v-if="showHeader" style="position: absolute;top:0;left: 0;z-index: 999;" line-style="background:#fff;max-width:750px" title="我喜欢"></shop-header>
+    <shop-header ref="shopHeader" v-if="showHeader" style="position: absolute;top:0;left: 0;z-index: 999;" line-style="background:#fff;max-width:750PX" title="我喜欢"></shop-header>
 
     <div class="serviceCenterContent">
       <div class="all-service" >
@@ -152,7 +152,7 @@
       top 0
       bottom 0
       right 0
-      max-width 750px
+      max-width 750PX
       .all-service
         min-height 1px
         // height 100vh

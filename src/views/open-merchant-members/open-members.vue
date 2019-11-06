@@ -413,7 +413,7 @@
     right 0
     overflow hidden
     background #fff
-    max-width 750px
+    max-width 750PX
 
     .img-list
       img
@@ -456,7 +456,7 @@
     height 3rem
     width 100%
     background-color #2d2b32
-    max-width 750px
+    max-width 750PX
     z-index 99
     display flex
     justify-content flex-start

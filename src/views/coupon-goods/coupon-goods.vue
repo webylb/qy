@@ -604,6 +604,8 @@
         this.notVip = false
       },
       goOpenMember() {
+        // this.$refs.openMember.openServeList()
+        this.notVip = false
         core.getOpenMemberUrl({merchantId: this.merchantId}).then(res => {
           if(res.code && '00' == res.code){
             if(res.result){
@@ -648,7 +650,7 @@
       bottom 0
       right 0
       width 100%
-      max-width 750px
+      max-width 750PX
       height 3.063rem
       line-height 3.063rem
       background-color rgb(252,212,148)
@@ -722,7 +724,7 @@
       right 0
       bottom 3.063rem
       width 100%
-      max-width 750px
+      max-width 750PX
       background-color rgb(245,245,245)
       padding-bottom 0.063rem
       .goods-detail
