@@ -6,14 +6,17 @@
         <div class="order-item" @click="goOrder('wait')">
           <img src="./images/order-wait.png" alt="">
           <p>待付款</p>
+          <div class="num-label" v-if="orderNumData && orderNumData.waitPaymentCount > 0"> {{ orderNumData.waitPaymentCount>99 ? '99+' : orderNumData.waitPaymentCount }}</div>
         </div>
         <div class="order-item" @click="goOrder('waitActive')">
           <img src="./images/order-wait-active.png" alt="">
           <p>待激活</p>
+          <div class="num-label" v-if="orderNumData && orderNumData.waitActivationCount > 0"> {{ orderNumData.waitActivationCount>99 ? '99+' : orderNumData.waitActivationCount }}</div>
         </div>
         <div class="order-item" @click="goOrder('waitDelivery')">
           <img src="./images/order-wait-delivery.png" alt="">
           <p>待发货</p>
+          <div class="num-label" v-if="orderNumData && orderNumData.waitSendGoodsCount > 0"> {{ orderNumData.waitSendGoodsCount>99 ? '99+' : orderNumData.waitSendGoodsCount }}</div>
         </div>
         <div class="order-item" @click="goOrder('success')">
           <img src="./images/order-success.png" alt="">
@@ -41,17 +44,13 @@
         type: Number,
         default: 0
       },
-      isMember: {
-        type: Boolean,
-        default: false
-      },
       isLogin: {
         type: Boolean,
         default:false
       },
-      userName: {
-        type: String,
-        default: ''
+      orderNumData: {
+        type: Object,
+        default: null
       }
     },
     mounted() {
@@ -115,6 +114,7 @@
     .order-item
       text-align center
       width 3.45rem
+      position relative
       img 
         width 2rem
         height 2rem
@@ -122,6 +122,16 @@
         font-size:0.81rem;
         color:rgba(61,58,57,1);
         margin-top 0.28rem
-  
+      .num-label
+        position absolute
+        top -0.375rem
+        left 2.4rem
+        background-color rgba(226, 58, 55, 1)
+        min-width 1rem
+        height 1rem
+        border-radius 50%
+        color #fff
+        line-height 1rem
+        font-size 0.69rem
 </style>
 

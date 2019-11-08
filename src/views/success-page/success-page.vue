@@ -4,9 +4,11 @@
             @scrollToEnd="loadMore"
             :data="list" class="redemption-scroll" ref="redemptionScroll">
       <div>
-        <p class="success-icon"><i class="iconfont">&#xe644;</i></p>
+        <p class="success-icon">
+          <img src="./images/success.png" alt="">
+        </p>
         <p class="success-p">恭喜您购买成功!</p>
-        <p class="success-p2">商品将在 <span>3</span> 分钟内到账!</p>
+        <p class="success-p2">收到卡券内请在<span>一个月</span>内激活并使用！</p>
         <div class="operation-wrapper">
           <div @click="toMoney" class="left">继续购买</div>
           <div @click="toRedemption" class="right">查看订单</div>
@@ -80,19 +82,21 @@
       bottom 0
       background-color #f5f5f5
       .success-icon
-        padding-top 3.1rem
-        i
-          font-size 5rem
-          color #00d500;
+        padding-top 5.63rem
+        img 
+          width 4.19rem
+          height 5.44rem
       .success-p
-        font-size 1.25rem
+        font-size 1.13rem
         padding-top 1.5rem
+        color rgba(61,58,57,1)
       .success-p2
-        font-size 1rem
-        padding-top 0.5rem
+        font-size 0.88rem
+        padding-top 0.75rem
+        color rgba(153, 153, 153, 1)
         span
-          font-size 1.25rem
-          color  #ff4800
+          font-size 0.88rem
+          color rgba(196, 143, 73, 1)
       .operation-wrapper
         width 82.61%
         margin 0 auto
@@ -101,15 +105,17 @@
         justify-content space-between
         div
           width 8.375rem
-          height 2.75rem
-          line-height 2.75rem
-          border-radius 0.313rem
-          color #ff4800
+          height 2.5rem
+          line-height 2.5rem
           font-size 1.125rem
-          border 1px solid #ff4800
+          border-radius 0.25rem
+          border 1px solid rgba(196, 143, 73, 1)
+        .left 
+          color rgba(196, 143, 73, 1)
         .right
+          color rgba(196, 143, 73, 1)
+          background-color rgba(196, 143, 73, 1)
           color #fff
-          background-color #ff4800
       .tuijian
         padding 0 4.27%
         .you-like

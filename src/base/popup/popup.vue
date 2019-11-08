@@ -2,14 +2,18 @@
   <transition name="fade">
     <div class="popup">
       <div class="popup-wrapper">
-        <div class="popup-title" v-show="showPopupTitle">{{title}}</div>
+        <div class="popup-title" v-if="isShowTitle">{{ title }}</div>
+        <div v-else class="no-title"></div>
         <div class="popup-info">
           <slot></slot>
         </div>
-        <div class="popup-operation">
-          <div @click="cancel" v-show="showCancel">{{cancelCart}}</div>
-          <div @click="confirm" class="popup-sure" v-if="defaultBtn">{{confirmCart}}</div>
-          <div @click="confirm" class="popup-sure" v-else><a :href="'tel:'+ phoneNum">{{confirmCart}}</a></div>
+        <div class="popup-operation" v-if="isShowCancel">
+          <div class="cancel" @click="cancel">{{ cancelText }}</div>
+          <div class="confirm" @click="confirm" v-if="defaultBtn">{{ confirmText }}</div>
+          <div v-else><a :href="'tel:'+ phoneNum">{{ confirmText }}</a></div>
+        </div>
+        <div class="popup-operation" v-else>
+          <div class="cancel" @click="cancel">{{ confirmText }}</div>
         </div>
       </div>
     </div>
@@ -20,23 +24,23 @@
     export default {
         name: "popup",
         props:{
-          title:{
-            type:String,
-            default:'操作提示'
-          },
-          cancelCart:{
-            type: String,
-            default: '取消'
-          },
-          confirmCart:{
-            type:String,
-            default:'确定'
-          },
-          showCancel: {
+          isShowTitle: {
             type: Boolean,
             default: true
           },
-          showPopupTitle: {
+          title:{
+            type: String,
+            default: '操作提示'
+          },
+          cancelText:{
+            type: String,
+            default: '取消'
+          },
+          confirmText:{
+            type: String,
+            default: '确定'
+          },
+          isShowCancel: {
             type: Boolean,
             default: true
           },
@@ -72,7 +76,7 @@
     animation  popup-dialog-in .5
     .popup-wrapper
       position fixed
-      max-width 300px
+      width 20rem
       display table
       text-align center
       margin auto
@@ -81,18 +85,22 @@
       bottom 0
       left 0
       right 0
-      width 80%
       z-index 502
       border-radius 0.5rem
+      overflow hidden
       .popup-title
-        font-size 18px
-        padding 1.3rem 1.6rem 0.5rem
+        font-size 1.13rem
+        color rgba(61,58,57,1)
+        padding 1.84rem 0.75rem 0 
+      .no-title 
+        padding-top 1rem
+      .popup-info
+        font-size 1rem
+        line-height 1.5rem
+        color rgba(61,58,57,1)
       .popup-operation
         position relative
         display flex
-        padding 0.875rem 0
-        line-height 1.2rem
-        font-size 1rem
         color #999
         &:after
           content: " "
@@ -101,39 +109,51 @@
           top: 0
           right: 0
           height: 1px
-          border-top: 1px solid #D5D5D6
-          color: #D5D5D6
+          border-top: 1px solid rgba(221,221,221,1);
+          color: rgba(221,221,221,1);
           -webkit-transform-origin: 0 0
           transform-origin: 0 0
           -webkit-transform: scaleY(0.5)
           transform: scaleY(0.5)
-        .popup-sure
-          color #ff4800
-          position relative
-          &:after
-            content " "
-            position absolute
-            left 0
-            top  0
-            bottom  0
-            width  1px
-            border-left 1px solid #D5D5D6
-            color #D5D5D6
-            -webkit-transform-origin 0 0
-            transform-origin 0 0
-            -webkit-transform scaleX(0.5)
-            transform scaleX(0.5)
-          a
-            color #ff4800
-            width 100%
-            height 100%
-            display inline-block
+          z-index: -1;
+        .confirm
+          color rgba(255,255,255,1)
+          background-color rgba(183,130,49,1)
+          font-size 1.13rem
         div
           flex 1
+          padding 1rem 0
+          letter-spacing 0.05rem
+        .cancel
+          font-size 1.13rem
+          color rgba(183,130,49,1)
+
   .fade-enter-active, .fade-leave-active {
-    transition: opacity .5s;
+    transition: opacity 0.5s;
   }
   .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
   }
+.fadeIn {
+  -webkit-animation: fadeIn .3s;
+          animation: fadeIn .3s;
+}
+
+@-webkit-keyframes fadeIn {
+    from {
+      opacity: 0
+    }
+    to {
+      opacity: 1
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0
+    }
+    to {
+        opacity: 1
+    }
+}
 </style>

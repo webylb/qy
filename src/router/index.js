@@ -69,7 +69,7 @@ export default new Router({
     {
       path: '/serviceCenter',
       name: 'serviceCenter',
-      meta: {title: '服务中心',keepAlive:true},
+      meta: {title: '会员商品',keepAlive:true},
       component: () => import(/* webpackChunkName: "serviceCenter" */ '@/views/service-center/service-center.vue')
     },
     //卡券商品

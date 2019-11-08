@@ -1,16 +1,23 @@
 <template>
   <div class="order-nav">
-    <div class="nav-item" @click="handleNav(index)"
-         v-for="(item,index) in navList" :key="index"
-         :class="activeIndex===index?'active':''">{{item}}
-      <div v-show="item==='待付款' && numData.unpaidOrderCount!==0"
-           :class="numData.unpaidOrderCount>9?'num1':'num'">
-        {{numData.unpaidOrderCount}}
+    <div class="order-list">
+      <div class="nav-item" ref="navItem" @click="handleNav(index)"
+          v-for="(item,index) in navList" :key="index"
+          :class="activeIndex===index?'active':''">{{item}}
+        <!-- <div v-if="item==='待付款' && numData.unPayOrderCount > 0"
+            :class="numData.unPayOrderCount>9?'num1':'num'">
+          {{numData.unPayOrderCount>99 ? '99+' : numData.unPayOrderCount}}
+        </div>
+        <div v-if="item==='待激活' && numData.unActiveOrderCount > 0"
+            :class="numData.unActiveOrderCount>9?'num1':'num'">
+          {{numData.unActiveOrderCount>99 ? '99+' : numData.unActiveOrderCount }}
+        </div>
+        <div v-if="item==='待发货' && numData.unShipOrderCount > 0"
+            :class="numData.unShipOrderCount>9?'num1':'num'">
+          {{ numData.unShipOrderCount>99 ? '99+' : numData.unShipOrderCount}}
+        </div> -->
       </div>
-      <div v-show="item==='待激活' && numData.unShipOrderCount!==0"
-           :class="numData.unShipOrderCount>9?'num1':'num'">
-        {{numData.unShipOrderCount}}
-      </div>
+      <div class="tabs-line" ref="tabsLine"></div>
     </div>
   </div>
 </template>
@@ -27,9 +34,9 @@
       numData: {
         type: Object,
         default: {
-          unReceiptOrderCount: 0,
+          unPayOrderCount: 0,
+          unActiveOrderCount: 0,
           unShipOrderCount: 0,
-          unpaidOrderCount: 0
         }
       },
       activeIndex: {
@@ -37,54 +44,90 @@
         default: 0
       }
     },
+    mounted(){
+      
+    },
     methods: {
       handleNav(e) {
         this.$emit('handleNav', e)
+      },
+      tabsLineChange(index){
+        // this.$refs.navItem[index].style.animation = 'changeType 0.1s linear'
+        setTimeout(() => {
+          let width = this.$refs.navItem[index].getBoundingClientRect().width
+          this.$refs.tabsLine.style.width = width + 'px' 
+          this.$refs.tabsLine.style.transform = 'translateX('+ this.$refs.navItem[index].getBoundingClientRect().x +'px)'
+          this.$refs.tabsLine.style.transitionDuration = '0.3s'
+        }, 20)
       }
     }
   }
 </script>
+<style lang="css">
+  @-webkit-keyframes changeType {
+    from {
+      font-size: 1rem;
+    }
+    to {
+      font-size: 1.25rem;
+    }
+  }
 
+  @keyframes changeType {
+    from {
+      font-size: 1rem;
+    }
+    to {
+      font-size: 1.25rem;
+    } 
+  }
+</style>
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   .order-nav
     background-color: #ffffff;
-    box-shadow: 0rem 0.063rem 0.25rem 0rem rgba(102, 102, 102, 0.3);
-    display flex
-    justify-content space-around
-    .nav-item
-      flex 1
+    .order-list
+      width 100%
+      height 3.5rem
       position relative
-      text-align center
-      height 2.75rem
-      line-height 2.75rem
-      font-size 0.875rem
-      color #666
-      .num, .num1
-        font-size 0.75rem
-        box-sizing border-box
-        border 1px solid #ff4800
-        color #ff4800
-        position absolute
-        right 0.3rem
-        min-width 1rem
-        height 1rem
-        border-radius 0.5rem
+      display flex
+      justify-content space-evenly
+      align-items center
+      .nav-item
+        position relative
         text-align center
-        line-height 1rem
-        background-color #fff
-        top 0.5rem
-      .num1
-        padding 0 3px
-    .active
-      color #ff4800
-      position relative
-      &:before
-        content ''
-        position absolute
-        width 2.188rem
-        left 50%
-        transform translate(-50%, -50%)
-        bottom 0
-        height 0.094rem
-        background-color #ff4800
+        height 3.5rem
+        font-size: 1rem;
+        color: rgba(153,153,153,1);
+        font-weight: normal;
+        height: 100%;
+        box-sizing border-box
+        line-height 3.5rem
+        .num, .num1
+          font-size 0.69rem
+          box-sizing border-box
+          background rgba(226, 58, 55, 1)
+          position absolute
+          left 95%
+          min-width 1rem
+          height 1rem
+          border-radius 0.5rem
+          text-align center
+          line-height 1rem
+          color #fff
+          top 0.65rem
+        .num1
+          padding 0 0.25rem
+      .active
+        color: rgba(196,143,73,1);
+        // animation: changeType 0.1s linear;
+        // font-size: 1.25rem;
+        font-weight bold
+      .tabs-line
+        position: absolute;
+        bottom: 0px;
+        left: 0;
+        z-index: 1;
+        height: 0.15rem;
+        background-color: rgba(183,130,49,1);
+        border-radius: 0.1rem;
 </style>

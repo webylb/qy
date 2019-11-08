@@ -3,10 +3,10 @@
     <div class="slider-group" ref="sliderGroup">
       <slot></slot>
     </div>
-    <div v-if="dotsStyle == 'dot' && dots.length > 1" class="dots" v-show="isShowDots">
+    <div v-if="dotsStyle == 'dot' && dots && dots.length > 1" class="dots" v-show="isShowDots">
       <span class="dot" v-for="(item,index) in dots" :key="index" :class="{active:currentPageIndex === index}"></span>
     </div>
-    <div v-if="dotsStyle == 'line' && dots.length > 1" class="dots" v-show="isShowDots">
+    <div v-if="dotsStyle == 'line' && dots && dots.length > 1" class="dots" v-show="isShowDots">
       <span class="line-dot" v-for="(item,index) in dots" :key="index" :class="{active:currentPageIndex === index}"></span>
     </div>
   </div>

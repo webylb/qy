@@ -1,54 +1,57 @@
 
 <template>
     <div :class="['coupon-item', valid ? 'coupon-valid-item' : 'coupon-invalid-item' ]" @click="handleItem">
-      <div class="exchange-date">
-        <div>
-          <span class="exchange-topText">兑换时间:</span><span> {{ timeFormat(coupondata.createTime) }}</span>
-        </div>
-        <div>
-          <button type="button" class="confirmUse" @click="showConfirmUse(coupondata.id)" v-if="valid">确认使用</button>
+      <div class="coupon-info">
+        <img class="coupon-img" :src="coupondata.skuCover" alt="">
+        <div class="coupon-detail">
+          <div class="coupon-title" style="-webkit-box-orient: vertical">{{ coupondata.skuName }}</div>
+          <div class="exchange-times">{{ timeFormat(coupondata.createTime) }}</div>
+          <div class="coupon-vaild-date">{{ timeFormat(coupondata.expireTime) }} 失效</div>
         </div>
       </div>
-      <div class="coupon-info">
-        <div class="coupon-img">
-          <img :src="coupondata.skuCover" alt="">
+      <div class="coupon-centent">
+        <div v-if="coupondata.card && (!coupondata.qrCode)">
+          <div class="coupon-option">
+            <span>卡号: {{ coupondata.card }}</span>
+            <button type="button" class="coupon-copy"
+              v-clipboard:copy="copyText"
+              v-clipboard:success="onCopySuccess"
+              v-clipboard:error="onCopyError">复制</button>
+          </div>
+          <div class="coupon-option" v-if="coupondata.pwd">
+            <span>密码: {{ coupondata.pwd }}</span>
+          </div>
         </div>
-        <div class="coupon-detail">
-          <h2 class="coupon-title">{{ coupondata.skuName }}</h2>
-          <div class="coupon-vaild-date">有效期至 {{ timeFormat(coupondata.expireTime) }}</div>
-          <div class="coupon-centent">
-            <div>
-              <div v-if="coupondata.card && (!coupondata.qrCode)" class="coupon-num">卡号: {{ coupondata.card }}</div>
-              <div v-if="coupondata.card && coupondata.pwd && (!coupondata.qrCode)" class="coupon-pwd">密码: {{ coupondata.pwd }}</div>
-              <div v-if="(!coupondata.card) && coupondata.pwd && (!coupondata.qrCode)" class="coupon-camilo">卡密: {{ coupondata.pwd }}</div>
-              <div v-if="coupondata.qrCode" class="coupon-qrcode">
-                <span @click="showQrcode(coupondata.qrCode)">点击查看卡券</span>
-              </div>
-            </div>
-            <div v-if="!coupondata.qrCode" class="coupon-option">
-              <button type="button" class="coupon-copy"
-                v-clipboard:copy="copyText"
-                v-clipboard:success="onCopySuccess"
-                v-clipboard:error="onCopyError">复制</button>
-            </div>
+        <div v-if="(!coupondata.card) && coupondata.pwd && (!coupondata.qrCode)">
+          <div class="coupon-option">
+            <span>卡密: {{ coupondata.pwd }}</span>
+            <button type="button" class="coupon-copy"
+              v-clipboard:copy="copyText"
+              v-clipboard:success="onCopySuccess"
+              v-clipboard:error="onCopyError">复制</button>
+          </div>
+        </div>
+        <div v-if="coupondata.qrCode" >
+          <div class="coupon-option">
+            <span>二维码</span>
+            <button type="button" class="qr-btn"  @click="showQrcode(coupondata.qrCode)">点击出示券码</button>
           </div>
         </div>
       </div>
       <div class="coupon-direction-for-use">
         <div class="coupon-dfu-button" @click="openDirectionForUse">
-          <div class="">
-            <p>使用说明
-            <span v-if="!openText">
-              <i class="iconfont">&#xe632;</i>
-            </span>
-            <span v-else>
-              <i class="iconfont">&#xe634;</i>
-            </span>
-            </p>
-          </div>
+          <p>使用说明
+          <span v-if="!openText">
+            <i class="iconfont">&#xe632;</i>
+          </span>
+          <span v-else>
+            <i class="iconfont">&#xe634;</i>
+          </span>
+          </p>
         </div>
-        <div v-if="coupondata.jumpUrl && !coupondata.qrCode" class="coupon-dfu-link">
-          <a :href="coupondata.jumpUrl">点击去使用</a>
+        <div class="coupon-dfu-link">
+          <button type="button" class="confirmUse" @click="showConfirmUse(coupondata.id)" v-if="valid">确认使用</button>
+          <a v-if="coupondata.jumpUrl && !coupondata.qrCode" :href="coupondata.jumpUrl">点击去使用</a>
         </div>
       </div>
       <div class="coupon-dfu-text" v-show="openText" v-html="coupondata.instructions">
@@ -91,7 +94,7 @@
     },
     methods:{
       timeFormat(date){
-        return util.formatDate(date)
+        return util.formatDate(date, 'Y/M/DH')
       },
       handleItem(){
         this.$emit('handleItem',{item:this.data})
@@ -118,107 +121,96 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
-  .coupon-invalid-item
-    background url("./images/invalid.png") no-repeat right top;
-    background-size 4.15625rem 3.53125rem
-    background-position 96% -0.3rem
-  .coupon-item + .coupon-item
-    margin-top 0.625rem
   .coupon-item
     width 100%
     background-color #fff
-    padding 0 1rem
-    padding-bottom 0.75rem
-    box-sizing: border-box;
-    .exchange-date
-      height 2.03rem
-      border-bottom 1px solid rgb(230,230,230)
-      font-size 0.6875rem
-      line-height 2.03rem
-      color rgb(153,153,153)
-      box-sizing border-box
-      display flex
-      justify-content space-between
-      .exchange-topText
-        display inline-block
-        margin-right 0.2rem
-      .confirmUse
-        font-size 0.75rem
-        color #998054
-        background-color #f6dcaf
-        outline none
-        border none
-        border-radius 0.063rem
-        height 1.313rem
-        line-height 1.313rem
+    padding 0.75rem
+    box-sizing border-box
+    margin-bottom 0.75rem
+    border-radius 0.5rem
     .coupon-info
-      padding 0.75rem 0
-      display flex
-      height 4.3125rem
+      font-size: 0.94rem;
+      color: #3d3a39;
+      width: 100%;
+      padding: 0 0 0.75rem 8.5rem;
+      min-height: 5.16rem;
+      box-sizing: border-box;
+      position: relative;
       .coupon-img
-        width 4.3125rem
-        height 100%
-        img
-          width 100%
-          height 100%
-          display inline-block
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 7.75rem;
+        height: 5.16rem;
+        border-radius 0.25rem
       .coupon-detail
-        height 4.3125rem
-        padding-left 0.75rem
-        flex 1
+        min-height 5.16rem
         position relative
+        box-sizing border-box
         .coupon-title
-          font-size 0.875rem
-          margin-bottom 0.5rem
+          line-clamp 2
+          overflow hidden
+          display -webkit-box
+          text-overflow ellipsis
+          -webkit-line-clamp 2
+          -webkit-box-orient vertical
+          font-size 0.94rem
+          line-height 1.3
+          color rgba(61,58,57,1)
+        .exchange-times 
+          margin-top 0.3rem
+          font-size 0.69rem
+          color rgba(153,153,153,1)
         .coupon-vaild-date
-          font-size 0.6875rem
-          color rgb(255,72,0)
-          margin-bottom 0.5rem
-        .coupon-centent{
-          display flex
-          justify-content space-between
-          justify-items center
-        }
-        .coupon-num
-          font-size 0.6875rem
-          color rgb(153,153,153)
-          margin-bottom 0.5rem
-        .coupon-pwd
-          font-size 0.6875rem
-          color rgb(153,153,153)
-        .coupon-camilo
-          font-size 0.6875rem
-          color rgb(153,153,153)
-        .coupon-qrcode
           position absolute
-          left 0.75rem
-          bottom 0
-          border-bottom: 1px solid #42b0e9;
-          box-sizing: border-box;
-          span
-            color rgb(66,176,233)
-            font-size 0.75rem
-        .coupon-option
-          width 2.8125rem
-          display flex
-          align-items center
-          .coupon-copy
-            width 100%
-            height 1.1875rem
-            line-height 1.1875rem
-            border 1px solid rgb(255,72,0)
-            border-radius 10px
-            color rgb(255,72,0)
-            padding 0
-            outline none
-            background-color #fff
-            font-size 0.75rem
+          bottom 0rem
+          left 0
+          font-size 0.69rem
+          color rgba(61, 58, 57, 1)
+
+    .coupon-centent
+      padding-bottom 1.25rem
+      box-sizing border-box
+      .coupon-option
+        width 100%
+        display flex
+        align-items center
+        font-size 0.75rem
+        color rgba(61,58,57,1)
+        margin-bottom 0.4rem
+        &:last-child
+          margin-bottom 0
+        .coupon-copy
+          margin-left 1.45rem
+          border 0.0625rem solid rgba(73, 109, 94, 1)
+          border-radius 0.14rem
+          color rgba(73, 109, 94, 1)
+          padding 0.26rem 0.32rem
+          box-sizing border-box
+          outline none
+          background-color #fff
+          font-size 0.75rem
+          line-height: 1;
+        .qr-btn
+          margin-left 1.45rem
+          border 0.0625rem solid rgba(73, 109, 94, 1)
+          border-radius 0.14rem
+          color rgba(73, 109, 94, 1)
+          padding 0.26rem 0.32rem
+          box-sizing border-box
+          outline none
+          background-color #fff
+          font-size 0.75rem
+          line-height: 1;
 
     .coupon-direction-for-use
-      height 1.47rem
       font-size 0.6875rem
       display flex
       justify-content space-between
+      align-items center
+      padding-top 0.75rem
+      box-sizing border-box
+      border-top 0.0625rem solid rgba(238,238,238,1)
       .coupon-dfu-button
         color rgb(153,153,153)
         line-height: 1.2rem;
@@ -226,12 +218,58 @@
           font-size 0.75rem
       .coupon-dfu-link
         a
-          color rgb(66,176,233)
-          font-size 0.75rem
-          border-bottom 1px solid rgb(66,176,233)
+          color rgba(196, 143, 73, 1)
+          border 0.0625rem solid rgba(196, 143, 73, 1)
+          padding 0.53rem 0.94rem
+          margin-left 0.75rem
+          border-radius 0.25rem
+          font-size 0.81rem
+        .confirmUse
+          outline none
+          background-color #fff
+          padding 0.53rem 0.94rem
+          color #999
+          border 1px solid rgba(199, 199, 199, 1)
+          border-radius 0.25rem
+          font-size 0.81rem
     .coupon-dfu-text
+      margin-top 0.5rem
       color rgb(153,153,153)
       border 1px solid rgb(230,230,230)
+      padding 0.25rem 0.5rem
+      font-size 0.6875rem
+      line-height 1.25rem
+      border-radius 5px
+  .coupon-invalid-item
+    .coupon-info
+      .coupon-img
+        opacity 0.5
+      .coupon-detail
+        .coupon-title
+          color rgba(61,58,57,0.8)
+        .exchange-times 
+          color rgba(153,153,153,0.8)
+        .coupon-vaild-date
+          color rgba(61, 58, 57, 0.8)
+    .coupon-centent
+      .coupon-option
+        color rgba(61,58,57,0.8)
+        .coupon-copy
+          border 0.0625rem solid rgba(73, 109, 94, 0.6)
+          color rgba(73, 109, 94, 0.6)
+        .qr-btn
+          border 0.0625rem solid rgba(73, 109, 94, 0.6)
+          color rgba(73, 109, 94, 0.6)
+  
+    .coupon-direction-for-use
+      .coupon-dfu-link
+        a
+          color rgba(196, 143, 73, 0.6)
+          border 0.0625rem solid rgba(196, 143, 73, 0.6)
+    .coupon-dfu-text
+      margin-top 0.5rem
+      color rgb(153,153,153,0.8)
+      border 1px solid rgb(230,230,230,0.8)
       padding 0.25rem 0.5rem
       font-size 0.6875rem
       line-height 1.25rem

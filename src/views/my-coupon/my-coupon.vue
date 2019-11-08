@@ -7,75 +7,47 @@
     <div :style="myCouponStyle" ref="myCouponScroll" class="myCouponScroll">
       <div>
         <div class="coupon-category">
-          <div class="coupon-tab coupon-tab-valid" :class="[ activeLink == 1 ? 'active' : '']">
-            <div class="coupon-list" @click="handelClick(1)">有效期内</div>
-          </div>
-          <div class="coupon-tab" :class="[ activeLink == 2 ? 'active' : '']">
-            <div class="coupon-list" @click="handelClick(2)">已失效</div>
+          <div class="coupon-tab" v-for="(item, index) in tabList" :key="item.id" :class="[index == activeLink ? 'coupon-tab-active' : '']" @click="handelClick(index)" ref="tabItem">{{ item.name }}</div>
+          <div class="tabs-line" ref="tabsLine"></div>
+        </div>
+        <div>
+          <transition-group tag="div" :name="transitionName">
+            <div style="top:3.5rem;" v-show="activeLink === index" v-for="(i, index) in tabList" :key="i.id" class="validCoupon">
+              <scroll ref="validCouponScroll" class="validCouponScroll"
+                :data="couponsList"
+                :pullup="true"
+                @scrollToEnd="loadMore">
+                <div style="padding:0.75rem 0.75rem 0.25rem;box-sizing:border-box;">
+                  <div>
+                    <coupon-item class="nav-item"
+                      @handleItem="handleItem"
+                      @showDesText="showDesText"
+                      v-for="(item,index) in couponsList" :key="index"
+                      :coupondata="item"
+                      :valid="valid"
+                      @popupStatus="popupStatus"
+                      @showConfirmUse="showConfirmUse">
+                    </coupon-item>
+                    <loading style="padding:  1rem 0" v-show="showLoad" :title="loadingTitle"></loading>
+                  </div>
+                </div>
+              </scroll>
+            </div>
+          </transition-group>
+        </div>
+        <div v-show="noCoupon" class="no-coupon">
+          <div class="no-coupon-content fadeIn">
+            <img src="./images/no-coupon.png" alt="no coupon" class="">
+            <p class="no-coupon-text">暂无卡券~</p>
+            <button type="button" class="goShop" @click="goShop">去逛逛</button>
           </div>
         </div>
 
-        <div v-if="activeLink == 1" class="validCoupon">
-          <scroll style="top:3.375rem" ref="validCouponScroll" class="validCouponScroll"
-            :data="couponsList"
-            :pullup="true"
-            @scrollToEnd="loadMore">
-            <div>
-              <div>
-                <coupon-item class="nav-item"
-                  @handleItem="handleItem"
-                  @showDesText="showDesText"
-                  v-for="(item,index) in couponsList" :key="index"
-                  :coupondata="item"
-                  :valid="valid"
-                  @popupStatus="popupStatus"
-                  @showConfirmUse="showConfirmUse">
-                </coupon-item>
-                <loading style="padding:  1rem 0" v-show="showLoad" :title="loadingTitle"></loading>
-              </div>
-              <div v-show="noCoupon" class="no-coupon">
-                <div class="no-coupon-content fadeIn">
-                  <img src="./images/no-coupon.png" alt="no coupon" class="">
-                  <p class="no-coupon-text">您还没有购买任何卡券</p>
-                  <button type="button" class="goShop" @click="goShop">前往购买</button>
-                </div>
-              </div>
-            </div>
-          </scroll>
-        </div>
-
-        <div class="validCoupon" v-else>
-          <scroll
-            style="top:3.375rem" class="validCouponScroll" ref="validCouponScroll"
-            :data="invalidCouponsList"
-            :pullup="true"
-            @scrollToEnd="loadMore">
-            <div>
-              <div>
-                <coupon-item class="nav-item"
-                  @handleItem="handleItem"
-                  @showDesText="showDesText"
-                  v-for="(item,index) in invalidCouponsList" :key="index"
-                  :coupondata="item"
-                  :valid="valid"
-                  @popupStatus="popupStatus">
-                </coupon-item>
-                <loading style="padding:  1rem 0" v-show="showLoad" :title="loadingTitle"></loading>
-              </div>
-              <div v-show="noInvalidCoupon" class="no-coupon">
-                <div class="no-coupon-content fadeIn">
-                  <img src="./images/no-coupon.png" alt="no coupon" class="">
-                  <p class="no-coupon-text">您还没有任何失效卡券</p>
-                </div>
-              </div>
-            </div>
-          </scroll>
-        </div>
-        <div class="coupon-customer-service">
+        <div class="coupon-customer-service" v-if="isShowCustome">
           客服电话：<a href="tel:4006680091">4006680091</a> 转 2
         </div>
-        <popup v-show="showConfirmPopup" :showPopupTitle="false" @confirm="confirm" @cancel="cancel">
-          <p style="padding:2.5rem 0.8rem 2rem; font-size: 1rem; color: #333333; line-height: 1.203rem;">
+        <popup v-show="showConfirmPopup" :isShowTitle="false" @confirm="confirm" @cancel="cancel">
+          <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: rgba(61,58,57,1); line-height: 1.2;">
             卡券确认已使用？
           </p>
         </popup>
@@ -97,22 +69,31 @@
     name: 'myCoupon',
     data() {
       return {
+        tabList: [{
+          name: '有效期内',
+          id: 1
+        },
+        {
+          name: '已失效',
+          id: 2
+        }],
         showHeader: false,
         myCouponStyle: "",
-        activeLink: 1,
+        activeLink: 0,
         valid: true,
         couponsList: [],
-        invalidCouponsList:[],
         currentPage: 1,
         pageSize: 10,
-        showLoad: false,
+        showLoad: true,
         noCoupon: false,
-        noInvalidCoupon: false,
         loadingTitle: '正在加载...',
         hasMore: null,
         popupClose: false,
         showConfirmPopup: false,
         checkId: null,
+        isShowCustome: null,
+        scrollStyle: null,
+        transitionName: 'slide-left',
       }
     },
     components: {
@@ -131,11 +112,17 @@
           }
         },
         deep: true
+      },
+      couponsList(newVal){
+        if(newVal.length > 0){
+          this.isShowCustome = true
+        }else{
+          this.isShowCustome = false
+        }
       }
     },
     created() {
       document.title = this.$route.meta.title
-
       let ua = navigator.userAgent.toLowerCase();
       let isWeixin = ua.indexOf('micromessenger') != -1;
       if (!isWeixin) {
@@ -154,6 +141,10 @@
         history.pushState(null, null, document.URL);
         window.addEventListener('popstate', this.goBack, false);
       }
+      setTimeout(() => {
+        //初始化tab
+        this.tabsLineChange(0)
+      }, 500)
     },
     destroyed(){
       window.removeEventListener('popstate', this.goBack, false);
@@ -167,10 +158,15 @@
         }
         this.popupClose = false
       },
-      handelClick(status){
-        this.activeLink = status
+      handelClick(index){
+        if(index < this.activeLink){
+          this.transitionName = 'slide-right'
+        }else if(index > this.activeLink){
+          this.transitionName = 'slide-left'
+        }
+        this.activeLink = index
         this.currentPage = 1
-        if(status == 1){
+        if(index == 0){
           this.valid = true
           this.couponsList = []
           this.getValidCoupon({
@@ -179,26 +175,49 @@
           });
         } else {
           this.valid = false
-          this.invalidCouponsList=[]
+          this.couponsList=[]
           this.getInvalidCouponsList({
             currentPage: this.currentPage,
             pageSize: this.pageSize
           });
         }
+        this.tabsLineChange(index)
+      },
+      tabsLineChange(index){
+        this.$refs.tabItem[index].style.animation = 'changeType 0.1s linear'
+        setTimeout(() => {
+          let width = this.$refs.tabItem[index].getBoundingClientRect().width
+          // console.log(width)
+          this.$refs.tabsLine.style.width = width + 'px' 
+          this.$refs.tabsLine.style.transform = 'translateX('+ this.$refs.tabItem[index].getBoundingClientRect().x +'px)'
+          this.$refs.tabsLine.style.transitionDuration = '0.3s'
+        }, 20)
       },
       loadMore() {
-        if (!this.showLoad && !this.hasMore) {
-          this.getValidCoupon({
-            currentPage: this.currentPage,
-            pageSize: this.pageSize
-          })
+        if (!this.showLoad && this.hasMore) {
+          if(this.activeLink === 0){
+            this.getValidCoupon({
+              currentPage: this.currentPage,
+              pageSize: this.pageSize
+            })
+          }else{
+            this.getInvalidCouponsList({
+              currentPage: this.currentPage,
+              pageSize: this.pageSize
+            });
+          }
         }
       },
       loadImage() {
-        //this.$refs.validCouponScroll.refresh()
+        this.$refs.validCouponScroll.refresh()
       },
       showDesText(){
-        this.$refs.validCouponScroll.refresh()
+        // console.log(this.$refs.validCouponScroll)
+        if(this.activeLink === 0){
+          this.$refs.validCouponScroll[0].refresh()
+        }else{
+          this.$refs.validCouponScroll[1].refresh()
+        }
       },
       handleItem(){
         // console.log("点击了")
@@ -255,14 +274,18 @@
           //console.log(res);
           if (res.code && '00' === res.code) {
             this.currentPage++;
-            this.showLoad = false;
             this.couponsList = this.couponsList.concat(res.result.data)
             if (this.couponsList.length >= res.result.totalRecord) {
+              this.hasMore = false
+            }else{
               this.hasMore = true
             }
             if(this.couponsList.length < 1){
               this.noCoupon = true
+            }else{
+              this.noCoupon = false
             }
+            this.showLoad = false;
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             if(res.url){
               var index = res.url.lastIndexOf("\/");
@@ -274,6 +297,7 @@
                 window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
               }
             }
+            this.showLoad = false;
           } else {
             this.showLoad = false
             this.$toastBox.showToastBox(res.message)
@@ -286,14 +310,18 @@
           if (res.code && '00' === res.code) {
             // console.log(res)
             this.currentPage++;
-            this.showLoad = false;
-            this.invalidCouponsList = this.invalidCouponsList.concat(res.result.data)
-            if (this.invalidCouponsList.length >= res.result.totalRecord) {
+            this.couponsList = this.couponsList.concat(res.result.data)
+            if (this.couponsList.length >= res.result.totalRecord) {
+              this.hasMore = false
+            }else{
               this.hasMore = true
             }
-            if(this.invalidCouponsList.length < 1){
-              this.noInvalidCoupon = true
+            if(this.couponsList.length < 1){
+              this.noCoupon = true
+            }else{
+              this.noCoupon = false
             }
+            this.showLoad = false;
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             if(res.url){
               var index = res.url.lastIndexOf("\/");
@@ -305,6 +333,7 @@
                 window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
               }
             }
+            this.showLoad = false;
           } else {
             this.showLoad = false
             this.$toastBox.showToastBox(res.message)
@@ -314,7 +343,26 @@
     }
   }
 </script>
+<style lang="css">
+  @-webkit-keyframes changeType {
+    from {
+      font-size: 1rem;
+    }
+    to {
+      font-size: 1.25rem;
+    }
+  }
 
+  @keyframes changeType {
+    from {
+      font-size: 1rem;
+    }
+    to {
+      font-size: 1.25rem;
+    }
+  }
+
+</style>
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   .myCoupon
     .myCouponScroll
@@ -323,89 +371,77 @@
       left 0
       right 0
       bottom 0
-      background-color rgb(245, 245, 245)
+      background-color rgb(245, 245, 245, 1)
       .coupon-category
         width 100%
-        height 2.75rem
-        line-height 2.75rem
-        border-top 1px solid rgb(230,230,230)
+        height 3.5rem
+        line-height 3.5rem
         display flex
-        justify-content flex-start
+        justify-content space-evenly
         background-color rgb(255,255,255)
-        // -moz-box-shadow 0px 1px 2px #c1c1c1
-        // -webkit-box-shadow 0px 1px 2px #c1c1c1
-        // box-shadow 0px 1px 2px #c1c1c1
+        border-bottom 0.03rem solid rgba(238,238,238,1)
+        box-sizing border-box
+        position: relative;
+        .tabs-line
+          position: absolute;
+          bottom: 0px;
+          left: 0;
+          z-index: 1;
+          height: 0.15rem;
+          background-color: rgba(183,130,49,1);
+          border-radius: 0.1rem;
         .coupon-tab
-          flex 1
-          font-size 0.875rem
+          font-size 1rem
           text-align center
-          color rgb(102,102,102)
-          position relative
-          .coupon-list
-            height 100%
-            display inline-block
-          .router-link-active
-            color rgb(255,72,0)
-            border-bottom 3px solid rgb(255,72,0)
-            box-sizing: border-box;
-        .coupon-tab-valid::after
-          content ""
-          width 2px
-          height 1.7rem
-          position absolute
-          top 0.525rem
-          right -1px
-          background: -moz-linear-gradient(top, #fff, #ececec, #ddd, #ececec, #fff);
-          background: -webkit-gradient(linear, top, bottom, from(#fff), color-stop(0.25, #ececec), color-stop(0.5, #ddd), color-stop(0.75, #ececec), to(#fff));
-          background: -webkit-linear-gradient(top, #fff, #ececec, #ddd, #ececec, #fff);
-          background: -o-linear-gradient(top, #fff, #ececec, #ddd, #ececec, #fff);
-          background: linear-gradient(#fff, #ececec, #ddd, #ececec, #fff);
-
-        .active
-          .coupon-list
-            color #ff4800
-            padding 0 10px
-            border-bottom 3px solid #ff4800
-            box-sizing border-box
-
+          color rgba(153, 153, 153, 1)
+      
+        .coupon-tab-active
+          color: rgba(196,143,73,1);
+          animation: changeType 0.1s linear;
+          font-size: 1.25rem;
+          font-weight bold
 
     .validCoupon
+      position absolute
+      top 0
+      left 0
+      right 0
+      bottom 3rem
       .validCouponScroll
         position absolute
         top 0
         left 0
         right 0
-        bottom 3rem
-        background-color rgb(245, 245, 245)
+        bottom 0
+        background-color rgb(245, 245, 245, 1)
         overflow hidden
-
-      .no-coupon
-        // position fixed
-        // top 0
-        // left 0
-        // right 0
-        // bottom 0
+    .no-coupon
+        position absolute
+        top 3.5rem
+        left 0
+        right 0
+        bottom 0
         .no-coupon-content
-          position absolute
-          top 6rem
-          width 9.5rem
-          left 50%
-          transform translateX(-50%)
+          height: 100%;
+          padding-top 4rem
           text-align center
+          background-color #fff
           img
-            width 9.5rem
-            height 6.78125rem
+            width 7.5rem
+            height 7.5rem
           .no-coupon-text
-            margin 0.75rem 0 0.9375rem 0
+            margin 1.5rem 0
             font-size 0.75rem
-            color rgb(153,153,153)
+            color rgba(153, 153, 153, 1)
+            font-size 1rem
           .goShop
             outline none
-            background transparent
-            color rgb(66,176,233)
-            border 0.0625rem solid rgb(66,176,233)
-            border-radius 4px
-            padding 0.22rem  0.625rem
+            background rgba(196, 143, 73, 1)
+            color rgb(255,255,255)
+            border none
+            border-radius 0.25rem
+            padding 0.59rem 1.45rem
+            font-size 1.13rem;
 
     .coupon-customer-service
       font-size 0.875rem
@@ -444,5 +480,28 @@
     to {
         opacity: 1
     }
+}
+
+.slide-right-enter-active,
+.slide-right-leave-active,
+.slide-left-enter-active,
+.slide-left-leave-active {
+    will-change: transform;
+    transition: all .3s;
+    position: absolute;
+    width:100%;
+    left:0;
+}
+.slide-right-enter {
+    transform: translateX(-100%);
+}
+.slide-right-leave-active {
+    transform: translateX(100%);
+}
+.slide-left-enter {
+    transform: translateX(100%);
+}
+.slide-left-leave-active {
+    transform: translateX(-100%);
 }
 </style>

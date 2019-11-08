@@ -71,7 +71,6 @@
         <div class="avatar">
           <img v-if="!headImage" src="./images/default_avatar.png" alt="default_avatar">
           <img v-else :src="headImage" alt="avatar">
-          <div class="user-id">ID: 12312312</div>
         </div>
       </div>
       <div v-if="isLogin" class="member-info">

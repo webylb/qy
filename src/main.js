@@ -34,7 +34,7 @@ FastClick.prototype.focus = function (targetElement) {
 };
 
 FastClick.attach(document.body);
-
+const vConsole = new Vconsole();
 // dev数据
 if(process.env.NODE_ENV === 'development'){
   window.infoData = {
@@ -44,8 +44,8 @@ if(process.env.NODE_ENV === 'development'){
     openingPageUuid: '',
   }
   // document.cookie = "QY_COOKIE_PASSPORT_NAME="+"\"sessionId=5d4d7a3867bd42a2b50d98202ab80676&userId=113\""
-  const vConsole = new Vconsole();
-  Vue.use(vConsole)
+  
+  // Vue.use(vConsole)
 }
 
 //添加focus指令

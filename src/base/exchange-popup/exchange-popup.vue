@@ -92,7 +92,6 @@
       .popup-operation
         position relative
         display flex
-        line-height 1.5rem
         color #999
         &:after
           content: " "

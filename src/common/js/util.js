@@ -41,14 +41,18 @@ const formatDate = function(date, type) {
   var hour   = date.getHours()
   var minute = date.getMinutes()
   var second = date.getSeconds()
-
-  if (type == 'YYYY-MM-DD') {
+  
+  if (type === 'YYYY-MM-DD') {
       return [year, month, day].map(formatNumber).join('-')
-  }
-  if (type == '1') {
+  }else if (type === 'Y/M/D') {
+    return [year, month, day].map(formatNumber).join('/')
+  }else if(type === 'Y/M/DH'){
+    return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':')
+  }else if(type === 'M/DH'){
+    return [ month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':')
+  }else if (type === '1') {
     return [month, day].map(formatNumber).join('-')+' '+[hour,minute].map(formatNumber).join(':')
-  }
-  else {
+  }else {
       return [year, month, day].map(formatNumber).join('-') + ' ' + [hour, minute, second].map(formatNumber).join(':')
   }
 }
@@ -77,7 +81,7 @@ const priceStr = function (tb,rmb) {
       }
     }
     if (rmb>0){
-      txt=txt+'￥'+rmb.toFixed(2)
+      txt=txt+rmb.toFixed(2)
     }
     return txt
 };

@@ -135,7 +135,7 @@
         height 2rem
       p 
         font-size:0.81rem;
-        color:rgba(61,58,57,1);
+        color:rgba(102, 102, 102, 1)
         margin-top 0.28rem
   
 </style>

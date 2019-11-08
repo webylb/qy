@@ -19,6 +19,7 @@
             <div v-if="item.moduleType === 'centerOrder'">
               <center-order
                 :isLogin="isLogin"
+                :orderNumData="orderNumData"
                 @onLoaded="onLoaded"
               ></center-order>
             </div>
@@ -164,7 +165,8 @@
         passIdList: null, //要过滤掉的商品id
         isLogin: null,
         userName: null,
-        headImage: null
+        headImage: null,
+        orderNumData: null
       }
     },
     created() {
@@ -242,6 +244,7 @@
               this.isMember = res.result.vipUser
               this.isHaveFavorite = res.result.like
               this.expireTime = tool.formatDate(res.result.cardExpireTime, "YYYY-MM-DD")
+              this.getUserOrderNum()
             }else{
               this.isMember = res.result.vipUser
             }
@@ -267,6 +270,17 @@
             this.packageConfigId = res.result.packageConfigId
             this.merchantGiftPackageId = res.result.merchantGiftPackageId
 
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(e => {
+          this.$toastBox.showToastBox(e)
+        })
+      },
+      getUserOrderNum() {
+        core.getUserOrderNum().then(res => {
+          if (res.code && '00' === res.code) {
+            this.orderNumData = res.result
           } else {
             this.$toastBox.showToastBox(res.message)
           }
