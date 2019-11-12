@@ -3,7 +3,7 @@
     <div class="recommend-wrapper" v-if="type == 'listFile'">
       <div v-for="(i,index) in recommendList" :key="index" @click="jumplinkUrl(i.jumpUrl)" class="recommend-item-wrapper">
         <div class="img-wrapper">
-          <img :src="i.skuCover" alt="">
+          <img :src="i.cover" alt="">
         </div>
         <div class="info-wrapper">
           <p class="name">{{i.itemTitle}}</p>
@@ -22,7 +22,7 @@
     <div class="recommend-wrapper double-wrap" v-else-if="type == 'double'">
       <div v-for="(i,index) in recommendList" :key="index" @click="jumplinkUrl(i.jumpUrl)" class="recommend-item-wrapper">
         <div class="img-wrapper">
-          <img :src="i.skuCover" alt="">
+          <img :src="i.cover" alt="">
         </div>
         <div class="info-wrapper">
           <p class="name" style="-webkit-box-orient: vertical">{{i.itemTitle}}</p>
@@ -40,7 +40,7 @@
     <div class="recommend-wrapper single-big-wrap" v-else-if="type == 'singleBig'">
       <div v-for="(i,index) in recommendList" :key="index" @click="jumplinkUrl(i.jumpUrl)" class="recommend-item-wrapper">
         <div class="img-wrapper">
-          <img :src="i.skuCover" alt="">
+          <img :src="i.cover" alt="">
         </div>
         <div class="info-wrapper">
           <p class="name" style="-webkit-box-orient: vertical">{{i.itemTitle}}</p>

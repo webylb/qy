@@ -32,7 +32,7 @@
       text-align center
       position absolute
       left 50%
-      top 5.75rem
+      top 7.5rem
       transform translateX(-50%)
       width 15rem
       img

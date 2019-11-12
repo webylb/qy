@@ -8,32 +8,31 @@
             <img v-if="headImage" :src="headImage" alt="">
             <img v-else src="./images/vip-default-user.png" alt="user">
             <div class="detail">
-              <div class="title" v-if="!isLogin"><span>立即登录</span></div>
+              <div class="title" v-if="!isLogin" @click="getLoginUrl"><span>立即登录</span></div>
               <div class="title" v-else> <span>{{ userName || '' }}</span> <img  class="" src="./images/power.png" ></div>
               <div class="des" v-if="!isLogin">请登录后购买会员</div>
-              <div class="des" v-else-if="isLogin && !userVipInfo">您还未购买任何会员</div>
-              <div class="des" v-else>我的会员：已开通1种</div>
+              <div class="des" v-else-if="isLogin && !isMember">您还未购买任何会员</div>
+              <div class="des" v-else>我的会员：已开通{{ userVipInfo }}种</div>
             </div>
           </div>
           <div class="vip-wrap">
             <div class="title">
-              <div v-for="(item,index) in vipTypeList" :key="index" class="title-item" :class="[index == activeTitleIndex ? 'title-item-active' : '']" @click="changeTitleActiveIndex(index,item.cardType)" ref="titleItem">
-                {{ item.name }}
+              <div v-for="(item, index) in vipTypeList" :key="item.id" class="title-item" :class="[index == activeTitleIndex ? 'title-item-active' : '']" @click="changeTitleActiveIndex(index,item.id)" ref="titleItem">
+                {{ item.libraryName }}
               </div>
               <div class="tabs-line" ref="tabsLine"></div>
             </div>
             <div class="type-list">
               <transition-group tag="div" :name="transitionName">
-                <div v-show="activeTitleIndex == index" v-for="(item,index) in vipTypeList" :key="item.cardType" class="type-items">
-                  <div class="item" v-for="(item, index) in vipTypeList" :key="index" :class="[index == activeVipIndex ? 'item-active' : '']" @click="changeVipActiveIndex(index,item.cardType)" ref="titleItem">
-                    <div class="item-title">{{ item.name }}</div>
-                    <div class="item-price"><span>￥</span>{{ avg(item.salePrice) }}</div>
+                <div v-show="index == activeTitleIndex" v-for="(item, index) in vipTypeList" :key="item.id" class="type-items">
+                  <div class="item" v-for="(i, index) in item.qyMerchantVipSystemResultList" :key="index" :class="[index == activeVipIndex ? 'item-active' : '']" @click="changeVipActiveIndex(index, i)" ref="titleItem">
+                    <div class="item-title">{{ i.vipCardType }}</div>
+                    <div class="item-price"><span>￥</span>{{ avg(i.sellingPrice) }}</div>
                   </div>
                 </div>
               </transition-group>
             </div>
           </div>
-          
         </div>
         <loading v-else style="padding-top: 50%"></loading>
       </div>
@@ -46,7 +45,7 @@
       </div>
     </div>
     <div class="click-subAddVip" ref="immediatePayment">
-      <div class="left" @click="openExcharge" v-if="allData.isEnable !== 'N'">兑换码激活</div>
+      <!-- <div class="left" @click="openExcharge" v-if="allData.isEnable !== 'N'">兑换码激活</div> -->
       <div class="right" @click="immediatePay">立即开通</div>
     </div>
 
@@ -59,7 +58,7 @@
             <img class="success-img" src="./images/vip-success-open.png" alt="">
           </div>
           <div class="success-open-btmImg">
-            <p class="success-mon-info" v-show="!isExcharge">恭喜您成功开通会员</p>
+            <p class="success-mon-info" v-show="!isExcharge">恭喜您成功开通{{ successMonth }}</p>
             <p class="success-mon-info" style="margin: 2rem 0;" v-show="isExcharge">恭喜您,兑换成功{{ successMonth }}会员</p>
             <p class="success-text-info" v-show="!isExcharge">开始享受您精彩的会员之旅吧!</p>
             <p class="success-btnWrap">
@@ -112,7 +111,7 @@
         vipTypeDefaultId: null,
         activeTitleIndex: 0,
         activeVipIndex: 0,
-        checkType: '',
+        goodsLibraryId: '',
         successOpen: false,
         successTitle: '开通',
         successMonth: '--',
@@ -133,7 +132,10 @@
         userName: null,
         headImage: null,
         userVipInfo: null,
-        checkSecurity: false
+        goodsLibraryName: null,
+        vipTypeDefaultName: null,
+        checkSecurity: false,
+        userId: null
       }
     },
     created () {
@@ -156,7 +158,9 @@
       //价格列表
       this.getVipPackageList({merchantId: this.merchantId});
       //开通成功返回
-      this.isSuccess()
+      if(this.$route.query.type && this.$route.query.type != 0){
+        this.isSuccess()
+      }
     },
     watch:{
       successOpen(){
@@ -174,8 +178,6 @@
         this._initScroll()
         setTimeout(() => {
           this.initHeight()
-          //初始化tab
-          this.tabsLineChange(0)
         }, 500)
       });
     },
@@ -185,11 +187,19 @@
     methods: {
       getMemberInfo(opts) {
         core.memberInfo(opts).then(res => {
+          //console.log(res)
           if (res.code && '00' === res.code) {
-            this.isMember = res.result.vipUser
-            this.isLogin = res.result.id ? true : false
-            this.userName = res.result.nickname
-            this.headImage = res.result.headImage
+            if(res.result){
+              this.userId = res.result.id
+              this.isLogin = res.result.id ? true : false
+              this.userName = res.result.nickname
+              this.headImage = res.result.headImage
+              if(res.result.qyMerchantUserVipResults && res.result.qyMerchantUserVipResults.length > 0){
+                this.vipType = res.result.qyMerchantUserVipResults[0].goodsLibraryName
+                this.userVipInfo = res.result.qyMerchantUserVipResults.length
+              }
+              this.isMember = res.result.vipUser
+            }
             this.loading = false
           } else {
             this.loading = false
@@ -198,6 +208,22 @@
         }).catch(e => {
           this.loading = false
           this.$toastBox.showToastBox(e)
+        })
+      },
+      getLoginUrl(){
+        core.getLoginUrl({merchantId: this.merchantId}).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            if(res.result && res.result.url){
+              window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            }else {
+              this.$router.push('/openMembers')
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
         })
       },
       getNewShopTequan(opts) {
@@ -245,7 +271,14 @@
           //console.log(res)
           if(res.code && '00' == res.code){
             this.vipTypeList = res.result
-            this.vipTypeDefaultId = res.result[0].cardType
+            this.goodsLibraryId = res.result[0].id
+            this.vipTypeDefaultId = res.result[0].qyMerchantVipSystemResultList[0].id
+            this.goodsLibraryName = res.result[0].libraryName
+            this.vipTypeDefaultName = res.result[0].qyMerchantVipSystemResultList[0].vipCardType
+            setTimeout(() => {
+              //初始化tab
+              this.tabsLineChange(0)
+            }, 20)
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -262,19 +295,28 @@
         }
       },
       goVipPay(){
-        let data;
-        if(this.checkType){
-          data = this.checkType
-        }else{
-          data = this.vipTypeDefaultId
+        if(!this.userId){
+          this.isPaying = true
+          this.getLoginUrl()
+          return false;
         }
-        let returnUrl = window.location.href.split(".html")[0]+'.html'+ this.$route.path + '?month='+data
-        core.vipPackagePay({cardType: data,returnUrl:returnUrl}).then(res => {
+        // if(!this.checkSecurity){
+        //   this.$toastBox.showToastBox("请先阅读用户保障协议")
+        //   this.isPaying = true
+        //   return false;
+        // }
+        let data = {channelNumber: null,outOrderId: null};
+        data.goodsLibraryId = this.goodsLibraryId
+        data.userId = this.userId
+        data.vipSystemId = this.vipTypeDefaultId
+        let returnUrl = window.location.href.split(".html")[0]+'.html'+ this.$route.path + '?type='+ this.goodsLibraryName + this.vipTypeDefaultName
+        data.returnUrl = returnUrl
+        let params = JSON.stringify(data)
+        core.vipPackagePay(params).then(res => {
           //console.log(res)
           if(res.code && '00' == res.code){
             if(res.result.goUrl){
               window.location.href = res.result.goUrl
-              this.isPaying = true
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             if(res.url){
@@ -287,11 +329,10 @@
                 window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
               }
             }
-            this.isPaying = true
           } else {
             this.$toastBox.showToastBox(res.message)
-            this.isPaying = true
           }
+          this.isPaying = true
         }).catch(error => {
           this.$toastBox.showToastBox(error)
           this.isPaying = true
@@ -301,20 +342,25 @@
         let res= (a).toFixed(2)
         return res
       },
-      changeTitleActiveIndex(index,cardType){
+      changeTitleActiveIndex(index,id){
         if(index < this.activeTitleIndex){
           this.transitionName = 'slide-right'
         }else if(index > this.activeTitleIndex){
           this.transitionName = 'slide-left'
         }
         this.activeTitleIndex = index
-        this.checkType = cardType
+        this.goodsLibraryId = id
+        this.vipTypeDefaultId = this.vipTypeList[index].qyMerchantVipSystemResultList[0].id
+        this.goodsLibraryName = this.vipTypeList[index].libraryName
+        this.vipTypeDefaultName = this.vipTypeList[index].qyMerchantVipSystemResultList[0].vipCardType
         this.activeVipIndex = 0
         this.tabsLineChange(index)
       },
-      changeVipActiveIndex(index){
-        console.log(index)
+      changeVipActiveIndex(index, i){
+        console.log(i)
         this.activeVipIndex = index
+        this.vipTypeDefaultId = i.id
+        this.vipTypeDefaultName = i.vipCardType
       },
       tabsLineChange(index){
         this.$refs.titleItem[index].style.animation = 'changeType 0.1s linear'
@@ -399,18 +445,15 @@
         }
       },
       isSuccess(){
-        let month = this.$route.query.month
-        if(month){
+        let type = this.$route.query.type
+        // console.log(type)
+        if(type && type != 0){
           this.successTitle = '开通'
           this.isExcharge = false
           this.successOpen = true
-          if(month == 'month1'){
-            this.successMonth = "一个月"
-          }else if(month == 'month3'){
-            this.successMonth = "三个月"
-          }else if(month == 'month12'){
-            this.successMonth = "十二个月"
-          }
+          this.successMonth = type
+          // console.log(this.successMonth)
+          this.$router.replace({path:'/openMembers', query:{type: 0}})
         }
       },
       onLoaded(){
@@ -420,7 +463,8 @@
         this.checkSecurity = !this.checkSecurity
       },
       goSecurity(){
-        console.log('go')
+        // console.log('go')
+        this.$router.push('/userSecurity')
       }
     }
   }
@@ -529,15 +573,18 @@
         box-sizing border-box
         display flex
         flex-wrap wrap
-        justify-content space-around
+        justify-content flex-start
         .item
-          width: 6.3rem;
+          // width: 6.3rem;
+          width 30.45%
           height: 8.13rem;
           background: rgba(252,243,231,0);
           border: 0.05rem solid rgba(183,130,49,1);
           border-radius: 0.5rem;
-          margin: 1rem 0 0 0;
+          margin: 1rem 0.75rem 0 0;
           overflow: hidden;
+          &:nth-child(3n+3) 
+            margin-right 0
           .item-title 
             width: 100%;
             height: 2.5rem;
@@ -584,6 +631,7 @@
     z-index 100
     background rgba(0,0,0,.4)
   .security-content
+    display none
     position fixed
     bottom 3rem
     left 0
@@ -625,9 +673,9 @@
     font-size 1.13rem
     .right
       flex 1
-      text-align left
+      text-align center
       background-color rgba(196,143,73,1)
-      padding-left 3.5rem
+      // padding-left 3.5rem
       box-sizing border-box
 
     .left

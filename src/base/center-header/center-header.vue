@@ -4,7 +4,7 @@
       <div class="center-wrap">
         <div class="userInfo">
           <div  class="name-wrap">
-            <div v-if="isLogin && userName" class="name">{{ userName }}</div>
+            <div v-if="isLogin && vipInfo.userName" class="name">{{ vipInfo.userName }}</div>
             <div v-else class="name">嗨, 等你好久了!</div>
           </div>
           <div class="btn-wrap">
@@ -13,71 +13,44 @@
               <button type="button" v-if="!isMember" class="default-member">普通会员</button>
               <div v-else>
                 <button type="button" class="vip-member" @click="showVipInfo">
-                  <span>黄金会员</span>
+                  <span>{{ vipInfo.vipType }}</span>
                   <img src="./images/w-right.png" alt="">
                   <!-- <i class="iconfont">&#xe611;</i> -->
                   <div class="vip-info" v-show="maskShow" @click.stop>
                       <div class="title">我的会员</div>
                       <div class="vip-list">
-                        <div class="vip-item">
+                        <div class="vip-item" v-for="(item, index) in vipTypeList" :key="index">
                           <div class="vip-cont">
                             <div class="vip-detail">
                               <div class="vip-num">
-                                <span class="num">1</span>
+                                <span class="num">{{ index + 1 }}</span>
                               </div>
-                              <div class="name">黄金会员</div>
+                              <div class="name">{{ item.libraryName }}</div>
                             </div>
-                            <button type="button" v-if="true">立即续费</button>
-                            <button type="button" v-else>立即开通</button>
+                            <button type="button" v-if="item.sTime" @click="unlockMember">立即续费</button>
+                            <button type="button" v-else @click="unlockMember">立即开通</button>
                           </div>
-                          <div class="times" v-if="true">有效期2019/10/01至2019/11/01</div>
-                        </div>
-                        <div class="vip-item">
-                          <div class="vip-cont">
-                            <div class="vip-detail">
-                              <div class="vip-num">
-                                <span class="num">2</span>
-                              </div>
-                              <div class="name">黄金会员</div>
-                            </div>
-                            <button type="button" v-if="true">立即续费</button>
-                            <button type="button" v-else>立即开通</button>
-                          </div>
-                          <div class="times" v-if="true">有效期2019/10/01至2019/11/01</div>
-                        </div>
-                        <div class="vip-item">
-                          <div class="vip-cont">
-                            <div class="vip-detail">
-                              <div class="vip-num">
-                                <span class="num">3</span>
-                              </div>
-                              <div class="name">黄金会员</div>
-                            </div>
-                            <div> 
-                              <button type="button" v-if="true">立即续费</button>
-                              <button type="button" v-else>立即开通</button>
-                            </div>
-                          </div>
-                          <div class="times" v-if="true">有效期2019/10/01至2019/11/01</div>
+                          <div class="times" v-if="item.sTime">有效期{{ item.sTime }}至{{ item.eTime }}</div>
                         </div>
                       </div>
                   </div>
                 </button>
-                <div class="time">有效期2019/10/01至2019/11/01</div>
+                <div class="time">有效期{{ vipInfo.startTime }}至{{ vipInfo.expireTime }}</div>
               </div>
             </div>
           </div>
         </div>
-        <div class="avatar">
-          <img v-if="!headImage" src="./images/default_avatar.png" alt="default_avatar">
-          <img v-else :src="headImage" alt="avatar">
+        <div class="avatar" @click="goUserInfo">
+          <img class="avatar_img" v-if="!vipInfo.headImage" src="./images/default_avatar.png" alt="default_avatar">
+          <img class="avatar_img" v-else :src="vipInfo.headImage" alt="avatar">
+          <img v-if="isLogin" class="avatar_right_img" src="./images/user-right.png" alt="">
         </div>
       </div>
       <div v-if="isLogin" class="member-info">
         <div class="left">
           <img src="./images/power.png" alt="">
           <span v-if="!isMember">开通会员解锁更多权益</span>
-          <span v-else>已开通黄金会员</span>
+          <span v-else>已开通{{ vipInfo.vipType }}</span>
         </div>
         <button type="button" class="renew-member" @click="unlockMember">
           <span v-if="!isMember">立即开通</span>
@@ -113,14 +86,13 @@
         type: Boolean,
         default: false
       },
-      userName: {
-        type: String,
-        default: ''
+      vipInfo: {
+        type: Object,
+        default: {}
       },
-      headImage: {
-        type: String,
-        default: ''
-      },
+      vipTypeList: {
+        type: Array
+      }
     },
     mounted() {
 
@@ -148,6 +120,9 @@
       },
       showVipInfo(){
         this.maskShow = !this.maskShow
+      },
+      goUserInfo() {
+        this.$router.push('/userInfo')
       }
     },
     destroyed() {
@@ -313,16 +288,17 @@
             font-size 0.69rem
             
     .avatar 
-      width 5rem
-      height 5rem
-      position relative
-      img 
-        width 100%
-        height 100%
+      display flex
+      justify-content flex-start
+      align-items center
+      .avatar_img 
+        width 5rem
+        height 5rem
         border-radius 50%
-      .user-id
-        position absolute
-        bottom 0px
+      .avatar_right_img
+        width 0.45rem
+        height 0.75rem
+        margin-left 0.75rem
   
   .member-info
     width: 100%;

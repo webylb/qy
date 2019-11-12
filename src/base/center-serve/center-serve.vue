@@ -17,7 +17,7 @@
         </div>
       </div>
       <div class="center-wrap" style="padding-top:1.75rem;">
-        <div class="order-item" v-if="noSecurity" @click="goServe('security')">
+        <div class="order-item" v-show="isSupportRefund == 'Y'" @click="goServe('security')">
           <img src="./images/serve-security.png" alt="">
           <p>差价赔付</p>
         </div>
@@ -29,7 +29,7 @@
           <img src="./images/serve-customer.png" alt="">
           <p>客服售后</p>
         </div>
-        <div class="order-item" v-if="!noSecurity" style="opacity: 0;">
+        <div class="order-item" v-show="isSupportRefund == 'N'" style="opacity: 0;">
           <img src="./images/serve-security.png" alt="">
           <p>差价赔付</p>
         </div>
@@ -59,9 +59,9 @@
         type: Boolean,
         default:false
       },
-      noSecurity: {
-        type: Boolean,
-        default: false
+      isSupportRefund: {
+        type: String,
+        default: 'N'
       }
     },
     mounted() {
@@ -87,13 +87,13 @@
               this.$router.push('/favorites')
               break;
             case 'preferential':
-              //this.$router.push('/myCoupon')
+              this.$router.push('/myBill')
               break;
             case 'security':
-              //this.$router.push('/myCoupon')
+              this.$router.push('/myBill')
               break;
             case 'question':
-              //this.$router.push('/myCoupon')
+              this.$router.push('/commomQuestion')
               break;
             case 'customer':
               window.location.href = 'https://tb.53kf.com/code/client/10187208/1'

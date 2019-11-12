@@ -8,12 +8,12 @@
           <slot></slot>
         </div>
         <div class="popup-operation" v-if="isShowCancel">
-          <div class="cancel" @click="cancel">{{ cancelText }}</div>
-          <div class="confirm" @click="confirm" v-if="defaultBtn">{{ confirmText }}</div>
+          <div class="cancel" @click.stop="cancel">{{ cancelText }}</div>
+          <div class="confirm" @click.stop="confirm" v-if="defaultBtn">{{ confirmText }}</div>
           <div v-else><a :href="'tel:'+ phoneNum">{{ confirmText }}</a></div>
         </div>
         <div class="popup-operation" v-else>
-          <div class="cancel" @click="cancel">{{ confirmText }}</div>
+          <div class="cancel" @click.stop="cancel">{{ confirmText }}</div>
         </div>
       </div>
     </div>
@@ -30,7 +30,7 @@
           },
           title:{
             type: String,
-            default: '操作提示'
+            default: '提示'
           },
           cancelText:{
             type: String,
@@ -81,10 +81,9 @@
       text-align center
       margin auto
       background-color #fff
-      top 0
-      bottom 0
-      left 0
-      right 0
+      top 40%
+      left 50%
+      transform translate(-50%, -50%)
       z-index 502
       border-radius 0.5rem
       overflow hidden
@@ -102,6 +101,9 @@
         position relative
         display flex
         color #999
+        height 3rem
+        width 100%
+        line-height 3rem
         &:after
           content: " "
           position: absolute
@@ -122,7 +124,6 @@
           font-size 1.13rem
         div
           flex 1
-          padding 1rem 0
           letter-spacing 0.05rem
         .cancel
           font-size 1.13rem

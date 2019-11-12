@@ -6,11 +6,11 @@
           <div class="bill-info">
             <div class="bill-top-item bill-shop">
               <div class="title">剁手<img src="./images/eyes.png" alt=""></div>
-              <div class="des"><span>120</span>次特权商品</div>
+              <div class="des"><span>{{ totalRecord }}</span>次特权商品</div>
             </div>
             <div class="bill-top-item bill-save">
               <div class="title">为您节省<img src="./images/eyes.png" alt=""></div>
-              <div class="des"><span>1123123.12</span>元</div>
+              <div class="des"><span>{{ sumMyDiscountCount }}</span>元</div>
             </div>
           </div>
           <div class="bill-detail">
@@ -36,17 +36,17 @@
                 >
                   <div class="data-item border-bottom" v-for="(item,index) in listData" :key="index">
                     <div class="left-des">
-                      <div class="item-title">{{item.name}}</div>
-                      <div class="item-time">{{item.time}}</div>
+                      <div class="item-title">{{item.skuName}}</div>
+                      <div class="item-time">{{ timeFormat(item.createTime) }}</div>
                     </div>
                     <div class="right-price">
-                      <div class="text">节省<span class="num">{{ item.price }}</span>元</div>
+                      <div class="text">节省<span class="num">{{ item.totalDiscountPrice }}</span>元</div>
                     </div>
                   </div>
                 </van-list>
                 <div class="total" v-if="listData && listData.length > 0">
                   <div>合计</div>
-                  <div>已省<span>10</span>元</div>
+                  <div>已省<span>{{ sumMyDiscountCount }}</span>元</div>
                 </div>
               </div>
             </div>
@@ -93,6 +93,7 @@
             type="date"
             :show-toolbar=false
             @change="getDateVal"
+            :max-date="maxDate"
           />
       <div class="btm-option"> 
         <div class="reset" @click="onReset">重置</div>
@@ -106,7 +107,7 @@
   import { Button, DatetimePicker, Popup , Field, List } from 'vant';
   import Scroll from '../../base/scroll/scroll'
   import Loading from '../../base/loading/loading'
-  import * as core from '../../api/member'
+  import * as core from '../../api/myBill'
   import tool from '../../common/js/util'
 
   export default {
@@ -129,19 +130,16 @@
         startTime: null,
         endTime: null,
         currentDate: new Date(),
+        maxDate: new Date(),
         pageSize: 10,
         pageIndex: 1,
         loading: false,
         finished: false,
         offsetVal: 1,
         checkStatus: false,
-        listData: [
-          {
-            name: '星巴克大杯通兑券×1',
-            time: '2019/10/29 15:00:00',
-            price: 2
-          }
-        ]
+        listData: [],
+        totalRecord: 0,
+        sumMyDiscountCount: 0
       }
     },
     watch: {
@@ -169,9 +167,7 @@
     },
     created() {
       document.title = this.$route.meta.title
-      setTimeout(() => {
-        this.loaded = false
-      }, 1500)
+      this.getDiscountsInfo({pageIndex:this.pageIndex,pageSize: this.pageSize})
     },
     mounted() {
 
@@ -185,7 +181,7 @@
         if(this.endTime){
           data.endTime = this.endTime
         }
-        this.getList(data)
+        this.getDiscountsInfo(data)
       },
       showPopup(){
         this.isShowPopup = true
@@ -205,11 +201,17 @@
       },
       getDateVal(ele){
         let date = ele.getValues()
-        console.log(date)
-        if(this.timeType == 'start'){
+        //console.log(date)
+        if(!this.timeType){
+          this.timeType = 'start'
           this.startTime = tool.formatDate(new Date(date[0], date[1] - 1, date[2]).getTime(), 'YYYY-MM-DD')
         }else{
-          this.endTime = tool.formatDate(new Date(date[0], date[1] - 1, date[2]).getTime(), 'YYYY-MM-DD')
+          if(this.timeType == 'start'){
+            this.startTime = tool.formatDate(new Date(date[0], date[1] - 1, date[2]).getTime(), 'YYYY-MM-DD')
+          }else{
+            this.timeType = 'end'
+            this.endTime = tool.formatDate(new Date(date[0], date[1] - 1, date[2]).getTime(), 'YYYY-MM-DD')
+          }
         }
       },
       onReset(){
@@ -225,7 +227,40 @@
         if(this.endTime){
           data.endTime = this.endTime
         }
-        // this.getHexiaoList(data, 'close')
+        this.getDiscountsInfo(data, 'close')
+      },
+      getDiscountsInfo(opts,isShow){
+        core.getDiscountsInfo(opts).then(res => {
+          // console.log(res)
+          if (res.code && res.code == '00') {
+            if(res.result.page.data && isShow){
+              this.listData = []
+              this.listData = this.listData.concat(res.result.page.data)
+            }else{
+              this.listData = this.listData.concat(res.result.page.data)
+            }
+            this.totalRecord = res.result.page.totalRecord
+            this.sumMyDiscountCount = res.result.sumMyDiscountCount
+            this.loading = false
+            this.pageIndex = opts.pageIndex + 1
+            if(this.listData.length >= this.totalRecord){
+              this.finished = true;
+            }
+            this.loaded = false
+            if(isShow == 'close'){
+              this.onReset()
+              this.isShowPopup = false
+            }
+          }else{
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.loaded = false
+          this.$toastBox.showToastBox(error)
+        })
+      },
+      timeFormat(val){
+        return tool.formatDate(val,'Y/M/DH')
       }
     }
   }

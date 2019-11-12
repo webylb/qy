@@ -30,7 +30,7 @@
             <div v-show="item.status==='WAIT'" @click="confirmReceipt(item.id)" class="pay">
               立即支付
             </div>
-            <div @click="quxiao(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'">申请退款</div>
+            <!-- <div @click="quxiao(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'">申请退款</div> -->
             <div @click="activeOrder(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'" class="pay">立即激活</div>
             <div @click="showRechargeDetail(item)" v-show="item.status==='SUCCESS' && item.isActivated==='Y' && item.type==='直充'">查看详情</div>
             <div @click="showCouponDetail(item)"
@@ -56,17 +56,17 @@
       客服电话：<a href="tel:4006680091">4006680091</a> 转 2
     </div>
     <popup v-show="showQuXiaoPopup" :isShowTitle="false" @confirm="confirmQuXiao" @cancel="cancel">
-      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333; line-height: 1.2;">
+      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
         是否取消订单?
       </p>
     </popup>
     <popup v-show="showQueRenPopup" :isShowTitle="false" @confirm="confirmQueRen" @cancel="cancel">
-      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333; line-height: 1.2;">
+      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
         是否确认支付?
       </p>
     </popup>
     <popup v-show="showActivePopup" :isShowTitle="false" @confirm="confirmActiveOrder" @cancel="cancel">
-      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333; line-height: 1.2;">
+      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
         是否确认激活?
       </p>
     </popup>

@@ -48,14 +48,20 @@ export default new Router({
     //会员个人中心
     {
       path: '/myCenter',
-      meta: {title: '个人中心',keepAlive:false},
+      meta: {title: '会员中心',keepAlive:false},
       component: () => import(/* webpackChunkName: "member" */ '../views/my-center/my-center.vue')
+    },
+    //会员个人信息
+    {
+      path: '/userInfo',
+      meta: {title: '会员中心',keepAlive:false},
+      component: () => import(/* webpackChunkName: "member" */ '../views/user-info/user-info.vue')
     },
     //我喜欢
     {
       path: '/favorites',
       name: 'favorites',
-      meta: {title: '我喜欢',keepAlive:false},
+      meta: {title: '我的收藏',keepAlive:false},
       component: () => import(/* webpackChunkName: "favorites" */ '@/views/favorites/favorites.vue')
     },
     //承接页
@@ -79,11 +85,23 @@ export default new Router({
       meta: {title: '',keepAlive:false},
       component: () => import(/* webpackChunkName: "couponGoods" */ '@/views/coupon-goods/coupon-goods.vue')
     },
-    //账单
+    //我的优惠
     {
       path: '/myBill',
       meta: {title: '我的优惠',keepAlive:false},
-      component: () => import(/* webpackChunkName: "member" */ '../views/my-bill/my-bill.vue')
+      component: () => import(/* webpackChunkName: "center" */ '../views/my-bill/my-bill.vue')
+    },
+    //常见问题
+    {
+      path: '/commomQuestion',
+      meta: {title: '常见问题',keepAlive:false},
+      component: () => import(/* webpackChunkName: "center" */ '../views/common-question/common-question.vue')
+    },
+     //用户保障
+    {
+      path: '/userSecurity',
+      meta: {title: '会员保障',keepAlive:false},
+      component: () => import(/* webpackChunkName: "center" */ '../views/user-security/user-security.vue')
     },
     //订单
     {

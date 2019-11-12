@@ -12,13 +12,13 @@
                 <p class="good-item-cashPrice">
                   <span class="good-item-moneylable">¥</span>
                   <span> {{ priceToFixed(item.settlementPrice) }}</span>
-                  <span class="good-item-lable">会员价</span>
+                  <img class="good-item-lable" src="./images/label.png" />
                 </p>
                 <p class="good-item-oldPrice">
                   官方价: <s>¥{{ priceToFixed(item.marketPrice) }}</s>
                 </p>
                 <div v-show="index === activeIndex" class="checkIcon">
-                  <i class="iconfont">&#xe608;</i>
+                  <img src="./images/check.png" alt="">
                 </div>
               </div>
             </div>
@@ -48,14 +48,16 @@
           </div>
           <div v-else class="num-option">
             <div class="shop-num-minus" @click="minsNum">
-              <i v-show="isMin" class="iconfont min-default">&#xe605;</i>
-              <i v-show="!isMin" class="iconfont min-active">&#xe606;</i>
+              <img v-if="isMin" class="min-default" src="./images/mins.png" alt="">
+              <img v-else class="min-active" src="./images/mins-active.png" alt="">
             </div>
             <div class="shop-num-input">
-              <input type="number" v-model="shopNum" @click.stop="focusInput"  @blur="scrollToTop" readonly="readonly" class="shop-num-val">
+              {{ shopNum }}
+              <!-- <input type="number" v-model="shopNum" @click.stop="focusInput"  @blur="scrollToTop" readonly="readonly" class="shop-num-val"> -->
             </div>
             <div class="shop-num-add" @click="addNum">
-              <i class="iconfont" :class="[ isMax === true ? 'max-active' : 'max-default' ]">&#xe604;</i>
+              <img v-if="isMax" class="max-default" src="./images/add.png" alt="">
+              <img v-else class="max-active" src="./images/add-active.png" alt="">
             </div>
           </div>
         </div>
@@ -69,7 +71,6 @@
               {{ useExpireTips  }}
             </div>
           </div>
-
         </div>
         <div class="good-descript">
           <div class="good-descript-title">商品描述</div>
@@ -88,16 +89,21 @@
     <loading v-show="showLoad" style="padding-top: 50%"></loading>
     <div class="add-like">
       <div class="add-like-btn" @click="addLike">
-        <i class="iconfont" v-if="islike">&#xe607;</i>
-        <i class="iconfont" v-else>&#xe609;</i>
+        <img class="like-img" v-if="!islike" src="./images/like.png" alt="">
+        <img class="like-img" v-else src="./images/like-active.png" alt="">
+      </div>
+    </div>
+    <div class="like-info">
+      <div ref="likeInfo">
+        {{ linkHintText }}
       </div>
     </div>
     <div class="to-service-wrap">
       <div class="to-service" @click="toServiceCall">
-        <i class="iconfont">&#xe629;</i>
+        <img src="./images/coustom_serve.png" alt="">
       </div>
     </div>
-    <popup v-show="showPopup" :showPopupTitle='showPopupTitle' :cancelCart="cancelText" :confirmCart="okText" @confirm="confirm" @cancel="cancel">
+    <popup v-show="showPopup" :showPopupTitle='showPopupTitle' :cancelText="cancelText" :confirmText="okText" @confirm="confirm" @cancel="cancel">
       <p style="padding: 1.5rem 0rem; font-size: 1.125rem; color:#333; line-height: 1.3;">
         {{ hintInformation }}
       </p>
@@ -107,7 +113,11 @@
         客服电话：<a href="tel:4006680091" style="letter-spacing: 0rem;color: #ff4800;">4006680091 转 2 </a>（会员权益业务），如有疑问，请致电工作人员。
       </p>
     </popup>
-    <not-vip-popup v-show="notVip" @hidePopup="hidePopup" @openMember="openMember"></not-vip-popup>
+    <popup v-show="notVip" @cancel="cancel" @confirm="openMember" :title="您暂不可使用此权益" confirmText="前去开卡">
+      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333; line-height: 1.2;">
+        仅限会员用户，开通会员即可享受特权优惠权益
+      </p>
+    </popup>
   </div>
 </template>
 
@@ -172,13 +182,15 @@
         okText:"到货提醒",
         itemId: null,
         skuId: null,
+        libraryId: null,
         shareUrl: location.href,
         shareLink:  window.location.href,  //分享出去的链接
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
         notVip: false,
-        openVipUrl: ''
+        openVipUrl: '',
+        linkHintText: '已收藏'
       }
     },
     created () {
@@ -190,6 +202,9 @@
       if(this.$route.query.skuId){
         this.skuId = this.$route.query.skuId
       }
+      if(this.$route.query.libraryId){
+        this.libraryId = this.$route.query.libraryId
+      }
       //判断是否为微信
       let ua = navigator.userAgent.toLowerCase();
       let isWeixin = ua.indexOf('micromessenger') != -1;
@@ -200,8 +215,8 @@
         this.showHeader=false
         this.couponGoodsStyle = "top:0rem"
       }
-      if(!this.itemId){
-        this.$toastBox.showToastBox("商品ID出错")
+      if(!this.itemId || !this.libraryId){
+        this.$toastBox.showToastBox("商品库ID出错")
         return;
       }
       this.getPassId({merchantId: this.merchantId})
@@ -253,9 +268,6 @@
         this.allsingleSavePrice = (this.singleSavePrice * newval).toFixed(2)
         this.allGoodsPrice = (this.goodsPrice * newval).toFixed(2)
       }
-    },
-    destroyed () {
-
     },
     methods: {
       initHeight(){
@@ -325,7 +337,7 @@
             if (res.result.length > 0) {
               this.passIdList = res.result
             }
-            this.getVipGoodsDetail({itemId: this.itemId, merchantId: this.merchantId})
+            this.getVipGoodsDetail({itemId: this.itemId, merchantId: this.merchantId, qyMerchantGoodsLibraryId: this.libraryId})
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -343,8 +355,8 @@
             // this.getShare()
             this.itemId = res.result.id
 
-            if(res.result.qySkuResultList){
-              let data = res.result.qySkuResultList
+            // if(res.result.qySkuResultList){
+            //   let data = res.result.qySkuResultList
               // if (this.passIdList){
               //   for(let k=0, length3 = this.passIdList.length; k<length3; k++){
               //     for(let j = data.length - 1; j>= 0; j--){
@@ -354,8 +366,9 @@
               //     }
               //   }
               // }
-              this.swiperList = data
-            }
+              // this.swiperList = data
+            // }
+            this.swiperList = res.result.qySkuResultList
             this.title = res.result.title
             this.goodDescript = res.result.content
             this.islike = res.result.like
@@ -452,14 +465,14 @@
         let data = {}
         if(this.$refs.rechargeInputItem){
           if(this.rechargeNum){
-            data = {skuId: this.goodsSku,account:this.rechargeNum,returnUrl: returnUrl,outItemNo:this.outItemNo,providerId:this.providerId}
+            data = {skuId: this.goodsSku,goodsLibraryId: this.libraryId,account:this.rechargeNum,returnUrl: returnUrl,outItemNo:this.outItemNo,providerId:this.providerId}
           }else{
             this.$toastBox.showToastBox("请输入充值账号!")
             this.isPaying = true
             return;
           }
         } else {
-          data = {skuId: this.goodsSku, count: this.shopNum,returnUrl: returnUrl,outItemNo:this.outItemNo,providerId:this.providerId}
+          data = {skuId: this.goodsSku,goodsLibraryId: this.libraryId,count: this.shopNum,returnUrl: returnUrl,outItemNo:this.outItemNo,providerId:this.providerId}
         }
         core.vipGoodsPay(data).then(res => {
           //console.log(res)
@@ -556,15 +569,24 @@
       },
       addLike(){
         if(this.islike){
-          this.cancelFavorite(this.itemId)
+          this.cancelFavorite(this.itemId,this.libraryId)
         }else{
-          this.addFavorite(this.itemId)
+          this.addFavorite(this.itemId,this.libraryId)
         }
       },
-      addFavorite(opts){
-        core.vipGoodsAddLike({itemId: opts}).then(res=>{
+      addFavorite(id, libraryId){
+        core.vipGoodsAddLike({itemId: id, goodsLibraryId: libraryId}).then(res=>{
           if(res.code && '00' == res.code){
             this.islike = true
+            this.linkHintText = '已收藏'
+            this.$refs.likeInfo.style.transform = 'translate(0)' 
+            this.$refs.likeInfo.style.transition = 'transform 0.3s'
+            let timer = null
+            clearTimeout(timer)
+            timer = setTimeout(() => {
+              this.$refs.likeInfo.style.transform = 'translate(100%)' 
+              this.$refs.likeInfo.style.transition = 'transform 0.3s'
+            },1000)
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -572,10 +594,19 @@
           this.$toastBox.showToastBox("网络错误")
         })
       },
-      cancelFavorite(opts){
-        core.vipGoodsDelLike({itemId: opts}).then(res=>{
+      cancelFavorite(id, libraryId){
+        core.vipGoodsDelLike({itemId: id, goodsLibraryId: libraryId}).then(res=>{
           if(res.code && '00' == res.code){
             this.islike = false
+            this.linkHintText = '已取消'
+            this.$refs.likeInfo.style.transform = 'translate(0)' 
+            this.$refs.likeInfo.style.transition = 'transform 0.3s'
+            let timer = null
+            clearTimeout(timer)
+            timer = setTimeout(() => {
+              this.$refs.likeInfo.style.transform = 'translate(100%)' 
+              this.$refs.likeInfo.style.transition = 'transform 0.3s'
+            },1000)
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -596,12 +627,10 @@
       cancel(){
         this.showPopup = false
         this.showCallPopup = false
+        this.notVip = false
       },
       openMember(){
         this.goOpenMember()
-      },
-      hidePopup(){
-        this.notVip = false
       },
       goOpenMember() {
         // this.$refs.openMember.openServeList()
@@ -651,10 +680,10 @@
       right 0
       width 100%
       max-width 750PX
-      height 3.063rem
-      line-height 3.063rem
-      background-color rgb(252,212,148)
-      color rgb(111,65,9)
+      height 3rem
+      line-height 3rem
+      background-color rgba(196, 143, 73, 1)
+      color rgba(255, 255, 255, 1)
       font-size 1.125rem
       text-align center
       font-weight: 600;
@@ -662,67 +691,82 @@
       align-items center
       .pay-save
         flex 1
-        height 3.063rem
+        height 3rem
         padding-left 1rem
         .pay-save-priceicon
-          font-size 0.938rem
-          color: #2d2b32
+          font-size 0.94rem
+          color: rgba(255, 255, 255, 1)
           font-weight 600
-          //height 1.031rem
         .pay-save-goodprice
           font-size 1.25rem
           font-weight 600
-          //height 1.031rem
         .pay-save-saveprice
           font-size 0.813rem
           font-weight 600
-          //height 1.031rem
       .pay-btn
-        width 9.28125rem
+        width 9.84rem
         background url('./images/paybtn.png') no-repeat center
         background-size 100% 100%
         font-size 1.125rem
-        font-weight 600
-        color #fcd494
+        color rgba(255, 255, 255, 1)
         text-align right
         padding-right 1.438rem
         box-sizing border-box
-
+    .like-info
+      position fixed
+      bottom 12.2625rem
+      right 1.95rem
+      width: 5.5rem;
+      height: 1.5rem;
+      z-index 9
+      overflow hidden
+      div
+        padding-left 1rem
+        box-sizing border-box
+        background: rgba(61,58,57,1);
+        opacity: 0.3;
+        border-radius: 0.75rem 0rem 0rem 0.75rem
+        font-size 0.88rem;
+        color rgba(255,255,255,1)
+        line-height 1.5rem
+        position absolute
+        left 0 
+        top 0
+        width 100%
+        height 100%
+        transform translateX(100%)
     .add-like, .to-service-wrap
       position fixed
       bottom 11.8125rem
       right 0.75rem
-      width 2.375rem
-      height 2.375rem
-      line-height 2.375rem
+      width 2.4rem
+      height 2.4rem
+      line-height 2.4rem
       border-radius 50%
       background-color rgb(255,255,255)
-      box-shadow 0rem 0.2rem 0.35rem 0rem rgba(0, 0, 0, 0.08)
+      box-shadow 0rem 0.1rem 0.3rem 0rem rgba(171,171,171,0.5)
       text-align center
+      z-index 10
+    .add-like
       .add-like-btn
+        position relative
         width 100%
         height 100%
-        position relative
-        i
-          position absolute
-          left 50%
-          top 50%
-          transform translate(-50%,-50%)
-          color rgb(255,20,20)
-          font-size 1.2rem
-          line-height 1.15
-          height 50%
+        .like-img
+          width 1.44rem
+          height 1.25rem
     .to-service-wrap
       bottom 8.5rem
       color #3992ff
-      i
-        font-size 1.2rem
+      img
+        width 1.38rem
+        height 1.38rem
     .couponGoodsContent
       position fixed
       left 0
       top 0
       right 0
-      bottom 3.063rem
+      bottom 3rem
       width 100%
       max-width 750PX
       background-color rgb(245,245,245)
@@ -760,7 +804,7 @@
                   min-height: 2.4rem;
                   margin-top 0.45rem
                   font-size 0.875rem
-                  color #333
+                  color rgba(61, 58, 57, 1)
                   padding 0 0.438rem
                   box-sizing border-box
                   line-clamp 2
@@ -773,7 +817,7 @@
                   -webkit-box-orient: vertical;
                 .good-item-cashPrice
                   margin-top 0.32rem
-                  color #ff4800
+                  color rgba(179, 151, 93, 1)
                   padding 0 0.438rem
                   height 0.938rem
                   box-sizing border-box
@@ -788,19 +832,14 @@
                     font-weight 600
                     font-size 1.125rem
                   .good-item-lable
-                    background-color: #2d2c32;
-                    border-radius: 0rem 0.563rem 0.563rem 0.563rem;
-                    font-size 0.6rem
-                    color #f1c488
-                    padding 0.25rem 0.625rem
-                    transform scale(0.8)
-                    display inline-block
-                    margin-left -0.2rem
+                    width:2rem;
+                    height:0.75rem;
+                    margin-left 0.2rem
 
                 .good-item-oldPrice
                   padding 0 0.438rem
                   font-size 0.688rem
-                  color #999999
+                  color rgba(153, 153, 153, 1)
                   margin-top 0.3rem
                   box-sizing border-box
                 .checkIcon
@@ -810,14 +849,15 @@
                   width 1.125rem
                   height 1.125rem
                   color #ff4800
-                  i
-                    font-size 1rem
+                  img
+                    width 100%
+                    height 100%
 
               .good-active-item-content
-                box-shadow 0rem 0.156rem 0.313rem 0rem rgba(255, 72, 0, 0.23)
+                box-shadow 0rem 0.1rem 0.4rem 0rem rgba(196, 143, 73, 0.2)
                 //border-color #ff4800
                 box-sizing border-box
-                border 1px solid #ff4800
+                border 1px solid rgba(196, 143, 73, 1)
                 // -webkit-animation fadeIn 0.5s
                 // animation fadeIn 0.5s
                 transition border 0.3s
@@ -838,7 +878,7 @@
             align-items center
             .hint-text
               font-size 1.063rem
-              color #333
+              color rgba(61, 58, 57, 1)
             .hint-num
               margin-left 0.75rem
               font-size 0.75rem
@@ -879,14 +919,16 @@
               width 1.188rem
               height 1.188rem
               .min-default
-                color #e1e1e1
-                font-size 18px
+                width 100%
+                height 100%
               .min-active
-                color #ff4800
-                font-size 18px
+                width 100%
+                height 100%
             .shop-num-input
               width 2.531rem
               height 100%
+              font-size 1rem
+              text-align center
               .shop-num-val
                 width 100%
                 text-align center
@@ -898,11 +940,11 @@
               width 1.188rem
               height 1.188rem
               .max-default
-                color #ff4800
-                font-size 18px
+                width 100%
+                height 100%
               .max-active
-                color #e1e1e1
-                font-size 18px
+                width 100%
+                height 100%
         .shop-recharge-wrap
           margin-top 0.7rem
           .shop-num-hint
@@ -945,7 +987,7 @@
             box-sizing border-box
             .v-ext
               font-size 0.938rem
-              color #333
+              color rgba(61, 58, 57, 1)
             .v-time
               font-size 0.813rem
               color #ff1414
@@ -969,7 +1011,7 @@
               content ""
               width 0.188rem
               height 1rem
-              background-color #ff4800
+              background-color rgba(196, 143, 73, 1)
 	            border-radius 0.094rem
           .good-descript-text
             padding-bottom 0.5rem

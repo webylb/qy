@@ -416,32 +416,32 @@
         background-color rgb(245, 245, 245, 1)
         overflow hidden
     .no-coupon
-        position absolute
-        top 3.5rem
-        left 0
-        right 0
-        bottom 0
-        .no-coupon-content
-          height: 100%;
-          padding-top 4rem
-          text-align center
-          background-color #fff
-          img
-            width 7.5rem
-            height 7.5rem
-          .no-coupon-text
-            margin 1.5rem 0
-            font-size 0.75rem
-            color rgba(153, 153, 153, 1)
-            font-size 1rem
-          .goShop
-            outline none
-            background rgba(196, 143, 73, 1)
-            color rgb(255,255,255)
-            border none
-            border-radius 0.25rem
-            padding 0.59rem 1.45rem
-            font-size 1.13rem;
+      position absolute
+      top 3.5rem
+      left 0
+      right 0
+      bottom 0
+      .no-coupon-content
+        height: 100%;
+        padding-top 4rem
+        text-align center
+        background-color #fff
+        img
+          width 7.5rem
+          height 7.5rem
+        .no-coupon-text
+          margin 1.5rem 0
+          font-size 0.75rem
+          color rgba(153, 153, 153, 1)
+          font-size 1rem
+        .goShop
+          outline none
+          background rgba(196, 143, 73, 1)
+          color rgb(255,255,255)
+          border none
+          border-radius 0.25rem
+          padding 0.59rem 1.45rem
+          font-size 1.13rem;
 
     .coupon-customer-service
       font-size 0.875rem

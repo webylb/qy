@@ -18,16 +18,17 @@
             <div v-show="index == activeMeunIndex" v-for="(i, index) in serveMeunData" :key="i.id" class="serveTabs">
               <scroll ref="servicesWrapper" class="services-Wrapper" :key="i.id" :data="i.qyCategoryResultList">
                 <ul class="services-content">
-                  <li class="service-list" v-for="service in i.qyCategoryResultList" :key="service.id">
+                  <li class="service-list" v-for="(service, index) in i.qyCategoryResultList" :key="index">
                     <div>
                       <div class="service-title">{{ service.name }}</div>
                       <div class="service-itemWrap">
-                        <div class="service-item" v-for="item in service.qyItemResultList" :key="item.id"  @click="clickServieItem(item.id,item.jumpUrl,item.isDirect)">
+                        <div class="service-item" v-for="(item, index) in service.qyItemResultList" :key="index"  @click="clickServieItem(item.id,item.jumpUrl,i.id)">
                           <div class="icon">
                             <img :src="item.cover" :alt="item.title">
                           </div>
                           <div class="service-name">{{ item.title }}</div>
                           <div class="service-des">{{ item.subTitle }}</div>
+                          <img v-if="hasLabel" class="label" src="./images/label.png" >
                         </div>
                       </div>
                       <!-- <div class="listLast" ref="listLast" v-if="index===serviceMenuList.length-1" :style="listLastHeight"></div> -->
@@ -41,13 +42,24 @@
       </div>
       <loading style="padding-top: 40%" v-show="showLoad" :title="loadingTitle"></loading>
     </div>
+    <div class="float-wrap">
+      <div v-for="item in allData" :key="item.uid">
+        <div v-if="item.moduleType === 'Menu'">
+          <member-menu
+            :menuList="item.configJson.menu_entry"
+            :merchantId="merchantId"
+            @jumplinkUrl="jumplinkUrl"
+          ></member-menu>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-  import BScroll  from 'better-scroll'
   import Scroll from '../../base/scroll/scroll'
   import ShopHeader from '../../base/shop-header/shop-header'
+  import MemberMenu from '../../base/member-menu/member-menu'
   import * as core from '../../api/serviceCenter'
   import tool from '../../common/js/util'
   import wxShareMixin from '../../common/js/wxShareMixin'
@@ -58,13 +70,16 @@
     components: {
       ShopHeader,
       Loading,
-      Scroll
+      Scroll,
+      MemberMenu
     },
     mixins:[wxShareMixin],
     data () {
       return {
         merchantId: window.infoData.merchantId,
+        privilegePageUuid: window.infoData.privilegePageUuid || '',
         showLoad: true,
+        allData: [],
         loadingTitle: '正在加载...',
         showHeader: false,
         serviceCenterStyle: "",
@@ -81,7 +96,8 @@
         shareDesc: '多达100余种会员特权，每年能帮您节省5998元，畅享世界从这里开始！', //分享的详情介绍
         shareImgUrl: 'https://c1.51jujibao.com/static/mkt/2019/05/shareImages/huiyuan.png',
         passIdList: null,//要过滤掉的商品id
-        transitionName: 'slide-left'
+        transitionName: 'slide-left',
+        hasLabel: false
       }
     },
     created () {
@@ -111,12 +127,18 @@
               this.passIdList = res.result
             }
             this.getServideCenterData({merchantId: this.merchantId})
+            this.getNewShopTequan({pageUuid: this.privilegePageUuid})
           } else {
             this.$toastBox.showToastBox(res.message)
           }
         }).catch(e => {
           this.$toastBox.showToastBox(e)
         })
+      },
+      jumplinkUrl(url) {
+        if (url) {
+          window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+        }
       },
       getServideCenterData(opts){
         core.getServiceCenter(opts).then(res => {
@@ -211,14 +233,11 @@
         // var li = this.$refs.servicesWrapper.getElementsByClassName('service-list')[index]
         // this.servicesScroll.scrollToElement(li, 300)
       },
-      clickServieItem(id,jumpUrl,event){
-        if(!event._constructed) {
-          //console.log("1",event)
-        }
+      clickServieItem(id,jumpUrl,libraryId){
         if(jumpUrl){
           window.location.href = tool.replaceUrlMerchantId(jumpUrl,this.merchantId)
         }else{
-          this.$router.push({path:'/couponGoods', query:{itemId: id}})
+          this.$router.push({path:'/couponGoods', query:{itemId: id, libraryId: libraryId}})
         }
       },
       checkedDefault(){
@@ -241,7 +260,22 @@
           this.$refs.tabsLine.style.transform = 'translateX('+ this.$refs.menuItem[index].getBoundingClientRect().x +'px)'
           this.$refs.tabsLine.style.transitionDuration = '0.3s'
         }, 20)
-      }
+      },
+      getNewShopTequan(opts) {
+        core.newShopTequan(opts).then(res => {
+          // console.log(res)
+          if (res.code && '00' === res.code) {
+            if (res.result.data) {
+              let data = JSON.parse(res.result.data)
+              this.allData = data
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(e => {
+          this.$toastBox.showToastBox(e)
+        })
+      },
     },
     computed: {
       currentIndex: {
@@ -404,6 +438,13 @@
                     white-space nowrap
                     overflow hidden
                     text-overflow ellipsis
+                  .label
+                    position absolute
+                    left 0px
+                    top -0.2rem
+                    width 2.06rem
+                    height 1rem
+
 
 
 .slide-right-enter-active,

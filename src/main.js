@@ -42,10 +42,11 @@ if(process.env.NODE_ENV === 'development'){
     merchantName: '测试账户',
     privilegePageUuid: 'b8c88b368d264cf2be74a0493ceb81ce',
     openingPageUuid: '',
+    personalCenterPageUuid: '3456ff378897416aa530dc3155f51019'
   }
   // document.cookie = "QY_COOKIE_PASSPORT_NAME="+"\"sessionId=5d4d7a3867bd42a2b50d98202ab80676&userId=113\""
   
-  // Vue.use(vConsole)
+  Vue.use(vConsole)
 }
 
 //添加focus指令

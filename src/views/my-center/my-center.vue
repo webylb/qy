@@ -9,11 +9,11 @@
                 :merchantId="merchantId"
                 :isMember="isMember"
                 :isLogin="isLogin"
-                :headImage="headImage"
-                :userName="userName"
+                :vipInfo="vipInfo"
+                :vipTypeList="vipTypeList"
                 @onLoaded="onLoaded"
                 @unlockMember="unlockMember"
-                @goLogin="goLogin"
+                @goLogin="getLoginUrl"
               ></center-header>
             </div>
             <div v-if="item.moduleType === 'centerOrder'">
@@ -26,6 +26,7 @@
             <div v-if="item.moduleType === 'centerServe'">
               <center-serve
                 :isLogin="isLogin"
+                :isSupportRefund="isSupportRefund"
                 @onLoaded="onLoaded"
               ></center-serve>
             </div>
@@ -72,8 +73,8 @@
       </div>
     </scroll>
     <div class="float-wrap">
-      <div v-for="item in allData" :key="item.uid">
-        <div v-if="item.moduleType === 'bottomFloat'">
+      <div v-for="item in menuData" :key="item.uid">
+        <!-- <div v-if="item.moduleType === 'bottomFloat'">
           <member-btmfloat
             :title="item.configJson.title"
             :btnText="item.configJson.btnText"
@@ -82,7 +83,7 @@
             @onLoaded="onLoaded"
             @jumplinkUrl="jumplinkUrl"
           ></member-btmfloat>
-        </div>
+        </div> -->
         <div v-if="item.moduleType === 'Menu'">
           <member-menu
             :menuList="item.configJson.menu_entry"
@@ -148,14 +149,15 @@
         merchantName: window.infoData.merchantName || '',
         merchantId: window.infoData.merchantId || '',
         privilegePageUuid: window.infoData.privilegePageUuid || '',
+        personalCenterPageUuid: window.infoData.personalCenterPageUuid || '',
         isMember: true,
         loaded: true,
-        expireTime: '0000-00-00',
         privilegeList: [],
         bannerList: [],
         imgList: [],
         recommendList: [],
         allData: null,
+        menuData: null,
         showErrWrap: false,
         isNewUser: null,
         showGiftPopup: false,
@@ -164,20 +166,22 @@
         merchantGiftPackageId: null ,//礼包id,
         passIdList: null, //要过滤掉的商品id
         isLogin: null,
-        userName: null,
-        headImage: null,
-        orderNumData: null
+        vipInfo: {},
+        orderNumData: null,
+        userVipInfoList: null,
+        vipTypeList: null,
+        isSupportRefund: 'N'
       }
     },
     created() {
       document.title = this.$route.meta.title
       if(this.$route.query.pageUuid){
-        this.privilegePageUuid = this.$route.query.pageUuid
+        this.personalCenterPageUuid = this.$route.query.pageUuid
       }
-      if (this.privilegePageUuid) {
+      if (this.personalCenterPageUuid) {
         this.loaded = false
         this.getMemberInfo({merchantId: this.merchantId})
-        this.getNewShopTequan({pageUuid: this.privilegePageUuid})
+        this.getNewShopTequan({pageUuid: this.personalCenterPageUuid})
       } else {
         this.showErrWrap = true
       }
@@ -237,20 +241,48 @@
           this.$toastBox.showToastBox(e)
         })
       },
+      getNewShopTequanMenu(opts) {
+        core.newShopTequan(opts).then(res => {
+          // console.log(res)
+          if (res.code && '00' === res.code) {
+            if (res.result.data) {
+              let data = JSON.parse(res.result.data)
+              this.menuData = data
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(e => {
+          this.$toastBox.showToastBox(e)
+        })
+      },
       getMemberInfo(opts) {
         core.memberInfo(opts).then(res => {
           if (res.code && '00' === res.code) {
-            if (res.result.vipUser) {
+            if(res.result){
+              this.isLogin = res.result.id ? true : false
+              this.vipInfo.userId = res.result.id
+              this.vipInfo.userName = res.result.nickname
+              this.vipInfo.headImage = res.result.headImage
+              if(res.result.qyMerchantUserVipResults && res.result.qyMerchantUserVipResults.length > 0){
+                this.userVipInfoList = []
+                this.vipInfo.vipType = res.result.qyMerchantUserVipResults[0].goodsLibraryName
+                this.vipInfo.startTime = tool.formatDate(res.result.qyMerchantUserVipResults[0].startTime, "Y/M/D")
+                this.vipInfo.expireTime = tool.formatDate(res.result.qyMerchantUserVipResults[0].expireTime, "Y/M/D")
+                for(let i=0, length = res.result.qyMerchantUserVipResults.length; i < length; i++){
+                  this.userVipInfoList[i] = {}
+                  this.userVipInfoList[i].id =  res.result.qyMerchantUserVipResults[i].goodsLibraryId
+                  this.userVipInfoList[i].vipType =  res.result.qyMerchantUserVipResults[i].goodsLibraryName
+                  this.userVipInfoList[i].startTime = tool.formatDate(res.result.qyMerchantUserVipResults[i].startTime, "Y/M/D")
+                  this.userVipInfoList[i].expireTime = tool.formatDate(res.result.qyMerchantUserVipResults[i].expireTime, "Y/M/D")
+                }
+              }
               this.isMember = res.result.vipUser
-              this.isHaveFavorite = res.result.like
-              this.expireTime = tool.formatDate(res.result.cardExpireTime, "YYYY-MM-DD")
               this.getUserOrderNum()
-            }else{
-              this.isMember = res.result.vipUser
+              this.getVipPackageList({merchantId: this.merchantId})
+              this.getNewShopTequanMenu({pageUuid: this.privilegePageUuid})
             }
-            this.isLogin = res.result.id ? true : false
-            this.userName = res.result.nickname
-            this.headImage = res.result.headImage
+            
             this.isNewUser = res.result.xinShou
             if(res.result.xinShou){
               if(res.result.recriveXinShouLiBao){ //已领取新人礼包
@@ -275,6 +307,38 @@
           }
         }).catch(e => {
           this.$toastBox.showToastBox(e)
+        })
+      },
+      getVipPackageList(opts){
+        core.vipPackageList(opts).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            if(this.userVipInfoList){
+              for (let i=0, length = res.result.length; i < length; i++) {
+                if(res.result)
+                for (let j=0, length2 = this.userVipInfoList.length; j < length2; j++) {
+                  if(res.result[i].id == this.userVipInfoList[j].id){
+                    res.result[i].isOpen = true
+                    res.result[i].sTime = this.userVipInfoList[j].startTime
+                    res.result[i].eTime = this.userVipInfoList[j].expireTime
+                  }
+                }
+              }
+            }
+            this.vipTypeList = res.result
+            for (let i=0, length = this.vipTypeList.length; i < length; i++) {
+              for (let j=0, length2 = this.vipTypeList[i].qyMerchantVipSystemResultList.length; j < length2; j++) {
+                if(this.vipTypeList[i].qyMerchantVipSystemResultList[j].isSupportRefund === 'Y'){
+                  this.isSupportRefund = 'Y'
+                }
+              }
+            }
+          
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
         })
       },
       getUserOrderNum() {
@@ -304,8 +368,21 @@
           this.$toastBox.showToastBox("网络错误")
         })
       },
-      goLogin() {
-
+      getLoginUrl(){
+        core.getLoginUrl({merchantId: this.merchantId}).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            if(res.result && res.result.url){
+              window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            }else {
+              this.$router.push('/openMembers')
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
       },
       hidePopup() {
         this.showGiftPopup = false

@@ -7,14 +7,16 @@
         <div class="login-form">
           <div class="login-form-item">
             <div class="input-wrap">
-              <i class="iconfont left-icon">&#xe615;</i>
+              <!-- <i class="iconfont left-icon">&#xe615;</i> -->
+              <img class="left-icon" src="./images/phone.png" alt="">
               <input type="number" v-model="phone" ref="phone"  @click="focusInput"  @blur="scrollToTop($event,'phone')" placeholder="请输入手机号" v-on:keyup="check_count($event,'phone')" maxlength="11" />
               <i class="iconfont right-icon" v-show="showPhoneClose" @click.stop="clearVal('phone')">&#xe641;</i>
             </div>
           </div>
           <div class="login-form-item">
               <div class="input-wrap">
-                <i class="iconfont left-icon">&#xe61e;</i>
+                <!-- <i class="iconfont left-icon">&#xe61e;</i> -->
+                <img class="left-icon" src="./images/pwd.png" alt="">
                 <input type="number" v-model="code" ref="code" @click="focusInput"  @blur="scrollToTop($event,'code')" placeholder="请输入验证码" v-on:keyup="check_count($event,'code')" maxlength="6" @input="changeSize()" />
                 <i class="iconfont right-icon" v-show="showCodeClose" @click.stop="clearVal('code')">&#xe641;</i>
               </div>
@@ -284,7 +286,7 @@
         padding 0 1.438rem
         .login-title
           font-size 1.375rem
-          color #333
+          color rgba(61, 58, 57, 1)
           margin 3.656rem 0 4.375rem
         .login-form
           .login-form-item
@@ -312,8 +314,8 @@
                 left 0
                 top 50%
                 transform translateY(-50%)
-                font-size 1.2rem
-                color #aaaaaa
+                width 1.25rem
+                height 1.25rem
               .right-icon
                 display block
                 position absolute
@@ -346,6 +348,7 @@
                 height 1.219rem
                 background #eeeeee
                 width 0.156rem
+                background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(221,221,221,1) 50%, rgba(255,255,255,0) 100%);
               button
                 font-size 0.813rem
                 min-width 4rem
@@ -356,7 +359,7 @@
                 text-align center
                 padding 0
                 margin 0
-                color #1890ff
+                color rgba(196, 143, 73, 1)
 
           .sub-wrap
             width 100%
@@ -365,13 +368,13 @@
               width 100%
               height 2.75rem
               font-size 1.125rem
-              border-radius 1.375rem
+              border-radius 0.5rem
               color #fff
               outline none
               border none
-              background-color #dddddd
+              background-color rgba(221,221,221,1)
             .sub-active
-              background-color #1890ff
+              background-color rgba(61, 58, 57, 1)
 
   .customer-service
     position absolute
