@@ -292,7 +292,7 @@
           .login-form-item
             display flex
             justify-content flex-start
-            border-bottom solid 0.031rem #eeeeee
+            border-bottom solid 0.031rem rgba(238, 238, 238, 1)
             height 3rem
             box-sizing border-box
             margin-bottom 0.125rem
@@ -346,9 +346,9 @@
                 top 50%
                 transform translateY(-50%)
                 height 1.219rem
-                background #eeeeee
-                width 0.156rem
-                background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(221,221,221,1) 50%, rgba(255,255,255,0) 100%);
+                width 0.08rem
+                background-color #f9e6e6
+                // background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(221,221,221,1) 50%, rgba(255,255,255,0) 100%);
               button
                 font-size 0.813rem
                 min-width 4rem

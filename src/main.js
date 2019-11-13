@@ -34,9 +34,9 @@ FastClick.prototype.focus = function (targetElement) {
 };
 
 FastClick.attach(document.body);
-const vConsole = new Vconsole();
+
 // dev数据
-if(process.env.NODE_ENV === 'development'){
+if(process.env.NODE_ENV === 'development' || process.env.VUE_APP_TITLE === 'QY_DEV'){
   window.infoData = {
     merchantId: 281,
     merchantName: '测试账户',
@@ -45,7 +45,7 @@ if(process.env.NODE_ENV === 'development'){
     personalCenterPageUuid: '3456ff378897416aa530dc3155f51019'
   }
   // document.cookie = "QY_COOKIE_PASSPORT_NAME="+"\"sessionId=5d4d7a3867bd42a2b50d98202ab80676&userId=113\""
-  
+  const vConsole = new Vconsole();
   Vue.use(vConsole)
 }
 

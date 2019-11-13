@@ -42,9 +42,9 @@
         <div v-if="orderList && orderList.length < 1" class="no-order">
           <div class="no-coupon">
             <div class="no-coupon-content fadeIn">
-              <img src="../order-form/images/no-coupon.png" alt="no coupon"
+              <img src="../order-form/images/no-order.png" alt="no coupon"
                    class="">
-              <p class="no-coupon-text">您还没有相关订单</p>
+              <p class="no-coupon-text">暂无订单~</p>
             </div>
           </div>
         </div>
@@ -462,23 +462,24 @@
       right 0
       bottom 3rem
       .no-order
-        height 16.875rem
+        height 20rem
       .no-coupon
         position relative
         .no-coupon-content
           position absolute
-          top 6rem
+          top 7.5rem
           width 9.5rem
           left 50%
           transform translateX(-50%)
           text-align center
           img
-            width 9.5rem
-            height 6.78125rem
+            width 7.5rem
+            height 7.5rem
+            margin-bottom 1.5rem
           .no-coupon-text
-            margin 0.75rem 0 0.9375rem 0
-            font-size 0.75rem
-            color rgb(153, 153, 153)
+            margin 0 auto
+            font-size 1rem
+            color rgba(153, 153, 153, 1)
 
       .order-item-wrapper
         background-color #fff

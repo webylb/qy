@@ -21,6 +21,7 @@
                 :isLogin="isLogin"
                 :orderNumData="orderNumData"
                 @onLoaded="onLoaded"
+                @goLogin="getLoginUrl"
               ></center-order>
             </div>
             <div v-if="item.moduleType === 'centerServe'">
@@ -28,6 +29,7 @@
                 :isLogin="isLogin"
                 :isSupportRefund="isSupportRefund"
                 @onLoaded="onLoaded"
+                @goLogin="getLoginUrl"
               ></center-serve>
             </div>
             <div v-if="item.moduleType === 'banner'">
@@ -302,6 +304,9 @@
             this.packageConfigId = res.result.packageConfigId
             this.merchantGiftPackageId = res.result.merchantGiftPackageId
 
+          } else if(res.code && '01' === res.code) {
+            this.isLogin = false
+            // this.$toastBox.showToastBox(res.message)
           } else {
             this.$toastBox.showToastBox(res.message)
           }

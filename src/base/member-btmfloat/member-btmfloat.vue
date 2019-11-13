@@ -64,9 +64,10 @@
 <style scoped lang="stylus" rel="stylesheet/stylus">
    .bottom-float
     background url('./images/bottom_float_bg.png') no-repeat center
-    bockground-size 100% 100%
+    background-size 100% 100%
     height 3.125rem
     width 100%
+    max-width 750PX
     position fixed
     bottom 0px
     left 0px

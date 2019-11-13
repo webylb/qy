@@ -201,6 +201,10 @@
               this.isMember = res.result.vipUser
             }
             this.loading = false
+          } else if(res.code && '01' === res.code) {
+            this.loading = false
+            this.isLogin = false
+            // this.$toastBox.showToastBox(res.message)
           } else {
             this.loading = false
             this.$toastBox.showToastBox(res.message)

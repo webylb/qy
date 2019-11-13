@@ -101,6 +101,8 @@
             default:
               break;
           }
+        }else{
+          this.$emit('goLogin')
         }
       }
     },

@@ -122,7 +122,11 @@
         this.maskShow = !this.maskShow
       },
       goUserInfo() {
-        this.$router.push('/userInfo')
+        if(this.isLogin){
+          this.$router.push('/userInfo')
+        }else{
+           this.$emit('goLogin')
+        }
       }
     },
     destroyed() {
@@ -324,7 +328,7 @@
       border 0
       background linear-gradient(0deg,rgba(251,216,184,1) 0%,rgba(252,208,169,1) 100%)
       border-radius 1rem
-      padding 0.32rem 0.55rem
+      padding 0.26rem 0.55rem
       color rgba(61,58,57,1)
       display flex
       align-items center

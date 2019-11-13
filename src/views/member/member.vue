@@ -34,7 +34,6 @@
               ></member-banner>
             </div>
             <div v-if="item.moduleType === 'classify'">
-              <!-- <member-title :titleText="item.name"></member-title> -->
               <member-classify
                 :privilegeList="item.configJson.class_entry"
                 :showStyle="item.configJson.optionsValue"
@@ -144,7 +143,7 @@
         isMember: true,
         loaded: true,
         isHaveFavorite: false,
-        expireTime: '0000-00-00',
+        expireTime: '0000/00/00',
         privilegeList: [],
         bannerList: [],
         imgList: [],
@@ -276,13 +275,10 @@
         core.memberInfo(opts).then(res => {
           if (res.code && '00' === res.code) {
             if (res.result.vipUser) {
-              this.isMember = res.result.vipUser
               this.isHaveFavorite = res.result.like
-              this.expireTime = tool.formatDate(res.result.cardExpireTime, "YYYY-MM-DD")
-            }else{
-              this.isMember = res.result.vipUser
+              this.expireTime = tool.formatDate(res.result.cardExpireTime, "Y/M/D")
             }
-
+            this.isMember = res.result.id ? true : false
             this.isNewUser = res.result.xinShou
             if(res.result.xinShou){
               if(res.result.recriveXinShouLiBao){ //已领取新人礼包
@@ -302,6 +298,9 @@
             this.packageConfigId = res.result.packageConfigId
             this.merchantGiftPackageId = res.result.merchantGiftPackageId
 
+          } else if(res.code && '01' === res.code) {
+            this.isMember = false
+            // this.$toastBox.showToastBox(res.message)
           } else {
             this.$toastBox.showToastBox(res.message)
           }

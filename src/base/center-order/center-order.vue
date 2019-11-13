@@ -83,7 +83,7 @@
               break;
           }
         }else{
-
+          this.$emit('goLogin')
         }
       }
     },
