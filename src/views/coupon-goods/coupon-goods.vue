@@ -89,8 +89,8 @@
     <loading v-show="showLoad" style="padding-top: 50%"></loading>
     <div class="add-like">
       <div class="add-like-btn" @click="addLike">
-        <img class="like-img" v-if="!islike" src="./images/like.png" alt="">
-        <img class="like-img" v-else src="./images/like-active.png" alt="">
+        <img class="like-img" :class="[!islike ? 'img-animate' : '']" v-show="!islike" src="./images/like.png" alt="">
+        <img class="like-img" :class="[islike ? 'img-animate' : '']" v-show="islike" src="./images/like-active.png" alt="">
       </div>
     </div>
     <div class="like-info">
@@ -104,17 +104,17 @@
       </div>
     </div>
     <popup v-show="showPopup" :showPopupTitle='showPopupTitle' :cancelText="cancelText" :confirmText="okText" @confirm="confirm" @cancel="cancel">
-      <p style="padding: 1.5rem 0rem; font-size: 1.125rem; color:#333; line-height: 1.3;">
+      <p style="padding: 1.5rem 0rem; font-size: 1.125rem; color:#333;">
         {{ hintInformation }}
       </p>
     </popup>
     <popup v-show="showCallPopup" :showPopupTitle='showPopupTitle' :defaultBtn="showPopupTitle" phoneNum='4006680091' cancelCart="我知道了" confirmCart="呼叫客服" @confirm="confirmCall" @cancel="cancel">
-      <p style="padding: 1.25rem 0.8rem;font-size: 1rem;font-weight: normal;font-stretch: normal;line-height: 1.375rem;letter-spacing: 0rem;color: #333333;text-align:left;">
+      <p style="padding: 1.25rem 0.8rem;font-size: 1rem;font-weight: normal;font-stretch: normal;letter-spacing: 0rem;color: #333333;text-align:left;">
         客服电话：<a href="tel:4006680091" style="letter-spacing: 0rem;color: #ff4800;">4006680091 转 2 </a>（会员权益业务），如有疑问，请致电工作人员。
       </p>
     </popup>
     <popup v-show="notVip" @cancel="cancel" @confirm="openMember" :title="您暂不可使用此权益" confirmText="前去开卡">
-      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333; line-height: 1.2;">
+      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
         仅限会员用户，开通会员即可享受特权优惠权益
       </p>
     </popup>
@@ -482,17 +482,7 @@
               this.isPaying = true
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
-            this.isPaying = true
-            if(res.url){
-              var index = res.url.lastIndexOf("\/");
-              var str = res.url.substring(index, res.url.length);
-              let regIndex = /\?/gi;
-              if(str && regIndex.test(str)){
-                window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-              }else{
-                window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-              }
-            }
+            this.getLoginUrl()
           }else if(res.code && '02' === res.code) {
             this.isPaying = true
             this.notVip = true
@@ -585,8 +575,10 @@
             clearTimeout(timer)
             timer = setTimeout(() => {
               this.$refs.likeInfo.style.transform = 'translate(100%)' 
-              this.$refs.likeInfo.style.transition = 'transform 0.3s'
+              this.$refs.likeInfo.style.transition = 'transform 0.2s'
             },1000)
+          } else if(res.code && '01' === res.code && res.isLogin == 'false') {
+            this.getLoginUrl()
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -605,8 +597,10 @@
             clearTimeout(timer)
             timer = setTimeout(() => {
               this.$refs.likeInfo.style.transform = 'translate(100%)' 
-              this.$refs.likeInfo.style.transition = 'transform 0.3s'
+              this.$refs.likeInfo.style.transition = 'transform 0.2s'
             },1000)
+          } else if(res.code && '01' === res.code && res.isLogin == 'false') {
+            this.getLoginUrl()
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -659,6 +653,22 @@
             }
           }
         }
+      },
+      getLoginUrl(){
+        core.getLoginUrl({merchantId: this.merchantId}).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            if(res.result && res.result.url){
+              window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            }else {
+              this.$router.push('/login')
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
       }
     },
     updated() {
@@ -1067,6 +1077,13 @@
 .good-descript-text >>> strong
   font-weight bold
 
+.img-animate {
+  -webkit-animation: zoom 0.3s;
+  -moz-animation: zoom 0.3s;
+  animation: zoom 0.3s;
+}
+
+
 @-webkit-keyframes fadeIn {
     from {
       opacity: 0.5
@@ -1083,5 +1100,38 @@
     to {
         opacity: 1
     }
+}
+
+@-webkit-keyframes zoom {
+  0%,100% {
+    -webkit-transform: scale(1);
+  }
+  50% {
+    -webkit-transform: scale(1.1);
+  }
+}
+@-moz-keyframes zoom {
+  0%,100% {
+    -moz-transform: scale(1);
+  }
+  50% {
+    -moz-transform: scale(1.1);
+  }
+}
+@keyframes zoom {
+  0%,100% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+  50% {
+    -webkit-transform: scale(1.1);
+    -moz-transform: scale(1.1);
+    -ms-transform: scale(1.1);
+    -o-transform: scale(1.1);
+    transform: scale(1.1);
+  }
 }
 </style>

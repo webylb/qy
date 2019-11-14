@@ -9,7 +9,7 @@
             <img v-else src="./images/vip-default-user.png" alt="user">
             <div class="detail">
               <div class="title" v-if="!isLogin" @click="getLoginUrl"><span>立即登录</span></div>
-              <div class="title" v-else> <span>{{ userName || '' }}</span> <img  class="" src="./images/power.png" ></div>
+              <div class="title" v-else> <span>{{ userName || '' }}</span> <img v-if="userVipInfo > 0" class="" src="./images/power.png" ></div>
               <div class="des" v-if="!isLogin">请登录后购买会员</div>
               <div class="des" v-else-if="isLogin && !isMember">您还未购买任何会员</div>
               <div class="des" v-else>我的会员：已开通{{ userVipInfo }}种</div>
@@ -221,7 +221,7 @@
             if(res.result && res.result.url){
               window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
             }else {
-              this.$router.push('/openMembers')
+              this.$router.push('/login')
             }
           } else {
             this.$toastBox.showToastBox(res.message)
@@ -274,15 +274,17 @@
         core.vipPackageList(opts).then(res => {
           //console.log(res)
           if(res.code && '00' == res.code){
-            this.vipTypeList = res.result
-            this.goodsLibraryId = res.result[0].id
-            this.vipTypeDefaultId = res.result[0].qyMerchantVipSystemResultList[0].id
-            this.goodsLibraryName = res.result[0].libraryName
-            this.vipTypeDefaultName = res.result[0].qyMerchantVipSystemResultList[0].vipCardType
-            setTimeout(() => {
-              //初始化tab
-              this.tabsLineChange(0)
-            }, 20)
+            if(res.result && res.result.length > 0){
+              this.vipTypeList = res.result
+              this.goodsLibraryId = res.result[0].id
+              this.vipTypeDefaultId = res.result[0].qyMerchantVipSystemResultList[0].id
+              this.goodsLibraryName = res.result[0].libraryName
+              this.vipTypeDefaultName = res.result[0].qyMerchantVipSystemResultList[0].vipCardType
+              setTimeout(() => {
+                //初始化tab
+                this.tabsLineChange(0)
+              }, 20)
+            }
           } else {
             this.$toastBox.showToastBox(res.message)
           }

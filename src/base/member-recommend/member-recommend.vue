@@ -6,7 +6,7 @@
           <img :src="i.cover" alt="">
         </div>
         <div class="info-wrapper">
-          <p class="name">{{i.itemTitle}}</p>
+          <p class="name">{{i.itemName}}</p>
           <p class="price"><s>¥{{ priceToFixed(i.marketPrice) }}</s>
             <span> 官方价</span></p>
           <p class="now-price">
@@ -25,7 +25,7 @@
           <img :src="i.cover" alt="">
         </div>
         <div class="info-wrapper">
-          <p class="name" style="-webkit-box-orient: vertical">{{i.itemTitle}}</p>
+          <p class="name" style="-webkit-box-orient: vertical">{{i.itemName}}</p>
           <p class="price">
             <s>¥{{ priceToFixed(i.marketPrice) }}</s>
             <span>官方价</span>
@@ -43,7 +43,7 @@
           <img :src="i.cover" alt="">
         </div>
         <div class="info-wrapper">
-          <p class="name" style="-webkit-box-orient: vertical">{{i.itemTitle}}</p>
+          <p class="name" style="-webkit-box-orient: vertical">{{i.itemName}}</p>
           <p class="price">
             <s>¥{{ priceToFixed(i.marketPrice) }}</s><span>官方价</span>
           </p>
@@ -145,13 +145,13 @@
           overflow: hidden;
           text-overflow:ellipsis;
           white-space: nowrap;
-          line-height 1
+          line-height 1.2
 
         .price
           margin 1.35rem 0 0.5875rem 0
           color #999
           font-size: 0.8125rem
-          line-height 1
+          line-height 1.2
           display flex
           align-items center
           overflow: hidden;

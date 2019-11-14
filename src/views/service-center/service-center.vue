@@ -423,14 +423,15 @@
                       height:2.63rem;
                       border-radius:50%;
                   .service-name
-                    margin-top 1.72rem
+                    margin-top 1.62rem
                     font-size 0.75rem
                     white-space nowrap
                     overflow hidden
                     text-overflow ellipsis
                     color rgba(196, 143, 73, 1)
+                    line-height 1.2
                   .service-des
-                    margin-top 0.4rem
+                    margin-top 0.3rem
                     font-size 0.75rem
                     color rgba(61, 58, 57, 1)
                     padding 0 0.2rem
@@ -438,6 +439,7 @@
                     white-space nowrap
                     overflow hidden
                     text-overflow ellipsis
+                    line-height 1.2
                   .label
                     position absolute
                     left 0px

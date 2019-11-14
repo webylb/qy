@@ -28,6 +28,12 @@
                       @popupStatus="popupStatus"
                       @showConfirmUse="showConfirmUse">
                     </coupon-item>
+                    <div v-show="couponsList && couponsList.length > 0" class="coupon-customer-service">
+                      <!-- 客服电话：<a href="tel:4006680091">4006680091</a> 转 2 -->
+                      <van-divider :style="{ fontSize: '0.75rem', borderColor: 'rgba(221, 221, 221, 1)', color: 'rgba(61, 58, 57, 1)', padding: '0 3rem' }">
+                        客服电话：<a href="tel:4006680091">4006680091</a>&nbsp;转&nbsp;<span>2</span>
+                      </van-divider>
+                    </div>
                     <loading style="padding:  1rem 0" v-show="showLoad" :title="loadingTitle"></loading>
                   </div>
                 </div>
@@ -42,10 +48,6 @@
             <button type="button" class="goShop" @click="goShop">去逛逛</button>
           </div>
         </div>
-
-        <div class="coupon-customer-service" v-if="isShowCustome">
-          客服电话：<a href="tel:4006680091">4006680091</a> 转 2
-        </div>
         <popup v-show="showConfirmPopup" :isShowTitle="false" @confirm="confirm" @cancel="cancel">
           <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: rgba(61,58,57,1); line-height: 1.2;">
             卡券确认已使用？
@@ -57,6 +59,7 @@
 </template>
 
 <script>
+  import { Divider } from 'vant';
   import Scroll from '../../base/scroll/scroll'
   import ShopHeader from '../../base/shop-header/shop-header'
   import couponItem from '../../base/coupon-item/coupon-item'
@@ -101,7 +104,8 @@
       ShopHeader,
       couponItem,
       Loading,
-      Popup
+      Popup,
+      [Divider.name]: Divider
     },
     watch: {
       // 弹框监听，当弹框显示的时候，pushState添加一个历史，供返回键使用
@@ -164,6 +168,7 @@
         }else if(index > this.activeLink){
           this.transitionName = 'slide-left'
         }
+        // this.noCoupon = false
         this.activeLink = index
         this.currentPage = 1
         if(index == 0){
@@ -406,7 +411,7 @@
       top 0
       left 0
       right 0
-      bottom 3rem
+      bottom 0
       .validCouponScroll
         position absolute
         top 0
@@ -443,22 +448,26 @@
           padding 0.59rem 1.45rem
           font-size 1.13rem;
 
-    .coupon-customer-service
-      font-size 0.875rem
-      color #999999
-      position fixed
-      left 0
-      right 0
-      bottom 0
-      height 3rem
-      text-align center
-      line-height 3rem
-      a
-        text-decoration: underline;
-        font-size: 0.875rem;
-        font-weight: normal;
-        letter-spacing: 0rem;
-        color: #42b0e9;
+  .coupon-customer-service
+    background rgba(245, 245, 245, 1)
+    font-size 0.75rem
+    color #999999
+    // position fixed
+    // left 0
+    // right 0
+    // bottom 0
+    text-align center
+    // z-index 11
+    a
+      font-size: 0.75rem;
+      font-weight: normal;
+      letter-spacing: 0rem;
+      color: rgba(73, 109, 94, 1)
+    span
+      color: rgba(73, 109, 94, 1)
+.common-question /deep/ .van-collapse-item__content {
+  padding-top 0
+}
 .fadeIn {
     -webkit-animation: fadeIn .3s;
             animation: fadeIn .3s;

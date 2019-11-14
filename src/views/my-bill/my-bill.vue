@@ -22,7 +22,7 @@
                 <img class="right-label" src="./images/bill-text-right.png" alt="">
               </div>
               <div class="time-option">
-                <span>日期：开始时间~结束时间</span>
+                <span>日期：{{ startTime || '开始时间' }} ~ {{ endTime || '结束时间'}}</span>
                 <button type="button" @click="showPopup">时间筛选 <img src="./images/btm.png" alt=""> </button>
               </div>
               <div class="shop-list">
@@ -40,17 +40,19 @@
                       <div class="item-time">{{ timeFormat(item.createTime) }}</div>
                     </div>
                     <div class="right-price">
-                      <div class="text">节省<span class="num">{{ item.totalDiscountPrice }}</span>元</div>
+                      <div class="text">节省<span class="num">{{ item.totalDiscountPrice || 0 }}</span>元</div>
                     </div>
                   </div>
                 </van-list>
                 <div class="total" v-if="listData && listData.length > 0">
                   <div>合计</div>
-                  <div>已省<span>{{ sumMyDiscountCount }}</span>元</div>
+                  <div>已省<span>{{ sumMyDiscountCount || 0 }}</span>元</div>
                 </div>
               </div>
+              <div class="btm-img">
+                <!-- <img src="./images/btm-img.png" alt=""> -->
+              </div>
             </div>
-            <div class="btm-img"><img src="./images/btm-img.png" alt=""></div>
           </div>   
         </div> 
         <div v-if="!loaded && !listData">
@@ -239,8 +241,8 @@
             }else{
               this.listData = this.listData.concat(res.result.page.data)
             }
-            this.totalRecord = res.result.page.totalRecord
-            this.sumMyDiscountCount = res.result.sumMyDiscountCount
+            this.totalRecord = res.result.page.totalRecord 
+            this.sumMyDiscountCount = res.result.sumMyDiscountCount || 0
             this.loading = false
             this.pageIndex = opts.pageIndex + 1
             if(this.listData.length >= this.totalRecord){
@@ -248,7 +250,7 @@
             }
             this.loaded = false
             if(isShow == 'close'){
-              this.onReset()
+              this.timeType = null
               this.isShowPopup = false
             }
           }else{
@@ -312,30 +314,38 @@
           padding-top 1.3rem
 
       .bill-detail
-        width 20.94rem
+        width 21.9375rem
         margin 0 auto  
         position relative
-        padding 1.5rem 0.5rem 0
+        padding 0 0.5rem
         box-sizing border-box
         min-height 65vh
         .top-img
-          width 20.94rem
-          height 2rem
+          width 21.9375rem
+          height 1rem
           position absolute
-          left 0
+          left 50%
           top -0.5rem
-          background url('./images/bill-top.png') no-repeat center
-          background-size 100% 100%
+          background-color rgba(47,73,62,1);
+          border-radius 0.5rem
+          transform translateX(-50%)
         .center-info
-          width 100%
+          position absolute
+          left 50%
+          transform translateX(-50%)
+          top 0
+          width 20.9375rem
           background #fff
           min-height 2rem
           padding 0 0.75rem
           box-sizing border-box
+          padding-top 1.4375rem
+          box-shadow:inset 0px 0.6rem 0.6rem -0.6rem rgba(32, 52, 43, 1);
           .title
             display flex
             justify-content center
             height 2rem
+            margin 0 -0.35rem
             .left-label
               align-self flex-end
               width 1.31rem
@@ -411,11 +421,16 @@
               color rgba(226, 58, 55, 1)
               font-family 'DIN-BOLD'
         .btm-img
-          width 100%
-          font-size 0
-          img  
-            width 100%
-            height auto
+          background url('./images/btm-img.png') no-repeat center
+          background-size 109% 100%
+          height 0.25rem
+          width 20.9375rem
+          margin 0 -0.75rem
+          position absolute
+          // font-size 0
+          // img  
+          //   width 100%
+          //   height auto
       .no-vip
         position fixed
         left 0
@@ -498,13 +513,7 @@
   }
 }
 
-.my-bill /deep/ .van-cell:not(:last-child)::after {
-  border-bottom: 0.0625rem solid #c7c7c7;
-}
  .my-bill /deep/ .van-field__left-icon {
    color rgba(196, 143, 73, 1)
  }
-// .my-bill /deep/ .van-hairline-unset--top-bottom::after {
-//   border: 0.03125rem solid #ebedf0;
-// }
 </style>

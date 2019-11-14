@@ -46,13 +46,13 @@
           <img v-if="isLogin" class="avatar_right_img" src="./images/user-right.png" alt="">
         </div>
       </div>
-      <div v-if="isLogin" class="member-info">
+      <div v-if="isLogin" class="member-info" @click="unlockMember">
         <div class="left">
           <img src="./images/power.png" alt="">
           <span v-if="!isMember">开通会员解锁更多权益</span>
           <span v-else>已开通{{ vipInfo.vipType }}</span>
         </div>
-        <button type="button" class="renew-member" @click="unlockMember">
+        <button type="button" class="renew-member">
           <span v-if="!isMember">立即开通</span>
           <span v-else>立即续费</span>
           <img src="./images/b-right.png" alt="">
@@ -263,7 +263,7 @@
                         font-weight: bold;
                         color: rgba(196,143,73,1);
                         font-size: 0.88rem;
-                        line-height: 1;
+                        line-height: 1.2;
                         text-align left 
                         width 8rem
                         overflow hidden

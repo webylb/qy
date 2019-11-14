@@ -380,7 +380,7 @@
             if(res.result && res.result.url){
               window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
             }else {
-              this.$router.push('/openMembers')
+              this.$router.push('/login')
             }
           } else {
             this.$toastBox.showToastBox(res.message)

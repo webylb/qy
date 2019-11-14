@@ -134,15 +134,15 @@
           align-items center
           .title
             font-size 0.813rem
-            color #666
-            padding 0.75rem 0 0.3rem
+            color rgba(61, 58, 57, 1)
+            padding 0.75rem 0 0.25rem
             text-align center
 
           .subhead
             font-size 0.688rem
             padding-bottom 1rem
             color #999
-            padding-top 0.2rem
+            padding-top 0.1rem
             text-align center
 
           img

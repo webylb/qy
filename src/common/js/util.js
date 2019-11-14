@@ -128,7 +128,12 @@ const replaceUrlMerchantId = function(url,id){
 const replaceUrlForUrpass = function(url){
   let reg = /vip.guijitech.com/gi;
   if(reg.test(url)){ //判断是不是承接页
-    return url.replace(reg, 'v.urpass.cn')
+    let reg2 = /prev-vip.guijitech.com/gi;
+    if(reg2.test(url)){
+      return url
+    }else{
+      return url.replace(reg, 'v.urpass.cn')
+    }
   }else{
     return url
   }

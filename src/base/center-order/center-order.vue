@@ -1,7 +1,10 @@
 <template>
   <div style="padding: 0rem;">
     <div class="center-order">
-      <div class="center-title">我的订单</div>
+      <div class="center-title">
+        <div class="title-left">我的订单</div>
+        <div class="title-right" @click="goOrder('all')"><span>查看全部订单</span> <img src="./images/right_icon.png" alt=""></div>
+      </div>
       <div class="center-wrap">
         <div class="order-item" @click="goOrder('wait')">
           <img src="./images/order-wait.png" alt="">
@@ -22,10 +25,10 @@
           <img src="./images/order-success.png" alt="">
           <p>已完成</p>
         </div>
-        <div class="order-item" @click="goOrder('all')">
+        <!-- <div class="order-item" @click="goOrder('all')">
           <img src="./images/order-all.png" alt="">
           <p>全部订单</p>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -102,9 +105,32 @@
   box-sizing border-box
   padding 1.22rem 0.72rem 0 0.72rem 
   .center-title
-    font-size 1.25rem
-    color rgba(61,58,57,1)
-    font-weight 500
+    display flex
+    justify-content space-between
+    align-items center 
+    .title-left 
+      font-size 1.25rem
+      color rgba(61,58,57,1)
+      font-weight 500
+    .title-right
+      display flex
+      justify-content flex-start
+      align-items baseline 
+      position relative
+      &::after 
+        content ''
+        position absolute
+        top -10px
+        left -10px
+        right -10px
+        bottom -10px
+      span 
+        font-size 0.82rem
+        color rgba(153, 153, 153, 1)
+      img  
+        width 0.38rem
+        height 0.65rem
+        margin-left 0.4rem
   .center-wrap
     display flex
     justify-content space-around
@@ -113,8 +139,15 @@
     box-sizing border-box
     .order-item
       text-align center
-      width 3.45rem
+      width 3.4rem
       position relative
+      &::after 
+        content ''
+        position absolute
+        top -10px
+        left -10px
+        right -10px
+        bottom -10px
       img 
         width 2rem
         height 2rem

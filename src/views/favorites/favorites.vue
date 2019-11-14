@@ -5,7 +5,7 @@
 
     <div :style="serviceCenterStyle" class="serviceCenterContent">
       <div class="all-service"  v-show="!showLoad">
-        <div class="menu-wrapper">
+        <div class="menu-wrapper" :style="{ justifyContent: serveMeunData && serveMeunData.length === 1 ? 'flex-start' : 'space-evenly'}">
           <div class="menu-item" ref="menuItem" v-for="(item, index) in serveMeunData" :key="index"
             :class="[ index === activeMeunIndex  ? 'active-menu-item' : '']"
             @click="clickMenuItem(index)">
@@ -303,6 +303,8 @@
           border-bottom 0.0625rem solid rgba(238,238,238,1)
           box-sizing border-box
           background-color rgba(255,255,255,1)
+          padding 0 0.75rem 
+          box-sizing border-box
           .tabs-line
             position: absolute;
             bottom: 0px;

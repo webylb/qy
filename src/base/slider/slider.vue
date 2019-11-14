@@ -193,5 +193,5 @@
         &:last-child
           margin-right 0
         &.active
-          background: rgba(255,46,0,1);
+          background: rgba(196, 143, 73,1);
 </style>

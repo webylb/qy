@@ -105,7 +105,7 @@
             if(res.result && res.result.url){
               window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
             }else {
-              this.$router.push('/openMembers')
+              this.$router.push('/login')
             }
           } else {
             this.$toastBox.showToastBox(res.message)
@@ -123,7 +123,7 @@
       confirm(){
         core.subLogOut().then(res => {
           if (res.code && '00' === res.code) {
-            this.$toastBox.showToastBox(res.message)
+            // this.$toastBox.showToastBox(res.message)
             this.$router.push('/')
           } else {
             this.$toastBox.showToastBox(res.message)

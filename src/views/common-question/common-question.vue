@@ -44,8 +44,8 @@
     </scroll>
     <div class="coupon-customer-service">
       <!-- 客服电话：<a href="tel:4006680091">4006680091</a> 转 2 -->
-      <van-divider :style="{ fontSize: '0.75rem',marginBottom: '1.25rem!important', borderColor: 'rgba(221, 221, 221, 1)', padding: '0 3rem' }">
-        客服电话：<a href="tel:4006680091">4006680091</a> 转 2
+      <van-divider :style="{ fontSize: '0.75rem',color: 'rgba(61, 58, 57, 1)', borderColor: 'rgba(221, 221, 221, 1)', padding: '0 3rem' }">
+        客服电话：<a href="tel:4006680091">4006680091</a>&nbsp;转&nbsp;<span>2</span>
       </van-divider>
     </div>
   </div>
@@ -146,7 +146,16 @@
       font-weight: normal;
       letter-spacing: 0rem;
       color: rgba(73, 109, 94, 1)
+    span
+      color: rgba(73, 109, 94, 1)
+
+
 .common-question /deep/ .van-collapse-item__content {
   padding-top 0
+  padding-bottom 1.2rem
+}
+
+.common-question /deep/ .van-cell {
+  padding: 1.2rem 1rem;
 }
 </style>

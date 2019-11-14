@@ -8,53 +8,56 @@
             class="order-scroll">
       <div style="overflow: hidden;">
         <div v-if="!showLoad">
-        <div v-for="item in orderList" class="order-item-wrapper"
-             :key="item.id">
-          <div class="title-wrapper">
-            <div class="title">{{ merchantName }}特权</div>
-            <div class="state">
-              <span v-show="item.status==='WAIT'">待付款</span>
-              <span v-show="item.status==='SUCCESS' && item.isShip==='N' && item.isActivated === 'N'">待激活</span>
-              <span v-show="item.status==='SUCCESS' && item.isShip==='N' && item.isActivated === 'Y'">待发货</span>
-              <span v-show="item.status==='SUCCESS' && item.isShip==='Y'">已完成</span>
-              <span v-show="item.status==='CANCEL'">已取消</span>
-              <span v-show="item.status==='FAIL'">支付失败</span>
+          <div v-for="item in orderList" class="order-item-wrapper"
+              :key="item.id">
+            <div class="title-wrapper">
+              <div class="title">{{ merchantName }}特权</div>
+              <div class="state">
+                <span v-show="item.status==='WAIT'">待付款</span>
+                <span v-show="item.status==='SUCCESS' && item.isShip==='N' && item.isActivated === 'N'">待激活</span>
+                <span v-show="item.status==='SUCCESS' && item.isShip==='N' && item.isActivated === 'Y'">待发货</span>
+                <span v-show="item.status==='SUCCESS' && item.isShip==='Y'">已完成</span>
+                <span v-show="item.status==='CANCEL'">已取消</span>
+                <span v-show="item.status==='FAIL'">支付失败</span>
+              </div>
+            </div>
+            <OrderItem :item-data="item"></OrderItem>
+            <div class="order-price">
+              共{{item.count}}件商品 实付款<span>¥</span><span class="money">{{price(0,item.money)}}</span>
+            </div>
+            <div class="order-item-bottom">
+              <div @click="quxiao(item.id)" v-show="item.status==='WAIT'">取消订单</div>
+              <div v-show="item.status==='WAIT'" @click="confirmReceipt(item.id)" class="pay">
+                立即支付
+              </div>
+              <!-- <div @click="quxiao(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'">申请退款</div> -->
+              <div @click="activeOrder(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'" class="pay">立即激活</div>
+              <div @click="showRechargeDetail(item)" v-show="item.status==='SUCCESS' && item.isActivated==='Y' && item.type==='直充'">查看详情</div>
+              <div @click="showCouponDetail(item)"
+                  v-show="item.status==='SUCCESS' && item.isShip==='Y' && item.type !='直充' && item.isActivated === 'Y' " class="pay">
+                查看并使用
+              </div>
             </div>
           </div>
-          <OrderItem :item-data="item"></OrderItem>
-          <div class="order-price">
-            共{{item.count}}件商品 实付款<span>¥</span><span class="money">{{price(0,item.money)}}</span>
+          <div v-if="orderList && orderList.length > 0" class="coupon-customer-service">
+            <!-- 客服电话：<a href="tel:4006680091">4006680091</a> 转 2 -->
+            <van-divider :style="{ fontSize: '0.75rem', borderColor: 'rgba(221, 221, 221, 1)', color: 'rgba(61, 58, 57, 1)', padding: '0 3rem' }">
+              客服电话：<a href="tel:4006680091">4006680091</a>&nbsp;转&nbsp;<span>2</span>
+            </van-divider>
           </div>
-          <div class="order-item-bottom">
-            <div @click="quxiao(item.id)" v-show="item.status==='WAIT'">取消订单</div>
-            <div v-show="item.status==='WAIT'" @click="confirmReceipt(item.id)" class="pay">
-              立即支付
-            </div>
-            <!-- <div @click="quxiao(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'">申请退款</div> -->
-            <div @click="activeOrder(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'" class="pay">立即激活</div>
-            <div @click="showRechargeDetail(item)" v-show="item.status==='SUCCESS' && item.isActivated==='Y' && item.type==='直充'">查看详情</div>
-            <div @click="showCouponDetail(item)"
-                 v-show="item.status==='SUCCESS' && item.isShip==='Y' && item.type !='直充' && item.isActivated === 'Y' " class="pay">
-              查看并使用
+          <div v-if="orderList && orderList.length < 1" class="no-order">
+            <div class="no-coupon">
+              <div class="no-coupon-content fadeIn">
+                <img src="../order-form/images/no-order.png" alt="no coupon"
+                    class="">
+                <p class="no-coupon-text">暂无订单~</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div v-if="orderList && orderList.length < 1" class="no-order">
-          <div class="no-coupon">
-            <div class="no-coupon-content fadeIn">
-              <img src="../order-form/images/no-order.png" alt="no coupon"
-                   class="">
-              <p class="no-coupon-text">暂无订单~</p>
-            </div>
-          </div>
-        </div>
         </div>
         <loading v-show="showLoad" :title="loadingTitle" style="padding-top:40%;"></loading>
       </div>
     </scroll>
-    <div class="order-customer-service">
-      客服电话：<a href="tel:4006680091">4006680091</a> 转 2
-    </div>
     <popup v-show="showQuXiaoPopup" :isShowTitle="false" @confirm="confirmQuXiao" @cancel="cancel">
       <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
         是否取消订单?
@@ -81,7 +84,7 @@
       <div class="coupon-info-wrap" v-if="couponList && couponList.length > 0">
         <div v-if="orderType == '兑换码'" class="slider-box 1">
           <slider class="slider-wrapper" :loop=false>
-            <div v-for="(item, index) in couponList" :key="item.id">
+            <div v-for="item in couponList" :key="item.id">
               <div class="item-wrap">
                 <div class="left">
                   <div v-if="item.card && item.pwd">
@@ -128,6 +131,7 @@
 </template>
 
 <script>
+  import { Divider } from 'vant';
   import Slider from '../../base/slider/slider'
   import OrderItem from '../../base/order-item/order-item'
   import OrderNav from '../../base/order-nav/order-nav'
@@ -178,7 +182,8 @@
       OrderItem,
       Loading,
       Popup,
-      Slider
+      Slider,
+      [Divider.name]: Divider
     },
     watch: {
       numData: {
@@ -283,7 +288,7 @@
       confirmActiveOrder(id) {
         core.activeOrder({orderId: this.activeOrderId}).then(res => {
           if (res.code && '00' === res.code) {
-            this.showQuXiaoPopup = false
+            this.showActivePopup = false
             this.activeOrderId = null
             this.$toastBox.showToastBox('激活成功')
             setTimeout(() => {
@@ -460,9 +465,14 @@
       z-index -1
       background-color #f5f5f5
       right 0
-      bottom 3rem
+      bottom 0
       .no-order
-        height 20rem
+        position: fixed;
+        left: 0;
+        top: 3.55rem;
+        right: 0;
+        bottom: 0;
+        background #fff
       .no-coupon
         position relative
         .no-coupon-content
@@ -524,23 +534,6 @@
             color rgba(196, 143, 73, 1)
             border-color rgba(196, 143, 73, 1)
       
-    .order-customer-service
-      background-color #f5f5f5
-      font-size 0.875rem
-      color #999999
-      position fixed
-      left 0
-      right 0
-      bottom 0
-      height 3rem
-      text-align center
-      line-height 3rem
-      a
-        text-decoration: underline;
-        font-size: 0.875rem;
-        font-weight: normal;
-        letter-spacing: 0rem;
-        color: #42b0e9;
     .tuijian
       padding 1rem 4.27% 0
       .you-like
@@ -653,4 +646,25 @@
       font-size 1rem
       line-height 1.2
       margin-bottom 2.38rem
+
+  .coupon-customer-service
+    background rgba(245, 245, 245, 1)
+    font-size 0.75rem
+    color #999999
+    // position fixed
+    // left 0
+    // right 0
+    // bottom 0
+    text-align center
+    z-index 11
+    a
+      font-size: 0.75rem;
+      font-weight: normal;
+      letter-spacing: 0rem;
+      color: rgba(73, 109, 94, 1)
+    span
+      color: rgba(73, 109, 94, 1)
+.common-question /deep/ .van-collapse-item__content {
+  padding-top 0
+}
 </style>

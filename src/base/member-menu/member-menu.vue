@@ -17,7 +17,7 @@
         </div>
       </div>
     </div>
-    <div class="menu-mask menu-fade" v-show="switchStatus == 'on'"></div>
+    <div class="menu-mask menu-fade" @click="switchBtnGroup()" v-show="switchStatus == 'on'"></div>
   </div>
 </template>
 
