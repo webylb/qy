@@ -11,20 +11,20 @@
               <div class="title" v-if="!isLogin" @click="getLoginUrl"><span>立即登录</span></div>
               <div class="title" v-else> <span>{{ userName || '' }}</span> <img v-if="userVipInfo > 0" class="" src="./images/power.png" ></div>
               <div class="des" v-if="!isLogin">请登录后购买会员</div>
-              <div class="des" v-else-if="isLogin && !isMember">您还未购买任何会员</div>
-              <div class="des" v-else>我的会员：已开通{{ userVipInfo }}种</div>
+              <div class="des" v-if="isLogin && !isMember">您还未购买任何会员</div>
+              <div class="des" v-if="isLogin && isMember">我的会员：已开通{{ userVipInfo }}种</div>
             </div>
           </div>
           <div class="vip-wrap">
             <div class="title">
-              <div v-for="(item, index) in vipTypeList" :key="item.id" class="title-item" :class="[index == activeTitleIndex ? 'title-item-active' : '']" @click="changeTitleActiveIndex(index,item.id)" ref="titleItem">
+              <div v-for="(item, index) in vipTypeTitleList" :key="item.id" class="title-item" :class="[index == activeTitleIndex ? 'title-item-active' : '']" @click="changeTitleActiveIndex(index,item.id)" ref="titleItem">
                 {{ item.libraryName }}
               </div>
               <div class="tabs-line" ref="tabsLine"></div>
             </div>
-            <div class="type-list">
+            <div class="type-list" v-if="vipTypeTitleList && vipTypeTitleList.length > 0">
               <transition-group tag="div" :name="transitionName">
-                <div v-show="index == activeTitleIndex" v-for="(item, index) in vipTypeList" :key="item.id" class="type-items">
+                <div v-show="index == activeTitleIndex" v-for="(item, index) in vipTypeTitleList" :key="item.id" class="type-items">
                   <div class="item" v-for="(i, index) in item.qyMerchantVipSystemResultList" :key="index" :class="[index == activeVipIndex ? 'item-active' : '']" @click="changeVipActiveIndex(index, i)" ref="titleItem">
                     <div class="item-title">{{ i.vipCardType }}</div>
                     <div class="item-price"><span>￥</span>{{ avg(i.sellingPrice) }}</div>
@@ -108,6 +108,7 @@
         showHeader: false,
         backUrl: '',
         vipTypeList: null,
+        vipTypeTitleList: null,
         vipTypeDefaultId: null,
         activeTitleIndex: 0,
         activeVipIndex: 0,
@@ -197,8 +198,10 @@
               if(res.result.qyMerchantUserVipResults && res.result.qyMerchantUserVipResults.length > 0){
                 this.vipType = res.result.qyMerchantUserVipResults[0].goodsLibraryName
                 this.userVipInfo = res.result.qyMerchantUserVipResults.length
+                this.isMember = true
+              }else{
+                this.isMember = false
               }
-              this.isMember = res.result.vipUser
             }
             this.loading = false
           } else if(res.code && '01' === res.code) {
@@ -275,21 +278,34 @@
           //console.log(res)
           if(res.code && '00' == res.code){
             if(res.result && res.result.length > 0){
-              this.vipTypeList = res.result
-              this.goodsLibraryId = res.result[0].id
-              this.vipTypeDefaultId = res.result[0].qyMerchantVipSystemResultList[0].id
-              this.goodsLibraryName = res.result[0].libraryName
-              this.vipTypeDefaultName = res.result[0].qyMerchantVipSystemResultList[0].vipCardType
-              setTimeout(() => {
-                //初始化tab
-                this.tabsLineChange(0)
-              }, 20)
+              if(res.result && res.result.length > 0) {
+                this.vipTypeList = res.result
+                this.goodsLibraryId = res.result[0].id
+                this.vipTypeDefaultId = res.result[0].qyMerchantVipSystemResultList[0].id
+                this.goodsLibraryName = res.result[0].libraryName
+                this.vipTypeDefaultName = res.result[0].qyMerchantVipSystemResultList[0].vipCardType
+                this.vipTypeTitleList = [] 
+                for (let i = 0 ; i < this.vipTypeList.length; i++) {
+                  if(this.vipTypeList[i].qyMerchantVipSystemResultList.length > 0){
+                    this.vipTypeTitleList.push(this.vipTypeList[i])
+                  }
+                }
+                //续费
+                if(this.$route.query.goodsLibraryId && this.$route.query.goodsLibraryId !=0){
+                  this.checkDefaultLibrary(this.$route.query.goodsLibraryId)
+                }else{
+                  setTimeout(() => {
+                    //初始化tab
+                    this.tabsLineChange(0)
+                  }, 20)
+                }
+              }
             }
           } else {
             this.$toastBox.showToastBox(res.message)
           }
         }).catch(error => {
-          this.$toastBox.showToastBox("网络错误")
+          this.$toastBox.showToastBox(error)
         })
       },
       immediatePay(){
@@ -363,13 +379,13 @@
         this.tabsLineChange(index)
       },
       changeVipActiveIndex(index, i){
-        console.log(i)
+        // console.log(i)
         this.activeVipIndex = index
         this.vipTypeDefaultId = i.id
         this.vipTypeDefaultName = i.vipCardType
       },
       tabsLineChange(index){
-        this.$refs.titleItem[index].style.animation = 'changeType 0.1s linear'
+        // this.$refs.titleItem[index].style.animation = 'changeType 0.1s linear'
         // console.log(index, this.$refs.titleItem[index].getBoundingClientRect())
         setTimeout(() => {
           let width = this.$refs.titleItem[index].getBoundingClientRect().width
@@ -380,7 +396,7 @@
         }, 20)
       },
       goBack(){
-        this.$router.push('/member')
+        this.$router.push({path: '/serviceCenter', query: {goodsLibraryId: this.goodsLibraryId}})
       },
       hideSuccessPopup(){
         this.successOpen = false
@@ -461,6 +477,16 @@
           // console.log(this.successMonth)
           this.$router.replace({path:'/openMembers', query:{type: 0}})
         }
+      },
+      checkDefaultLibrary(id){
+        let defaultLibrary = null
+        for (let j = 0 ; j < this.vipTypeList.length; j++) {
+          if (this.vipTypeList[j].id === parseInt(id)) {
+            defaultLibrary = j
+          }
+        }
+        this.changeTitleActiveIndex(defaultLibrary, id)
+        this.$router.replace({path:'/openMembers', query:{goodsLibraryId: 0}})
       },
       onLoaded(){
         this.scroll.refresh()
@@ -602,7 +628,7 @@
             color: rgba(183,130,49,1);
             text-align: center;
           .item-price
-            font-family: 'DIN-BOLD';
+            font-family: 'PingFang SC','DIN-BOLD';
             height: 5.63rem;
             line-height 5.63rem
             font-size: 1.75rem;

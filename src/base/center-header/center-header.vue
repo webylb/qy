@@ -27,8 +27,8 @@
                               </div>
                               <div class="name">{{ item.libraryName }}</div>
                             </div>
-                            <button type="button" v-if="item.sTime" @click="unlockMember">立即续费</button>
-                            <button type="button" v-else @click="unlockMember">立即开通</button>
+                            <button type="button" v-if="item.sTime" @click="unlockMember(item.id)">立即续费</button>
+                            <button type="button" v-else @click="unlockMember(item.id)">立即开通</button>
                           </div>
                           <div class="times" v-if="item.sTime">有效期{{ item.sTime }}至{{ item.eTime }}</div>
                         </div>
@@ -46,7 +46,7 @@
           <img v-if="isLogin" class="avatar_right_img" src="./images/user-right.png" alt="">
         </div>
       </div>
-      <div v-if="isLogin" class="member-info" @click="unlockMember">
+      <div v-if="isLogin" class="member-info" @click="unlockMember(vipInfo.id)">
         <div class="left">
           <img src="./images/power.png" alt="">
           <span v-if="!isMember">开通会员解锁更多权益</span>
@@ -112,8 +112,12 @@
       onLoaded(){
         this.$emit('onLoaded')
       },
-      unlockMember(){
-        this.$emit('unlockMember')
+      unlockMember(id){
+        if(id){
+          this.$emit('unlockMember', id)
+        }else{
+          this.$emit('unlockMember')
+        }
       },
       goLogin(){
         this.$emit('goLogin')

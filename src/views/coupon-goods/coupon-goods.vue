@@ -126,7 +126,6 @@
   import ShopHeader from '../../base/shop-header/shop-header'
   import Popup from '../../base/popup/popup'
   import Loading from '../../base/loading/loading'
-  import NotVipPopup from '../../base/notvip-popup/popup'
   import * as core from '../../api/serviceCenter'
   import tool from '../../common/js/util'
   import wxShareMixin from '../../common/js/wxShareMixin'
@@ -135,8 +134,7 @@
     components: {
       ShopHeader,
       Loading,
-      Popup,
-      NotVipPopup
+      Popup
     },
     mixins:[wxShareMixin],
     data () {
@@ -1032,16 +1030,19 @@
             overflow hidden
             line-height 1.2rem
             padding-top 0.2rem
+            color rgba(102, 102, 102, 1)
             p
               text-align justify
               text-justify newspaper
               word-break normal
               overflow hidden
+              color rgba(102, 102, 102, 1)
             span
               text-align justify
               text-justify newspaper
               word-break normal
               overflow hidden
+              color rgba(102, 102, 102, 1)
 
 // 改变placeholder
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
@@ -1072,10 +1073,12 @@
   vertical-align bottom
 
 .good-descript-text >>> b
-  font-weight bold !important
+  // font-weight bold !important
+  color rgba(61, 58, 57, 1)!important
 
 .good-descript-text >>> strong
-  font-weight bold
+  // font-weight bold
+  color rgba(61, 58, 57, 1)!important
 
 .img-animate {
   -webkit-animation: zoom 0.3s;

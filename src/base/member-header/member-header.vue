@@ -32,7 +32,7 @@
           <span class="member-info-right-icon"><img src="./images/member_order-icon.png" /><span>我的订单</span></span>
         </div>
       </div>
-      <div class="vt-renew" :class="[merchantId == '100000' ? 'urp-vt-renew' : '']" @click="vtRenew">
+      <div class="vt-renew" :class="[merchantId == '100000' ? 'urp-vt-renew' : '']" @click="unlockMember">
         <p>立即续费</p>
       </div>
       <div class="card-security" v-if="merchantId == '100000'" @click="goCardSecurity">
@@ -135,9 +135,6 @@
       },
       goToOrderList(){
         this.$emit('goToOrderList')
-      },
-      vtRenew(){
-        this.$emit('vtRenew')
       },
       toMyLike(){
         this.$emit('toMyLike')

@@ -162,13 +162,25 @@
             //   width+=this.$refs.menuItem[0].getBoundingClientRect().width
             // }
             // this.$refs.menuContent.style.width = width+'px'
-            if(this.$route.query.index > -1){
-              // console.log(this.$route.query.index)
-              this.clickMenuItem(parseInt(this.$route.query.index))
+            if(this.$route.query.goodsLibraryId && this.$route.query.goodsLibraryId !=0){
+              let id = this.$route.query.goodsLibraryId
+              let defaultLibrary = null
+              for (let j = 0 ; j < this.serveMeunData.length; j++) {
+                if (this.serveMeunData[j].id === parseInt(id)) {
+                  defaultLibrary = j
+                }
+              }
+              // console.log(defaultLibrary)
+              this.clickMenuItem(defaultLibrary)
+              this.$router.replace({path:'/serviceCenter', query:{goodsLibraryId: 0}})
             }else{
-              this.clickMenuItem(0)
+              if(this.$route.query.index > -1){
+                // console.log(this.$route.query.index)
+                this.clickMenuItem(parseInt(this.$route.query.index))
+              }else{
+                this.clickMenuItem(0)
+              }
             }
-            
             // if (!this.servicesScroll) {
               // 占位高度
               // let length=this.serviceMenuList.length
@@ -235,7 +247,14 @@
       },
       clickServieItem(id,jumpUrl,libraryId){
         if(jumpUrl){
-          window.location.href = tool.replaceUrlMerchantId(jumpUrl,this.merchantId)
+          let url = tool.replaceUrlMerchantId(jumpUrl,this.merchantId)
+          let reg = /\?/gi
+          if(reg.test(url)){
+            window.location.href = url + "&goodsLibraryId=" + libraryId
+          }else{
+            window.location.href = url + "?goodsLibraryId=" + libraryId
+          }
+          // window.location.href = tool.replaceUrlMerchantId(jumpUrl,this.merchantId)
         }else{
           this.$router.push({path:'/couponGoods', query:{itemId: id, libraryId: libraryId}})
         }
@@ -253,7 +272,7 @@
         }
       },
       tabsLineChange(index){
-        this.$refs.menuItem[index].style.animation = 'changeType 0.1s linear'
+        // this.$refs.menuItem[index].style.animation = 'changeType 0.1s linear'
         setTimeout(() => {
           let width = this.$refs.menuItem[index].getBoundingClientRect().width
           this.$refs.tabsLine.style.width = width + 'px' 
@@ -275,7 +294,7 @@
         }).catch(e => {
           this.$toastBox.showToastBox(e)
         })
-      },
+      }
     },
     computed: {
       currentIndex: {
@@ -307,8 +326,11 @@
       }
     },
     activated(){
-      if(this.servicesScroll){
-        this.servicesScroll.refresh();
+      for(let i = 0; i<this.serveMeunData.length; i++){
+        setTimeout(() => {
+          // console.log(i)
+          this.$refs.servicesWrapper[i].refresh();
+        }, 20)
       }
     }
   }
@@ -397,7 +419,7 @@
               padding 0.75rem 0
               .service-title
                 font-size 1.13rem
-                padding-bottom 0.25rem
+                // padding-bottom 0.25rem
                 box-sizing border-box
                 color rgba(61, 58, 57, 1)
           

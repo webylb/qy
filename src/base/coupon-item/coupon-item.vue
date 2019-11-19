@@ -248,12 +248,12 @@
         .coupon-title
           color rgba(61,58,57,0.8)
         .exchange-times 
-          color rgba(153,153,153,0.8)
+          color rgba(203, 203, 203, 1)
         .coupon-vaild-date
-          color rgba(61, 58, 57, 0.8)
+          color rgba(203, 203, 203, 1)
     .coupon-centent
       .coupon-option
-        color rgba(61,58,57,0.8)
+        color rgba(203, 203, 203, 1)
         .coupon-copy
           border 0.0625rem solid rgba(73, 109, 94, 0.6)
           color rgba(73, 109, 94, 0.6)

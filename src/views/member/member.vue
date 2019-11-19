@@ -22,7 +22,6 @@
                 @unlockMember="unlockMember"
                 @goToCouponList="goToCouponList"
                 @goToOrderList="goToOrderList"
-                @vtRenew="vtRenew"
                 @toMyLike="toMyLike"
               ></member-header>
             </div>
@@ -57,7 +56,16 @@
               ></member-recommend>
             </div>
             <div v-if="item.moduleType === 'Top'">
-              <member-title :titleText="item.configJson.title" :textCss="item.configJson.optionsValue"></member-title>
+              <member-title 
+                :titleText="item.configJson.title" 
+                :textCss="item.configJson.optionsValue" 
+                :urlOptionsValue="item.configJson.urlOptionsValue"
+                :jumpTypeOptionsValue="item.configJson.jumpTypeOptionsValue"
+                :urlSelectOptionsValue="item.configJson.urlSelectOptionsValue"
+                :urlInputValue="item.configJson.urlInputValue"
+                :urlTitle="item.configJson.urlTitle"
+                @jumplinkUrl="jumplinkUrl">
+              </member-title>
             </div>
             <div v-if="item.moduleType === 'line'">
               <member-line></member-line>
@@ -183,25 +191,25 @@
       },
       jumpChecklinkUrl(url){
         if(url){
-          if(this.merchantId == '100000'){
-            core.getPassMerchantUser({merchantId: this.merchantId}).then(res => {
-            //console.log(res)
-              if (res.code && '00' === res.code) {
-                if (res.result) {
-                  window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
-                }else{
-                  this.goOpenMember()
-                }
-              } else {
-                this.loaded = true
-                this.$toastBox.showToastBox(res.message)
-              }
-            }).catch(e => {
-              this.$toastBox.showToastBox(e)
-            })
-          }else{
+          // if(this.merchantId == '100000'){
+          //   core.getPassMerchantUser({merchantId: this.merchantId}).then(res => {
+          //   //console.log(res)
+          //     if (res.code && '00' === res.code) {
+          //       if (res.result) {
+          //         window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+          //       }else{
+          //         this.goOpenMember()
+          //       }
+          //     } else {
+          //       this.loaded = true
+          //       this.$toastBox.showToastBox(res.message)
+          //     }
+          //   }).catch(e => {
+          //     this.$toastBox.showToastBox(e)
+          //   })
+          // }else{
             window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
-          }
+          // }
         }
       },
       onLoaded() {
@@ -309,9 +317,6 @@
         })
       },
       unlockMember() {
-        this.goOpenMember()
-      },
-      vtRenew() {
         this.goOpenMember()
       },
       goOpenMember() {

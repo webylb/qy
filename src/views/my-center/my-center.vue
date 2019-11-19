@@ -64,7 +64,16 @@
               ></member-recommend>
             </div>
             <div v-if="item.moduleType === 'Top'">
-              <member-title :titleText="item.configJson.title" :textCss="item.configJson.optionsValue"></member-title>
+              <member-title 
+                :titleText="item.configJson.title" 
+                :textCss="item.configJson.optionsValue" 
+                :urlOptionsValue="item.configJson.urlOptionsValue"
+                :jumpTypeOptionsValue="item.configJson.jumpTypeOptionsValue"
+                :urlSelectOptionsValue="item.configJson.urlSelectOptionsValue"
+                :urlInputValue="item.configJson.urlInputValue"
+                :urlTitle="item.configJson.urlTitle"
+                @jumplinkUrl="jumplinkUrl">
+              </member-title>
             </div>
             <div v-if="item.moduleType === 'line'">
               <member-line></member-line>
@@ -199,25 +208,25 @@
       },
       jumpChecklinkUrl(url){
         if(url){
-          if(this.merchantId == '100000'){
-            core.getPassMerchantUser({merchantId: this.merchantId}).then(res => {
-            //console.log(res)
-              if (res.code && '00' === res.code) {
-                if (res.result) {
-                  window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
-                }else{
-                  this.goOpenMember()
-                }
-              } else {
-                this.loaded = true
-                this.$toastBox.showToastBox(res.message)
-              }
-            }).catch(e => {
-              this.$toastBox.showToastBox(e)
-            })
-          }else{
+          // if(this.merchantId == '100000'){
+          //   core.getPassMerchantUser({merchantId: this.merchantId}).then(res => {
+          //   //console.log(res)
+          //     if (res.code && '00' === res.code) {
+          //       if (res.result) {
+          //         window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+          //       }else{
+          //         this.goOpenMember()
+          //       }
+          //     } else {
+          //       this.loaded = true
+          //       this.$toastBox.showToastBox(res.message)
+          //     }
+          //   }).catch(e => {
+          //     this.$toastBox.showToastBox(e)
+          //   })
+          // }else{
             window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
-          }
+          // }
         }
       },
       onLoaded() {
@@ -268,6 +277,7 @@
               this.vipInfo.headImage = res.result.headImage
               if(res.result.qyMerchantUserVipResults && res.result.qyMerchantUserVipResults.length > 0){
                 this.userVipInfoList = []
+                this.vipInfo.id = res.result.qyMerchantUserVipResults[0].goodsLibraryId
                 this.vipInfo.vipType = res.result.qyMerchantUserVipResults[0].goodsLibraryName
                 this.vipInfo.startTime = tool.formatDate(res.result.qyMerchantUserVipResults[0].startTime, "Y/M/D")
                 this.vipInfo.expireTime = tool.formatDate(res.result.qyMerchantUserVipResults[0].expireTime, "Y/M/D")
@@ -279,7 +289,7 @@
                   this.userVipInfoList[i].expireTime = tool.formatDate(res.result.qyMerchantUserVipResults[i].expireTime, "Y/M/D")
                 }
               }
-              this.isMember = res.result.vipUser
+              this.isMember = res.result.qyMerchantUserVipResults && res.result.qyMerchantUserVipResults.length > 0 ? true :false
               this.getUserOrderNum()
               this.getVipPackageList({merchantId: this.merchantId})
               this.getNewShopTequanMenu({pageUuid: this.privilegePageUuid})
@@ -324,6 +334,7 @@
                 for (let j=0, length2 = this.userVipInfoList.length; j < length2; j++) {
                   if(res.result[i].id == this.userVipInfoList[j].id){
                     res.result[i].isOpen = true
+                    res.result[i].id = this.userVipInfoList[j].id
                     res.result[i].sTime = this.userVipInfoList[j].startTime
                     res.result[i].eTime = this.userVipInfoList[j].expireTime
                   }
@@ -357,14 +368,22 @@
           this.$toastBox.showToastBox(e)
         })
       },
-      unlockMember() {
-        this.goOpenMember()
+      unlockMember(id) {
+        if(id){
+          this.goOpenMember(id)
+        }else{
+          this.goOpenMember()
+        }
       },
-      goOpenMember() {
+      goOpenMember(id) {
         core.getOpenMemberUrl({merchantId: this.merchantId}).then(res => {
           if(res.code && '00' == res.code){
             if(res.result){
-              window.location.href = res.result
+              if(id){
+                window.location.href = res.result + "?goodsLibraryId="+ id
+              }else{
+                window.location.href = res.result
+              }
             }
           }else {
             this.$toastBox.showToastBox(res.message)

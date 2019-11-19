@@ -80,7 +80,7 @@
         <p>订单编号: {{ orderNum }}</p>
       </div>
     </popup>
-    <popup v-show="showCouponPopup" :title="goodsName" @confirm="cancel" @cancel="goMyCoupon" cancelText="查看已激活卡券">
+    <popup v-show="showCouponPopup" :title="goodsName" @confirm="cancel" @cancel="goMyCoupon" cancelText="我的卡券">
       <div class="coupon-info-wrap" v-if="couponList && couponList.length > 0">
         <div v-if="orderType == '兑换码'" class="slider-box 1">
           <slider class="slider-wrapper" :loop=false>
@@ -208,6 +208,7 @@
         this.activeIndex = 0
         this.$refs.orderNavs.tabsLineChange(0)
       }
+      this.cancel()
     },
     methods: {
       formatDateing(e) {
@@ -291,9 +292,15 @@
             this.showActivePopup = false
             this.activeOrderId = null
             this.$toastBox.showToastBox('激活成功')
-            setTimeout(() => {
-              this.handleNav(3, true)
-            }, 200)
+            if(res.result.isShip === 'Y'){
+              setTimeout(() => {
+                this.handleNav(4, true)
+              }, 200)
+            }else{
+              setTimeout(() => {
+                this.handleNav(3, true)
+              }, 200)
+            }
           } else  {
             this.showActivePopup = false
             this.$toastBox.showToastBox(res.message)
@@ -519,7 +526,7 @@
             color rgba(196, 143, 73, 1)
           .money
             font-size 1rem
-            font-family 'DIN-BOLD'
+            font-family 'PingFang SC','DIN-BOLD'
         .order-item-bottom
           display flex
           justify-content flex-end
@@ -580,7 +587,7 @@
       // margin-top 1.88rem
       .coupon-item-img
         width 6.2rem!important
-        height 6.25rem
+        height auto
         margin 0 auto
       .item-wrap
         height 5rem

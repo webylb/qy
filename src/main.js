@@ -37,13 +37,13 @@ FastClick.attach(document.body);
 
 // dev数据
 if(process.env.NODE_ENV === 'development'){
-  // window.infoData = {
-  //   merchantId: 281,
-  //   merchantName: '测试账户',
-  //   privilegePageUuid: 'b8c88b368d264cf2be74a0493ceb81ce',
-  //   openingPageUuid: '',
-  //   personalCenterPageUuid: '3456ff378897416aa530dc3155f51019'
-  // }
+  window.infoData = {
+    merchantId: 100071,
+    merchantName: '测试账户',
+    privilegePageUuid: 'eeec518e1a734da78179c916fe41b1e5',
+    openingPageUuid: '',
+    personalCenterPageUuid: '67216783016a41a89ac706a8e0a93b02'
+  }
   // document.cookie = "QY_COOKIE_PASSPORT_NAME="+"\"sessionId=5d4d7a3867bd42a2b50d98202ab80676&userId=113\""
   // const vConsole = new Vconsole();
   // Vue.use(vConsole)

@@ -178,11 +178,11 @@
         width: 0.32rem
         height: 0.32rem
         border-radius: 50%
-        background: rgba(0,0,0,0.1);
+        background: rgba(196, 143, 73, 0.1);
         &:last-child
           margin-right 0
         &.active
-          background: rgba(255,255,255,1);
+          background: rgba(196, 143, 73, 1);
 
       .line-dot
         display: inline-block

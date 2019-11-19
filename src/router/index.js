@@ -5,8 +5,8 @@ Vue.use(Router)
 
 export default new Router({
   mode: 'history',
-  base: '/f/q/'+ window.infoData.merchantId + '.html/',
-  // base: '/f/q/281.html/',
+  // base: '/f/q/'+ window.infoData.merchantId + '.html/',
+  base: '/f/q/100071.html/',
   routes: [
     {
       path: '/',

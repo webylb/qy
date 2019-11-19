@@ -307,7 +307,7 @@
             font-size 1rem
             span 
               font-size 1.88rem
-              font-family 'DIN-BOLD'
+              font-family 'PingFang SC','DIN-BOLD'
         .bill-shop
           padding-top 5.27rem
         .bill-save
@@ -407,7 +407,7 @@
               .num
                 font-size 1.25rem
                 color rgba(223, 156, 75, 1)
-                font-family 'DIN-BOLD'
+                font-family 'PingFang SC','DIN-BOLD'
         .total
           display flex
           justify-content space-between
@@ -419,7 +419,7 @@
             span 
               font-size 1.25rem
               color rgba(226, 58, 55, 1)
-              font-family 'DIN-BOLD'
+              font-family 'PingFang SC','DIN-BOLD'
         .btm-img
           background url('./images/btm-img.png') no-repeat center
           background-size 109% 100%
