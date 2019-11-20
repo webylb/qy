@@ -5,7 +5,7 @@
         <p class="title" style="-webkit-box-orient: vertical">{{itemData.skuName}}</p>
         <p v-show="itemData.payTime" class="time">{{timeFormat(itemData.payTime)}}</p>
         <!-- <p class="kind"><span>规格：{{itemData.specValueStr}}</span><span>x{{itemData.count}}</span></p> -->
-        <p class="price">¥ <span>{{price(0,itemData.money)}}</span></p>
+        <p class="price" v-if="itemData.money">¥ <span>{{price(0,itemData.money)}}</span></p>
       </div>
     </div>
 </template>

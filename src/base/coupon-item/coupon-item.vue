@@ -50,7 +50,7 @@
           </p>
         </div>
         <div class="coupon-dfu-link">
-          <button type="button" class="confirmUse" @click="showConfirmUse(coupondata.id)" v-if="valid">确认使用</button>
+          <button type="button" class="confirmUse" @click="showConfirmUse(coupondata.id)" v-if="valid">确认已使用</button>
           <a v-if="coupondata.jumpUrl && !coupondata.qrCode" :href="coupondata.jumpUrl">点击去使用</a>
         </div>
       </div>

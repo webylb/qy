@@ -2,7 +2,7 @@
   <div class="my-center">
     <scroll ref="centerScroll" class="center-scroll">
       <div>
-        <div v-if="loaded" class="main-wrapper">
+        <div v-if="loaded" class="main-wrapper" :style="mainWrapperStyle">
           <div v-for="item in allData" :key="item.uid">
             <div v-if="item.moduleType === 'centerTheme'">
               <center-header
@@ -151,8 +151,6 @@
       MemberHot,
       MemberRecommend,
       MemberLine,
-      GiftPopup,
-      MemberBtmfloat,
       MemberMenu
     },
     data() {
@@ -181,7 +179,8 @@
         orderNumData: null,
         userVipInfoList: null,
         vipTypeList: null,
-        isSupportRefund: 'N'
+        isSupportRefund: 'N',
+        mainWrapperStyle: 'padding-bottom:0;'
       }
     },
     created() {
@@ -193,6 +192,7 @@
         this.loaded = false
         this.getMemberInfo({merchantId: this.merchantId})
         this.getNewShopTequan({pageUuid: this.personalCenterPageUuid})
+        this.getNewShopTequanMenu({pageUuid: this.privilegePageUuid})
       } else {
         this.showErrWrap = true
       }
@@ -238,6 +238,11 @@
           if (res.code && '00' === res.code) {
             if (res.result.data) {
               let data = JSON.parse(res.result.data)
+              for(let i=0, length = data.length; i<length; i++){
+                if(data[i].moduleType == 'bottomFloat'){
+                  this.mainWrapperStyle = 'padding-bottom:3.125rem'
+                }
+              }
               this.allData = data
             }
             this.$nextTick(() => {
@@ -248,13 +253,11 @@
             this.$toastBox.showToastBox(res.message)
           }
         }).catch(e => {
-          console.log(e)
           this.$toastBox.showToastBox(e)
         })
       },
       getNewShopTequanMenu(opts) {
         core.newShopTequan(opts).then(res => {
-          // console.log(res)
           if (res.code && '00' === res.code) {
             if (res.result.data) {
               let data = JSON.parse(res.result.data)
@@ -292,7 +295,6 @@
               this.isMember = res.result.qyMerchantUserVipResults && res.result.qyMerchantUserVipResults.length > 0 ? true :false
               this.getUserOrderNum()
               this.getVipPackageList({merchantId: this.merchantId})
-              this.getNewShopTequanMenu({pageUuid: this.privilegePageUuid})
             }
             
             this.isNewUser = res.result.xinShou
@@ -419,16 +421,17 @@
             if (res.code && '00' === res.code) {
               this.$router.push({path: '/newUserCouponBag', query: {merchantGiftPackageId:this.merchantGiftPackageId, packageConfigId:this.packageConfigId}})
             } else if(res.code && '01' === res.code && res.isLogin == 'false'){
-              if(res.url){
-                var index = res.url.lastIndexOf("\/");
-                var str = res.url.substring(index, res.url.length);
-                let regIndex = /\?/gi;
-                if(str && regIndex.test(str)){
-                  window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-                }else{
-                  window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-                }
-              }
+              // if(res.url){
+              //   var index = res.url.lastIndexOf("\/");
+              //   var str = res.url.substring(index, res.url.length);
+              //   let regIndex = /\?/gi;
+              //   if(str && regIndex.test(str)){
+              //     window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+              //   }else{
+              //     window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+              //   }
+              // }
+              this.getLoginUrl()
             } else {
               this.$toastBox.showToastBox(res.message)
             }
@@ -464,8 +467,6 @@
       // margin 0 auto
       z-index 10
       background rgba(245,245,245,1)
-      .main-wrapper 
-        padding-bottom 3.125rem
     .error-wrap
       position absolute
       top 0

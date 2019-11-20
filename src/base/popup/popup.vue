@@ -77,7 +77,7 @@
     .popup-wrapper
       position fixed
       width 20rem
-      display table
+      // display table
       text-align center
       margin auto
       background-color #fff

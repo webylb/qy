@@ -254,16 +254,17 @@
                 }
               })
             }else if(res.code && '01' === res.code && res.isLogin == 'false'){
-              if(res.url){
-                var index = res.url.lastIndexOf("\/");
-                var str = res.url.substring(index, res.url.length);
-                let regIndex = /\?/gi;
-                if(str && regIndex.test(str)){
-                  window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-                }else{
-                  window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-                }
-              }
+              // if(res.url){
+              //   var index = res.url.lastIndexOf("\/");
+              //   var str = res.url.substring(index, res.url.length);
+              //   let regIndex = /\?/gi;
+              //   if(str && regIndex.test(str)){
+              //     window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+              //   }else{
+              //     window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+              //   }
+              // }
+              this.getLoginUrl()
             } else {
               this.$toastBox.showToastBox(res.message)
             }
@@ -292,16 +293,17 @@
             }
             this.showLoad = false;
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
-            if(res.url){
-              var index = res.url.lastIndexOf("\/");
-              var str = res.url.substring(index, res.url.length);
-              let regIndex = /\?/gi;
-              if(str && regIndex.test(str)){
-                window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-              }else{
-                window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-              }
-            }
+            // if(res.url){
+            //   var index = res.url.lastIndexOf("\/");
+            //   var str = res.url.substring(index, res.url.length);
+            //   let regIndex = /\?/gi;
+            //   if(str && regIndex.test(str)){
+            //     window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            //   }else{
+            //     window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            //   }
+            // }
+            this.getLoginUrl()
             this.showLoad = false;
           } else {
             this.showLoad = false
@@ -328,21 +330,51 @@
             }
             this.showLoad = false;
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
-            if(res.url){
-              var index = res.url.lastIndexOf("\/");
-              var str = res.url.substring(index, res.url.length);
-              let regIndex = /\?/gi;
-              if(str && regIndex.test(str)){
-                window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-              }else{
-                window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-              }
-            }
+            // if(res.url){
+            //   var index = res.url.lastIndexOf("\/");
+            //   var str = res.url.substring(index, res.url.length);
+            //   let regIndex = /\?/gi;
+            //   if(str && regIndex.test(str)){
+            //     window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            //   }else{
+            //     window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            //   }
+            // }
+            this.getLoginUrl()
             this.showLoad = false;
           } else {
             this.showLoad = false
             this.$toastBox.showToastBox(res.message)
           }
+        })
+      },
+      getLoginUrl(){
+        core.getLoginUrl({merchantId: this.merchantId}).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            if(res.result && res.result.url){
+              window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            }else {
+              this.$router.push('/login')
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
+      },
+      goOpenMember() {
+        core.getOpenMemberUrl({merchantId: this.merchantId}).then(res => {
+          if(res.code && '00' == res.code){
+            if(res.result){
+              window.location.href = res.result
+            }
+          }else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
         })
       }
     }

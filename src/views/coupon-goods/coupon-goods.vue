@@ -213,7 +213,7 @@
         this.showHeader=false
         this.couponGoodsStyle = "top:0rem"
       }
-      if(!this.itemId || !this.libraryId){
+      if(!this.itemId){
         this.$toastBox.showToastBox("商品库ID出错")
         return;
       }

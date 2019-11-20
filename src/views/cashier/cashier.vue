@@ -226,22 +226,39 @@
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             this.isPaying = true
-            if(res.url){
-              var index = res.url.lastIndexOf("\/");
-              var str = res.url.substring(index, res.url.length);
-              let regIndex = /\?/gi;
-              if(str && regIndex.test(str)){
-                window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-              }else{
-                window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-              }
-            }
+            // if(res.url){
+            //   var index = res.url.lastIndexOf("\/");
+            //   var str = res.url.substring(index, res.url.length);
+            //   let regIndex = /\?/gi;
+            //   if(str && regIndex.test(str)){
+            //     window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            //   }else{
+            //     window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            //   }
+            // }
+            this.getLoginUrl()
           } else {
             this.isPaying = true
             this.$toastBox.showToastBox(res.message)
           }
         }).catch(error => {
           this.isPaying = true
+          this.$toastBox.showToastBox("网络错误")
+        })
+      },
+      getLoginUrl(){
+        core.getLoginUrl({merchantId: this.merchantId}).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            if(res.result && res.result.url){
+              window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            }else {
+              this.$router.push('/login')
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
           this.$toastBox.showToastBox("网络错误")
         })
       }

@@ -87,8 +87,7 @@
         default: false
       },
       vipInfo: {
-        type: Object,
-        default: {}
+        type: Object
       },
       vipTypeList: {
         type: Array
@@ -220,7 +219,7 @@
                 font-size:1rem;
               .vip-list
                 width 100%
-                min-height: 8rem;
+                min-height: 1rem;
                 background:rgba(255,255,255,1);
                 box-shadow: 0rem 0.2rem 0.2rem 0rem rgba(215,215,215,1);
                 border-radius:0rem 0rem 0.5rem 0.5rem;

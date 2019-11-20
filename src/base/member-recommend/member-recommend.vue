@@ -3,10 +3,10 @@
     <div class="recommend-wrapper" v-if="type == 'listFile'">
       <div v-for="(i,index) in recommendList" :key="index" @click="jumplinkUrl(i.jumpUrl)" class="recommend-item-wrapper">
         <div class="img-wrapper">
-          <img :src="i.cover" alt="">
+          <img :src="i.cover || i.skuCover" alt="">
         </div>
         <div class="info-wrapper">
-          <p class="name">{{i.itemName}}</p>
+          <p class="name">{{i.itemName || i.itemTitle}}</p>
           <p class="price"><s>¥{{ priceToFixed(i.marketPrice) }}</s>
             <span> 官方价</span></p>
           <p class="now-price">
@@ -22,10 +22,10 @@
     <div class="recommend-wrapper double-wrap" v-else-if="type == 'double'">
       <div v-for="(i,index) in recommendList" :key="index" @click="jumplinkUrl(i.jumpUrl)" class="recommend-item-wrapper">
         <div class="img-wrapper">
-          <img :src="i.cover" alt="">
+          <img :src="i.cover || i.skuCover" alt="">
         </div>
         <div class="info-wrapper">
-          <p class="name" style="-webkit-box-orient: vertical">{{i.itemName}}</p>
+          <p class="name" style="-webkit-box-orient: vertical">{{ i.itemName || i.itemTitle }}</p>
           <p class="price">
             <s>¥{{ priceToFixed(i.marketPrice) }}</s>
             <span>官方价</span>
@@ -40,10 +40,10 @@
     <div class="recommend-wrapper single-big-wrap" v-else-if="type == 'singleBig'">
       <div v-for="(i,index) in recommendList" :key="index" @click="jumplinkUrl(i.jumpUrl)" class="recommend-item-wrapper">
         <div class="img-wrapper">
-          <img :src="i.cover" alt="">
+          <img :src="i.cover || i.skuCover" alt="">
         </div>
         <div class="info-wrapper">
-          <p class="name" style="-webkit-box-orient: vertical">{{i.itemName}}</p>
+          <p class="name" style="-webkit-box-orient: vertical">{{i.itemName || i.itemTitle}}</p>
           <p class="price">
             <s>¥{{ priceToFixed(i.marketPrice) }}</s><span>官方价</span>
           </p>

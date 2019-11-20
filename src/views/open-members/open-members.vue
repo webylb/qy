@@ -45,7 +45,7 @@
       </div>
     </div>
     <div class="click-subAddVip" ref="immediatePayment">
-      <!-- <div class="left" @click="openExcharge" v-if="allData.isEnable !== 'N'">兑换码激活</div> -->
+      <div class="left" @click="openExcharge" v-if="allData.isEnable !== 'N'">兑换码激活</div>
       <div class="right" @click="immediatePay">立即开通</div>
     </div>
 
@@ -59,7 +59,7 @@
           </div>
           <div class="success-open-btmImg">
             <p class="success-mon-info" v-show="!isExcharge">恭喜您成功开通{{ successMonth }}</p>
-            <p class="success-mon-info" style="margin: 2rem 0;" v-show="isExcharge">恭喜您,兑换成功{{ successMonth }}会员</p>
+            <p class="success-mon-info" style="margin: 2rem 0;" v-show="isExcharge">恭喜您,兑换成功{{ successMonth }}</p>
             <p class="success-text-info" v-show="!isExcharge">开始享受您精彩的会员之旅吧!</p>
             <p class="success-btnWrap">
               <button type="button" class="success-btn" @click="goBack">购买商品</button>
@@ -136,7 +136,8 @@
         goodsLibraryName: null,
         vipTypeDefaultName: null,
         checkSecurity: false,
-        userId: null
+        userId: null,
+        exchangeGoodsLibraryId: null
       }
     },
     created () {
@@ -215,22 +216,6 @@
         }).catch(e => {
           this.loading = false
           this.$toastBox.showToastBox(e)
-        })
-      },
-      getLoginUrl(){
-        core.getLoginUrl({merchantId: this.merchantId}).then(res => {
-          //console.log(res)
-          if(res.code && '00' == res.code){
-            if(res.result && res.result.url){
-              window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-            }else {
-              this.$router.push('/login')
-            }
-          } else {
-            this.$toastBox.showToastBox(res.message)
-          }
-        }).catch(error => {
-          this.$toastBox.showToastBox("网络错误")
         })
       },
       getNewShopTequan(opts) {
@@ -341,16 +326,17 @@
               window.location.href = res.result.goUrl
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
-            if(res.url){
-              var index = res.url.lastIndexOf("\/");
-              var str = res.url.substring(index, res.url.length);
-              let regIndex = /\?/gi;
-              if(str && regIndex.test(str)){
-                window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-              }else{
-                window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-              }
-            }
+            // if(res.url){
+            //   var index = res.url.lastIndexOf("\/");
+            //   var str = res.url.substring(index, res.url.length);
+            //   let regIndex = /\?/gi;
+            //   if(str && regIndex.test(str)){
+            //     window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            //   }else{
+            //     window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            //   }
+            // }
+            this.getLoginUrl()
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -396,13 +382,20 @@
         }, 20)
       },
       goBack(){
-        this.$router.push({path: '/serviceCenter', query: {goodsLibraryId: this.goodsLibraryId}})
+        if(this.isExcharge){
+          this.$router.push({path: '/serviceCenter', query: {goodsLibraryId: this.exchangeGoodsLibraryId}})
+          this.exchangeGoodsLibraryId = null
+        }else{
+          this.$router.push({path: '/serviceCenter', query: {goodsLibraryId: this.goodsLibraryId}})
+        }
+        this.hideSuccessPopup()
       },
       hideSuccessPopup(){
         this.successOpen = false
         this.exchangeOpen = false
         this.exchangeErrOpen = false
         this.exchangeInput = null
+        this.isExcharge = false
         if(this.okLink){
           window.location.href = this.okLink + "?referer="+ encodeURIComponent(window.location.href)
           this.okLink = ''
@@ -421,28 +414,26 @@
               this.isExcharge = true
               this.exchangeOpen = false
               this.successOpen = true
-              if(res.result.cardType == 'month1'){
-                this.successMonth = "一个月"
-              }else if(res.result.cardType == 'month3'){
-                this.successMonth = "三个月"
-              }else if(res.result.cardType == 'month12'){
-                this.successMonth = "十二个月"
-              }else if(res.result.cardType == 'day3'){
-                this.successMonth = "三天"
-              }else if(res.result.cardType == 'day7'){
-                this.successMonth = "七天"
+              if(res.result.cardType == '月卡'){
+                this.successMonth = res.result.goodsLibraryName + "月卡"
+              }else if(res.result.cardType == '季卡'){
+                this.successMonth = res.result.goodsLibraryName + "季卡"
+              }else if(res.result.cardType == '年卡'){
+                this.successMonth = res.result.goodsLibraryName + "年卡"
               }
+              this.exchangeGoodsLibraryId = res.result.goodsLibraryId
             } else if(res.code && '01' === res.code && res.isLogin == 'false'){
-              if(res.url){
-                var index = res.url.lastIndexOf("\/");
-                var str = res.url.substring(index, res.url.length);
-                let regIndex = /\?/gi;
-                if(str && regIndex.test(str)){
-                  window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-                }else{
-                  window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-                }
-              }
+              // if(res.url){
+              //   var index = res.url.lastIndexOf("\/");
+              //   var str = res.url.substring(index, res.url.length);
+              //   let regIndex = /\?/gi;
+              //   if(str && regIndex.test(str)){
+              //     window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+              //   }else{
+              //     window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+              //   }
+              // }
+              this.getLoginUrl()
               this.exchangeOpen = false
               this.exchangeErrOpen = true
               this.chargeErrText = res.message
@@ -485,7 +476,9 @@
             defaultLibrary = j
           }
         }
-        this.changeTitleActiveIndex(defaultLibrary, id)
+        if(defaultLibrary){
+          this.changeTitleActiveIndex(defaultLibrary, id)
+        }
         this.$router.replace({path:'/openMembers', query:{goodsLibraryId: 0}})
       },
       onLoaded(){
@@ -497,6 +490,22 @@
       goSecurity(){
         // console.log('go')
         this.$router.push('/userSecurity')
+      },
+      getLoginUrl(){
+        core.getLoginUrl({merchantId: this.merchantId}).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            if(res.result && res.result.url){
+              window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            }else {
+              this.$router.push('/login')
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
       }
     }
   }
@@ -631,7 +640,7 @@
             font-family: 'PingFang SC','DIN-BOLD';
             height: 5.63rem;
             line-height 5.63rem
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight bold
             color: rgba(183,130,49,1);
             text-align: center;

@@ -3,7 +3,7 @@
     <scroll ref="memberScroll" class="member-scroll">
       <div>
         <div v-if="loaded" class="main-wrapper" :style="mainWrapperStyle">
-          <div v-for="item in allData" :key="item.uid">
+          <div v-for="(item, index) in allData" :key="item.uid">
             <div v-if="item.moduleType === 'themes'">
               <member-header
                 :merchantId="merchantId"
@@ -27,6 +27,14 @@
             </div>
             <div v-if="item.moduleType === 'banner'">
               <member-banner
+                v-if="index === 0"
+                style="padding-top:0.375rem"
+                :bannerList="item.configJson.sub_entry"
+                @onLoaded="onLoaded"
+                @jumplinkUrl="jumpChecklinkUrl"
+              ></member-banner>
+              <member-banner
+                v-else
                 :bannerList="item.configJson.sub_entry"
                 @onLoaded="onLoaded"
                 @jumplinkUrl="jumpChecklinkUrl"
@@ -77,7 +85,7 @@
     </scroll>
     <div class="float-wrap">
       <div v-for="item in allData" :key="item.uid">
-        <div v-if="item.moduleType === 'bottomFloat'">
+        <div v-if="item.moduleType === 'bottomFloat' && isShowFloat">
           <member-btmfloat
             :title="item.configJson.title"
             :btnText="item.configJson.btnText"
@@ -164,7 +172,8 @@
         packageConfigId: null ,//礼包配置的id
         merchantGiftPackageId: null ,//礼包id,
         passIdList: null ,//要过滤掉的商品id
-        mainWrapperStyle: 'pading-bottom:0;'
+        mainWrapperStyle: 'padding-bottom:0;',
+        isShowFloat: null
       }
     },
     created() {
@@ -174,7 +183,6 @@
       }
       if (this.privilegePageUuid) {
         this.loaded = false
-        this.getMemberInfo({merchantId: this.merchantId})
         this.getPassId({merchantId: this.merchantId})
       } else {
         this.showErrWrap = true
@@ -261,11 +269,12 @@
               // }
               for(let i=0, length = data.length; i<length; i++){
                 if(data[i].moduleType == 'bottomFloat'){
+                  this.isShowFloat = true
                   this.mainWrapperStyle = 'padding-bottom:3.125rem'
                 }
               }
               this.allData = data
-
+              this.getMemberInfo({merchantId: this.merchantId})
             }
             this.$nextTick(() => {
               this.loaded = true
@@ -282,11 +291,23 @@
       getMemberInfo(opts) {
         core.memberInfo(opts).then(res => {
           if (res.code && '00' === res.code) {
-            if (res.result.vipUser) {
-              this.isHaveFavorite = res.result.like
-              this.expireTime = tool.formatDate(res.result.cardExpireTime, "Y/M/D")
+            if (res.result.qyMerchantUserVipResults && res.result.qyMerchantUserVipResults.length > 0) {
+              this.expireTime = tool.formatDate(res.result.qyMerchantUserVipResults[0].expireTime, "Y/M/D")
+              this.isMember = true
+              for(let i=0, length = this.allData.length; i<length; i++){
+                if(this.allData[i].moduleType == 'bottomFloat'){
+                  this.isShowFloat = false
+                  this.mainWrapperStyle = 'padding-bottom:0rem'
+                  setTimeout(() => {
+                    this.$refs.memberScroll.refresh()
+                  }, 20)
+                }
+              }
+            }else{
+              this.isMember = false
             }
-            this.isMember = res.result.id ? true : false
+            // this.isMember = res.result.id ? true : false
+            this.isHaveFavorite = res.result.like
             this.isNewUser = res.result.xinShou
             if(res.result.xinShou){
               if(res.result.recriveXinShouLiBao){ //已领取新人礼包
@@ -319,19 +340,6 @@
       unlockMember() {
         this.goOpenMember()
       },
-      goOpenMember() {
-        core.getOpenMemberUrl({merchantId: this.merchantId}).then(res => {
-          if(res.code && '00' == res.code){
-            if(res.result){
-              window.location.href = res.result
-            }
-          }else {
-            this.$toastBox.showToastBox(res.message)
-          }
-        }).catch(error => {
-          this.$toastBox.showToastBox("网络错误")
-        })
-      },
       hidePopup() {
         this.showGiftPopup = false
         this.showGiftCont = true
@@ -343,16 +351,7 @@
             if (res.code && '00' === res.code) {
               this.$router.push({path: '/newUserCouponBag', query: {merchantGiftPackageId:this.merchantGiftPackageId, packageConfigId:this.packageConfigId}})
             } else if(res.code && '01' === res.code && res.isLogin == 'false'){
-              if(res.url){
-                var index = res.url.lastIndexOf("\/");
-                var str = res.url.substring(index, res.url.length);
-                let regIndex = /\?/gi;
-                if(str && regIndex.test(str)){
-                  window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-                }else{
-                  window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-                }
-              }
+              this.getLoginUrl()
             } else {
               this.$toastBox.showToastBox(res.message)
             }
@@ -371,6 +370,35 @@
         if(this.packageConfigId){
           this.$router.push({path: '/newUserCouponBag', query: {merchantGiftPackageId:this.merchantGiftPackageId, packageConfigId:this.packageConfigId}})
         }
+      },
+      getLoginUrl(){
+        core.getLoginUrl({merchantId: this.merchantId}).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            if(res.result && res.result.url){
+              window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            }else {
+              this.$router.push('/login')
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
+      },
+      goOpenMember() {
+        core.getOpenMemberUrl({merchantId: this.merchantId}).then(res => {
+          if(res.code && '00' == res.code){
+            if(res.result){
+              window.location.href = res.result
+            }
+          }else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
       }
     }
   }

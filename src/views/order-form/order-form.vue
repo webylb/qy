@@ -23,7 +23,7 @@
             </div>
             <OrderItem :item-data="item"></OrderItem>
             <div class="order-price">
-              共{{item.count}}件商品 实付款<span>¥</span><span class="money">{{price(0,item.money)}}</span>
+              共{{item.count}}件商品 实付款<span>¥</span><span class="money">{{price(0,item.money) || 0}}</span>
             </div>
             <div class="order-item-bottom">
               <div @click="quxiao(item.id)" v-show="item.status==='WAIT'">取消订单</div>
@@ -82,7 +82,7 @@
     </popup>
     <popup v-show="showCouponPopup" :title="goodsName" @confirm="cancel" @cancel="goMyCoupon" cancelText="我的卡券">
       <div class="coupon-info-wrap" v-if="couponList && couponList.length > 0">
-        <div v-if="orderType == '兑换码'" class="slider-box 1">
+        <div v-if="orderType !== '二维码'" class="slider-box 1">
           <slider class="slider-wrapper" :loop=false>
             <div v-for="item in couponList" :key="item.id">
               <div class="item-wrap">
@@ -239,16 +239,17 @@
               this.showLoad = false;
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
-            if(res.url){
-              var index = res.url.lastIndexOf("\/");
-              var str = res.url.substring(index, res.url.length);
-              let regIndex = /\?/gi;
-              if(str && regIndex.test(str)){
-                window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-              }else{
-                window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-              }
-            }
+            // if(res.url){
+            //   var index = res.url.lastIndexOf("\/");
+            //   var str = res.url.substring(index, res.url.length);
+            //   let regIndex = /\?/gi;
+            //   if(str && regIndex.test(str)){
+            //     window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            //   }else{
+            //     window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            //   }
+            // }
+            this.getLoginUrl()
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -372,19 +373,6 @@
           this.$toastBox.showToastBox("网络错误")
         })
       },
-      goOpenMember() {
-        core.getOpenMemberUrl({merchantId: this.merchantId}).then(res => {
-          if(res.code && '00' == res.code){
-            if(res.result){
-              window.location.href = res.result
-            }
-          }else {
-            this.$toastBox.showToastBox(res.message)
-          }
-        }).catch(error => {
-          this.$toastBox.showToastBox("网络错误")
-        })
-      },
       handleNav(e, state) {
         if (this.showLoad) {
           return false
@@ -453,6 +441,35 @@
       onCopyError(){
         this.$toastBox.showToastBox("复制失败")
       },
+      getLoginUrl(){
+        core.getLoginUrl({merchantId: this.merchantId}).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            if(res.result && res.result.url){
+              window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            }else {
+              this.$router.push('/login')
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
+      },
+      goOpenMember() {
+        core.getOpenMemberUrl({merchantId: this.merchantId}).then(res => {
+          if(res.code && '00' == res.code){
+            if(res.result){
+              window.location.href = res.result
+            }
+          }else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
+      }
     }
   }
 </script>
@@ -606,13 +623,13 @@
             padding 1.25rem 0.75rem
             box-sizing border-box
             p
-              margin-bottom 0.75rem
+              margin-bottom 0.5rem
               width 100%
               display: flex;
               justify-content space-between
               align-items: center;
               font-size:0.88rem;
-              line-height: 1;
+              line-height: 1.2;
               &:last-child
                 margin-bottom 0
               span
@@ -624,8 +641,8 @@
                 outline none
                 background-color transparent
                 border-radius 0.13rem
-                line-height 1
-                padding 0.2rem 0.34rem
+                line-height 1.2
+                padding 0.15rem 0.34rem
                 font-size 0.75rem
                 border 0.0625rem solid rgba(195, 142, 72, 1)
                 color rgba(195, 142, 72, 1)

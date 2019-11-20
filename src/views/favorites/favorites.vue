@@ -129,6 +129,8 @@
               this.noFavorites = true
             }
             this.showLoad = false
+          } else if(res.code && '01' === res.code) {
+            this.getLoginUrl()
           } else {
             this.showLoad = false
             this.$toastBox.showToastBox(res.message)
@@ -196,6 +198,40 @@
       },
       goShop(){
         this.$router.push({path:'/member'})
+      },
+      getLoginUrl(){
+        core.getLoginUrl({merchantId: this.merchantId}).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            if(res.result && res.result.url){
+              window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            }else {
+              this.$router.push('/login')
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
+      },
+      refreshScroll(){
+        if(this.serveMeunData && this.serveMeunData.length > 1){
+          for(let i = 0; i<this.serveMeunData.length; i++){
+            setTimeout(() => {
+              // console.log(i)
+              // console.log(this.$refs.servicesWrapper[i])
+              this.$refs.servicesWrapper[i].refresh();
+            }, 20)
+            // this.$nextTick(() => {
+            //   this.$refs.servicesWrapper[i].refresh();
+            // })
+          }
+        }else{
+          setTimeout(() => {
+            this.$refs.servicesWrapper[0].refresh();
+          },20)
+        }
       }
     },
     computed: {
@@ -228,8 +264,8 @@
       }
     },
     activated(){
-      if(this.servicesScroll){
-        this.$refs.servicesWrapper.refresh();
+      if(this.$refs.servicesWrapper){
+        this.refreshScroll()
       }
     }
   }
@@ -367,14 +403,15 @@
                       height:2.63rem;
                       border-radius:50%;
                   .service-name
-                    margin-top 1.72rem
+                    margin-top 1.62rem
                     font-size 0.75rem
                     white-space nowrap
                     overflow hidden
                     text-overflow ellipsis
                     color rgba(196, 143, 73, 1)
+                    line-height 1.2
                   .service-des
-                    margin-top 0.4rem
+                    margin-top 0.3rem
                     font-size 0.75rem
                     color rgba(61, 58, 57, 1)
                     padding 0 0.2rem
@@ -382,6 +419,7 @@
                     white-space nowrap
                     overflow hidden
                     text-overflow ellipsis
+                    line-height 1.2
                   .label
                     position absolute
                     left 0px

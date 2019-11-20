@@ -1,6 +1,6 @@
 <template>
   <div class="my-bill">
-    <scroll ref="billScroll" class="bill-scroll">
+    <scroll ref="billScroll" class="bill-scroll" :bounce='{top: false,bottom: false}'>
       <div>
         <div v-if="!loaded && listData" class="bill-wrap">
           <div class="bill-info">
@@ -15,6 +15,7 @@
           </div>
           <div class="bill-detail">
             <div class="top-img"></div>
+            <div class="top-img2"></div>
             <div class="center-info">
               <div class="title">
                 <img class="left-label" src="./images/bill-text-left.png" alt="">
@@ -49,9 +50,9 @@
                   <div>已省<span>{{ sumMyDiscountCount || 0 }}</span>元</div>
                 </div>
               </div>
-              <div class="btm-img">
-                <!-- <img src="./images/btm-img.png" alt=""> -->
-              </div>
+            </div>
+            <div class="btm-img">
+              <!-- <img src="./images/btm-img.png" alt=""> -->
             </div>
           </div>   
         </div> 
@@ -320,6 +321,7 @@
         padding 0 0.5rem
         box-sizing border-box
         min-height 65vh
+        padding-bottom 1.5rem
         .top-img
           width 21.9375rem
           height 1rem
@@ -329,18 +331,25 @@
           background-color rgba(47,73,62,1);
           border-radius 0.5rem
           transform translateX(-50%)
-        .center-info
+        .top-img2
+          width 20.9375rem
+          height 0.5rem
           position absolute
           left 50%
           transform translateX(-50%)
           top 0
+          background-color rgba(47,73,62,1);
+          border-radius 0
+          transform translateX(-50%)
+          box-shadow inset 0 0.2rem 0.3rem -0.2rem #20342b
+          background #fff
+        .center-info
           width 20.9375rem
           background #fff
           min-height 2rem
           padding 0 0.75rem
           box-sizing border-box
           padding-top 1.4375rem
-          box-shadow:inset 0px 0.6rem 0.6rem -0.6rem rgba(32, 52, 43, 1);
           .title
             display flex
             justify-content center
@@ -425,12 +434,6 @@
           background-size 109% 100%
           height 0.25rem
           width 20.9375rem
-          margin 0 -0.75rem
-          position absolute
-          // font-size 0
-          // img  
-          //   width 100%
-          //   height auto
       .no-vip
         position fixed
         left 0

@@ -242,6 +242,7 @@
         this.$nextTick(() => {
           this.tabsLineChange(index)
         })
+        this.refreshScroll()
         // var li = this.$refs.servicesWrapper.getElementsByClassName('service-list')[index]
         // this.servicesScroll.scrollToElement(li, 300)
       },
@@ -272,12 +273,14 @@
         }
       },
       tabsLineChange(index){
-        // this.$refs.menuItem[index].style.animation = 'changeType 0.1s linear'
+        this.$refs.menuItem[index].style.animation = 'changeType 0.1s linear'
+        // console.log(this.$refs.menuItem[index].getBoundingClientRect().width)
         setTimeout(() => {
           let width = this.$refs.menuItem[index].getBoundingClientRect().width
+          // console.log(this.$refs.menuItem[index].getBoundingClientRect().width)
           this.$refs.tabsLine.style.width = width + 'px' 
           this.$refs.tabsLine.style.transform = 'translateX('+ this.$refs.menuItem[index].getBoundingClientRect().x +'px)'
-          this.$refs.tabsLine.style.transitionDuration = '0.3s'
+          this.$refs.tabsLine.style.transitionDuration = '0.2s'
         }, 20)
       },
       getNewShopTequan(opts) {
@@ -294,6 +297,23 @@
         }).catch(e => {
           this.$toastBox.showToastBox(e)
         })
+      },
+      refreshScroll(){
+        if(this.serveMeunData && this.serveMeunData.length > 1){
+          for(let i = 0; i<this.serveMeunData.length; i++){
+            setTimeout(() => {
+              // console.log(this.$refs.servicesWrapper[i])
+              this.$refs.servicesWrapper[i].refresh();
+            }, 20)
+            // this.$nextTick(() => {
+            //   this.$refs.servicesWrapper[i].refresh();
+            // })
+          }
+        }else{
+          setTimeout(() => {
+            this.$refs.servicesWrapper[0].refresh();
+          },20)
+        }
       }
     },
     computed: {
@@ -326,11 +346,8 @@
       }
     },
     activated(){
-      for(let i = 0; i<this.serveMeunData.length; i++){
-        setTimeout(() => {
-          // console.log(i)
-          this.$refs.servicesWrapper[i].refresh();
-        }, 20)
+      if(this.$refs.servicesWrapper){
+        this.refreshScroll()
       }
     }
   }

@@ -400,23 +400,24 @@
               }, 20)
             }
           } else if(res.code && '01' === res.code && res.isLogin == 'false'){
-            this.$toastBox.showToastBox('未登录用户')
-            let timer = null
-            clearTimeout(timer)
-            timer = setTimeout(()=>{
-              if(res.url){
-                var index = res.url.lastIndexOf("\/");
-                var str = res.url.substring(index, res.url.length);
-                let regIndex = /\?/gi;
-                if(str && regIndex.test(str)){
-                  window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-                  clearTimeout(timer)
-                }else{
-                  window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-                  clearTimeout(timer)
-                }
-              }
-            },1000)
+            // this.$toastBox.showToastBox('未登录用户')
+            // let timer = null
+            // clearTimeout(timer)
+            // timer = setTimeout(()=>{
+            //   if(res.url){
+            //     var index = res.url.lastIndexOf("\/");
+            //     var str = res.url.substring(index, res.url.length);
+            //     let regIndex = /\?/gi;
+            //     if(str && regIndex.test(str)){
+            //       window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            //       clearTimeout(timer)
+            //     }else{
+            //       window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            //       clearTimeout(timer)
+            //     }
+            //   }
+            // },1000)
+            this.getLoginUrl()
           } else if(res.code && '100' === res.code){
             this.exchargeInfoOpen = true
             this.exchargeInfoTitle = '温馨提示'
@@ -490,16 +491,17 @@
               this.exchargeInfoText = '恭喜你兑换成功,请前去体验~'
               this.exchargeInput = null
             } else if(res.code && '01' === res.code && res.isLogin == 'false'){
-              if(res.url){
-                var index = res.url.lastIndexOf("\/");
-                var str = res.url.substring(index, res.url.length);
-                let regIndex = /\?/gi;
-                if(str && regIndex.test(str)){
-                  window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-                }else{
-                  window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-                }
-              }
+              // if(res.url){
+              //   var index = res.url.lastIndexOf("\/");
+              //   var str = res.url.substring(index, res.url.length);
+              //   let regIndex = /\?/gi;
+              //   if(str && regIndex.test(str)){
+              //     window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+              //   }else{
+              //     window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+              //   }
+              // }
+              this.getLoginUrl()
               this.exchargeOpen = false
               this.exchargeInfoOpen = true
               this.exchargeInfoTitle = '兑换失败'
@@ -532,6 +534,22 @@
           this.getCouponBagDetail({merchantId: this.merchantId, merchantGiftPackageId: this.merchantGiftPackageId})
         }
       },
+      getLoginUrl(){
+        core.getLoginUrl({merchantId: this.merchantId}).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            if(res.result && res.result.url){
+              window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            }else {
+              this.$router.push('/login')
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
+      }
     }
   }
 </script>
