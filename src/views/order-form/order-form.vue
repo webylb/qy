@@ -3,11 +3,10 @@
     <order-nav class="order-nav1" ref="orderNavs" :num-data="numData" @handleNav="handleNav" :active-index="activeIndex"></order-nav>
     <scroll :pullup="true"
             @scrollToEnd="loadMore"
-            :data="orderList"
             ref="orderForm"
             class="order-scroll">
       <div style="overflow: hidden;">
-        <div v-if="!showLoad">
+        <div v-show="!showLoad">
           <div v-for="item in orderList" class="order-item-wrapper"
               :key="item.id">
             <div class="title-wrapper">
@@ -21,7 +20,7 @@
                 <span v-show="item.status==='FAIL'">支付失败</span>
               </div>
             </div>
-            <OrderItem :item-data="item"></OrderItem>
+            <OrderItem :item-data="item" @refshScroll="refshScroll"></OrderItem>
             <div class="order-price">
               共{{item.count}}件商品 实付款<span>¥</span><span class="money">{{price(0,item.money) || 0}}</span>
             </div>
@@ -55,7 +54,7 @@
             </div>
           </div>
         </div>
-        <loading v-show="showLoad" :title="loadingTitle" style="padding-top:40%;"></loading>
+        <loading v-show="showLoad" :title="loadingTitle" style="padding-top:10px;"></loading>
       </div>
     </scroll>
     <popup v-show="showQuXiaoPopup" :isShowTitle="false" @confirm="confirmQuXiao" @cancel="cancel">
@@ -83,7 +82,7 @@
     <popup v-show="showCouponPopup" :title="goodsName" @confirm="cancel" @cancel="goMyCoupon" cancelText="我的卡券">
       <div class="coupon-info-wrap" v-if="couponList && couponList.length > 0">
         <div v-if="orderType !== '二维码'" class="slider-box 1">
-          <slider class="slider-wrapper" :loop=false>
+          <slider class="slider-wrapper" :loop=false :isClick=true>
             <div v-for="item in couponList" :key="item.id">
               <div class="item-wrap">
                 <div class="left">
@@ -117,7 +116,7 @@
           </slider>   
         </div>
         <div v-if="orderType == '二维码'" class="slider-box 2">
-          <slider class="slider-wrapper" :loop=false>
+          <slider class="slider-wrapper" :loop=false :isClick=true>
             <div v-for="(item, index) in couponList" :key="index">
               <img class="coupon-item-img" :src="item.qrCode" alt="">
             </div>
@@ -215,28 +214,31 @@
         return tool.formatDate(e)
       },
       loadMore() {
-        if (!this.showLoad && !this.hasMore) {
+        if (!this.showLoad && this.hasMore) {
           if (this.orderList.length > 0) {
             this.getAllOrder(this.selectObj)
           }
         }
       },
       getAllOrder(opts) {
-        this.showLoad = true
         core.allOrder(opts).then(res => {
           //console.log(res)
           if (res.code && '00' === res.code) {
             if (res.result.data.length > 0) {
-              if(res.result.data){
+              if(res.result.data && res.result.data.length > 0){
                 this.orderList = this.orderList.concat(res.result.data)
               }
               this.showLoad = false;
               this.selectObj.currentPage++;
               if (this.orderList.length >= res.result.totalRecord) {
-                this.hasMore = true
+                this.hasMore = false
+              }else{
+                 this.hasMore = true
               }
+              this.$refs.orderForm.refresh()
             } else {
-              this.showLoad = false;
+              this.showLoad = false
+              this.hasMore = false
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             // if(res.url){
@@ -249,13 +251,19 @@
             //     window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
             //   }
             // }
+            this.showLoad = true
             this.getLoginUrl()
           } else {
+            this.showLoad = true
             this.$toastBox.showToastBox(res.message)
           }
         }).catch(e => {
+          this.showLoad = true
           this.$toastBox.showToastBox(e)
         })
+      },
+      refshScroll(){
+        this.$refs.orderForm.refresh()
       },
       price(a, b) {
         return tool.priceStr(a, b)
@@ -378,12 +386,12 @@
           return false
         }
         if (this.activeIndex !== e || state) {
-          this.activeIndex = e;
+          this.activeIndex = e
           this.$refs.orderNavs.tabsLineChange(e)
-          this.orderList = [];
-          this.showLoad = true;
-          this.currentPage = 1;
-          this.hasMore = false;
+          this.orderList = []
+          this.showLoad = true
+          this.currentPage = 1
+          this.hasMore = true
           if (e === 0) {
             this.selectObj = {
               currentPage: this.currentPage,
@@ -491,12 +499,15 @@
       right 0
       bottom 0
       .no-order
-        position: fixed;
-        left: 0;
-        top: 3.55rem;
-        right: 0;
-        bottom: 0;
+        // position: fixed;
+        // left: 0;
+        // top: 3.55rem;
+        // right: 0;
+        // bottom: 0;
         background #fff
+        height: calc(100vh - 3.56rem);
+        position: relative;
+        top: 1px;
       .no-coupon
         position relative
         .no-coupon-content
@@ -690,5 +701,28 @@
       color: rgba(73, 109, 94, 1)
 .common-question /deep/ .van-collapse-item__content {
   padding-top 0
+}
+
+.fadeIn {
+    -webkit-animation: fadeIn .3s;
+            animation: fadeIn .3s;
+}
+
+@-webkit-keyframes fadeIn {
+    from {
+      opacity: 0
+    }
+    to {
+      opacity: 1
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0
+    }
+    to {
+        opacity: 1
+    }
 }
 </style>

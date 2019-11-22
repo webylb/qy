@@ -6,7 +6,7 @@ Vue.use(Router)
 export default new Router({
   mode: 'history',
   base: '/f/q/'+ window.infoData.merchantId + '.html/',
-  // base: '/f/q/100071.html/',
+  // base: '/f/q/100036.html/',
   routes: [
     {
       path: '/',
@@ -123,6 +123,13 @@ export default new Router({
       name: 'myCoupon',
       meta: {title: '我的卡券',keepAlive:false},
       component: () => import(/* webpackChunkName: "myCoupon" */ '@/views/my-coupon/my-coupon.vue')
+    },
+    //券包中心
+    {
+      path: '/couponBagCenter',
+      name: 'couponBagCenter',
+      meta: {title: '礼包中心',keepAlive:false},
+      component: () => import(/* webpackChunkName: "couponBag" */ '@/views/coupon-bag-center/coupon-bag-center.vue')
     },
     //券包首页
     {

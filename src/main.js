@@ -38,11 +38,12 @@ FastClick.attach(document.body);
 // dev数据
 if(process.env.NODE_ENV === 'development'){
   // window.infoData = {
-  //   merchantId: 100071,
+  //   merchantId: 100036,
   //   merchantName: '测试账户',
   //   privilegePageUuid: '891456d4e4de46ddade2d74602942bf5',
   //   openingPageUuid: '',
-  //   personalCenterPageUuid: '67216783016a41a89ac706a8e0a93b02'
+  //   personalCenterPageUuid: '67216783016a41a89ac706a8e0a93b02',
+  //   giftPackagePageUuid: 'f08342d536ab4200abc45bacced04edd'
   // }
   // document.cookie = "QY_COOKIE_PASSPORT_NAME="+"\"sessionId=5d4d7a3867bd42a2b50d98202ab80676&userId=113\""
   // const vConsole = new Vconsole();

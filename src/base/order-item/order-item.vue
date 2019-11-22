@@ -1,6 +1,6 @@
 <template>
     <div @click="detail" class="order-item">
-      <img :src="itemData.cover" alt="">
+      <img :src="itemData.cover" alt="" @load="refshScroll">
       <div class="order-info">
         <p class="title" style="-webkit-box-orient: vertical">{{itemData.skuName}}</p>
         <p v-show="itemData.payTime" class="time">{{timeFormat(itemData.payTime)}}</p>
@@ -29,6 +29,9 @@
       },
       detail(){
         this.$emit('detail')
+      },
+      refshScroll() {
+        this.$emit('refshScroll')
       }
     }
   }

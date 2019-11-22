@@ -382,12 +382,13 @@
         }, 20)
       },
       goBack(){
-        if(this.isExcharge){
-          this.$router.push({path: '/serviceCenter', query: {goodsLibraryId: this.exchangeGoodsLibraryId}})
-          this.exchangeGoodsLibraryId = null
-        }else{
-          this.$router.push({path: '/serviceCenter', query: {goodsLibraryId: this.goodsLibraryId}})
-        }
+        // if(this.isExcharge){
+        //   this.$router.push({path: '/serviceCenter', query: {goodsLibraryId: this.exchangeGoodsLibraryId}})
+        //   this.exchangeGoodsLibraryId = null
+        // }else{
+        //   this.$router.push({path: '/serviceCenter', query: {goodsLibraryId: this.goodsLibraryId}})
+        // }
+        this.$router.push({path: '/member'})
         this.hideSuccessPopup()
       },
       hideSuccessPopup(){

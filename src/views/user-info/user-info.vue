@@ -26,7 +26,7 @@
                 用户ID
               </div>
               <div class="right">
-                {{ userId }}
+                {{ userToken }}
               </div>
             </div>
           </div>
@@ -67,7 +67,7 @@
         isMember: true,
         loaded: true,
         isLogin: false,
-        userId: "--",
+        userToken: "--",
         userName: "--",
         headImage: null,
         isLogOut: false
@@ -84,7 +84,7 @@
               if(!res.result.id){
                 this.getLoginUrl()
               } 
-              this.userId = res.result.id
+              this.userToken = res.result.userToken || res.result.id
               this.userName = res.result.nickname
               this.headImage = res.result.headImage
             }

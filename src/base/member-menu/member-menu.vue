@@ -148,7 +148,9 @@
       border-radius 50%
       padding: 0;
       color #fff
-      background-color rgba(183, 130, 49, 1)
+      //background-color rgba(183, 130, 49, 1)
+      background-color rgba(0,0,0,0.7)
+      box-shadow 0rem 0.15rem 0.5rem 0 rgba(53,53,53,.4);
       i {
         font-size: 1rem;
       }

@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="bottom-float" v-if="title">
+    <div class="bottom-float" v-if="title" @click="jumplinkUrl(urlValue)">
       <div class="title">
         {{ title }}
       </div>
-      <button type="button" @click="jumplinkUrl(urlValue)">{{ btnText }}
+      <button type="button">{{ btnText }}
         <i class=""></i>
       </button>
     </div>
