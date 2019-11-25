@@ -81,7 +81,7 @@
     </popup>
     <popup v-show="showCouponPopup" :title="goodsName" @confirm="cancel" @cancel="goMyCoupon" cancelText="我的卡券">
       <div class="coupon-info-wrap" v-if="couponList && couponList.length > 0">
-        <div v-if="orderType !== '二维码'" class="slider-box 1">
+        <div v-if="orderType !== '二维码' && orderType !== null" class="slider-box 1">
           <slider class="slider-wrapper" :loop=false :isClick=true>
             <div v-for="item in couponList" :key="item.id">
               <div class="item-wrap">
@@ -115,8 +115,8 @@
             </div>
           </slider>   
         </div>
-        <div v-if="orderType == '二维码'" class="slider-box 2">
-          <slider class="slider-wrapper" :loop=false :isClick=true>
+        <div v-if="orderType == '二维码'" class="slider-box 2" @click="showImgPrev">
+          <slider class="slider-wrapper" :isClick=true :loop=false :autoPlay=false>
             <div v-for="(item, index) in couponList" :key="index">
               <img class="coupon-item-img" :src="item.qrCode" alt="">
             </div>
@@ -130,7 +130,7 @@
 </template>
 
 <script>
-  import { Divider } from 'vant';
+  import { Divider, ImagePreview } from 'vant';
   import Slider from '../../base/slider/slider'
   import OrderItem from '../../base/order-item/order-item'
   import OrderNav from '../../base/order-nav/order-nav'
@@ -172,7 +172,8 @@
         orderNum: null,
         showCouponPopup: false,
         couponList: null,
-        orderType: null
+        orderType: null,
+        imgPrevList: []
       }
     },
     components: {
@@ -182,7 +183,8 @@
       Loading,
       Popup,
       Slider,
-      [Divider.name]: Divider
+      [Divider.name]: Divider,
+      [ImagePreview.name]: ImagePreview
     },
     watch: {
       numData: {
@@ -335,11 +337,28 @@
         this.orderType = null
       },
       showCouponDetail(item){
-        this.goodsName = item.skuName
         this.couponList = null
+        this.orderType = null
+
+        this.goodsName = item.skuName
         this.couponList = item.qyCardTicketResults
         this.orderType = item.type
         this.showCouponPopup = true
+        if(this.couponList && this.couponList.length > 0){
+          this.imgPrevList = []
+          this.couponList.forEach( item => {
+            this.imgPrevList.push(item.qrCode)
+          })
+        }
+      },
+      showImgPrev() {
+        ImagePreview({
+          images: this.imgPrevList,
+          startPosition: 0,
+          onClose() {
+            // do something
+          }
+        });
       },
       goMyCoupon(){
         this.showCouponPopup = false

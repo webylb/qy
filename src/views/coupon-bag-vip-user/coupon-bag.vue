@@ -70,6 +70,10 @@
         <loading v-show="loaded" style="padding-top: 50%"></loading>
       </div>
     </div>
+    <div class="click-subAddVip">
+      <div class="left" @click="openExcharge">兑换码激活</div>
+      <div class="right" @click="immediatePay">立即开通</div>
+    </div>
     <div class="go-order-form fiexd-top" v-if="exchargeStatus" @click="goOrderForm">
       <img src="./images/order.png" alt="">
       <div>订单</div>
@@ -78,9 +82,9 @@
       <img src="./images/coupon.png" alt="">
       <div>卡券</div>
     </div>
-    <div class="go-exchange-coupon" v-if="exchargeStatus" @click="openExcharge">
+    <!-- <div class="go-exchange-coupon" v-if="exchargeStatus" @click="openExcharge">
       <img src="./images/go-exchange.png" alt="">
-    </div>
+    </div> -->
     <div class="content-wrap fade" v-show="couponBagToast" @click="closeCouponBagToast"></div>
     <div class="coupon-bag-toast" ref="couponBagToast">
       <div class="coupon-bag-toast-wrap" v-if="itemCouponDetail">
@@ -142,39 +146,21 @@
         </div>
       </div>
     </div>
-    <div class="exchange-popup fade" v-show="exchargeOpen">
-      <div class="exchange-content">
-        <div class="exchange-open-top">
-          <input type="text" v-model="exchargeInput" @click.stop="focusInput"  @blur="scrollToTop" class="exchange-input" placeholder="请输入兑换码" />
-          <p class="exchange-btnWrap">
-            <button type="button" class="exchange-btn" @click="goExcharge">立即兑换</button>
-          </p>
-        </div>
-        <div class="exchange-open-close" @click="hideExchargePopup">
-          <i class="iconfont">&#xe63f;</i>
-        </div>
+    <ExchangePopup v-show="exchargeOpen" title="兑换码激活" confirmText="立即兑换" @cancel="hideExchargePopup" @confirm="goExcharge">
+      <div class="exchange-open-top" style="padding:1.88rem 1.25rem 2.69rem;margin: 0;text-align:center;">
+        <input type="text" v-model="exchangeInput" @click.stop="focusInput"  @blur="scrollToTop" class="exchange-input" placeholder="请输入兑换码" maxlength="16" />
       </div>
-    </div>
-    <div class="exchange-popup fade" v-show="exchargeInfoOpen">
-      <div class="exchange-content">
-        <div class="exchange-open-top">
-          <p class="exchange-info-title">{{ exchargeInfoTitle }}</p>
-          <p class="exchange-info-text">{{ exchargeInfoText }}</p>
-          <p class="exchange-btnWrap">
-            <button type="button" class="exchange-btn" @click.prevent="sureExcharge">我知道了</button>
-          </p>
-        </div>
-        <div class="exchange-open-close" @click="hideExchargePopup">
-          <i class="iconfont">&#xe63f;</i>
-        </div>
-      </div>
-    </div>
+    </ExchangePopup>
+    <ExchangePopup v-show="exchargeInfoOpen" :title="exchargeInfoTitle" :isShowCancel=false confirmText="我知道了" @cancel="sureExcharge">
+      <p class="exchange-err-text" style="padding:2.56rem 2.75rem;margin: 0;text-align:center;">{{ exchargeInfoText }}</p>
+    </ExchangePopup>
   </div>
 </template>
 
 <script>
   import BScroll  from 'better-scroll'
   import ShopHeader from '../../base/shop-header/shop-header'
+  import ExchangePopup from '../../base/exchange-popup/exchange-popup'
   import Slider from '../../base/slider/slider'
   import Loading from '../../base/loading/loading'
   import * as core from '../../api/couponBag'
@@ -186,7 +172,8 @@
     components: {
       ShopHeader,
       Slider,
-      Loading
+      Loading,
+      ExchangePopup
     },
     mixins:[wxShareMixin],
     data () {
@@ -241,6 +228,7 @@
         this.getCouponBagDetail({merchantId: this.merchantId, merchantGiftPackageId: this.merchantGiftPackageId})
       }else{
         this.$toastBox.showToastBox('无效礼包')
+        this.loaded = false
       }
     },
     watch:{
@@ -549,6 +537,9 @@
         }).catch(error => {
           this.$toastBox.showToastBox("网络错误")
         })
+      },
+      immediatePay(){
+        this.$toastBox.showToastBox('敬请期待')
       }
     }
   }
@@ -562,7 +553,7 @@
     position fixed
     left 0
     top 0
-    bottom 0rem
+    bottom 3rem
     right 0
     overflow hidden
     background #f7f1e3
@@ -744,6 +735,34 @@
           color #b78231
           font-size 1rem
           text-align center
+
+  .click-subAddVip
+    position fixed
+    bottom 0
+    left 0
+    height 3rem
+    width 100%
+    background-color #2d2b32
+    max-width 750PX
+    z-index 99
+    display flex
+    justify-content flex-start
+    line-height 3rem
+    color rgba(255,255,255,1)
+    font-size 1.13rem
+    .right
+      flex 1
+      text-align center
+      background-color rgba(196,143,73,1)
+      // padding-left 3.5rem
+      box-sizing border-box
+
+    .left
+      padding-left 1.5rem
+      box-sizing border-box
+      width 9.84rem
+      background rgba(196,143,73,1) url("./images/vip-code-btn.png") no-repeat center center
+      background-size 100% 100%
 
   .fiexd-top
     position fixed
@@ -984,81 +1003,36 @@
           font-size 1.125rem
           font-weight bold
 
-.exchange-popup
-  position fixed
-  bottom 0
-  left 0
-  right 0
-  top 0
-  background rgba(0,0,0,0.5)
-  z-index 101
-  .exchange-content
-    min-height 1rem
-    width 20rem
-    position absolute
-    left 50%
-    top 50%
-    transform translate(-50%,-50%)
-    .exchange-open-top
+  .exchange-open-top
+    width 100%
+    font-size 0
+    background #fff
+    box-sizing border-box
+    text-align center
+    display flex
+    flex-direction column
+    .exchange-input
+      margin 0 auto
+      height 2.75rem
       width 100%
-      // height 10rem
-      font-size 0
-      background #fff
-      border-radius 0.375rem
+      border 0.0625rem solid rgb(199,199,199);
+      border-radius 0.25rem
+      outline none
+      font-size 1rem
+      padding-left 1rem
+      box-sizing border-box
+    .exchange-err-title
+      width 100%
       text-align center
-      display flex
-      flex-direction column
-      .exchange-input
-        margin 0 auto
-        margin-top 1.5rem
-        margin-bottom 1.5rem
-        height 2.75rem
-        width 17.6875rem
-        border solid 0.063rem #2d2b32
-        border-radius 0.25rem
-        outline none
-        font-size 1.125rem
-        padding-left 0.5rem
-        box-sizing border-box
-      .exchange-info-title
-        width 100%
-        text-align center
-        font-size 1.125rem
-        font-weight 600
-        color rgb(51,51,51)
-        margin-top 1.25rem
-      .exchange-info-text
-        width 100%
-        text-align center
-        font-size 1rem
-        color rgb(102,102,102)
-        margin 1.25rem 0
-        padding: 0 0.75rem;
-        box-sizing: border-box;
-        line-height: 1.375rem;
-      .exchange-btnWrap
-        width 18.3125rem
-        margin  0 auto
-        margin-bottom 1rem
-        .exchange-btn
-          width 100%
-          height 2.75rem
-          line-height 2.75rem
-          background #fae2b3
-          color #333333
-          text-align center
-          font-size 1.125rem
-          font-weight 600
-          outline none
-          border none
-          border-radius 0.3125rem
-    .exchange-open-close
+      font-size 1.125rem
+      font-weight 600
+      color rgb(51,51,51)
       margin-top 1.25rem
+    .exchange-err-text
       width 100%
       text-align center
-      i
-        color rgb(188,188,188)
-        font-size 1.75rem
+      font-size 1rem
+      color rgb(102,102,102)
 
 
 .instructions >>> p

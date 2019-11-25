@@ -12,7 +12,7 @@
       <div class="btn_list" v-show="switchStatus == 'on'">
         <div class="btn_item" v-for="(item, index) in menuList" :key="index" :class="[switchStatus == 'on' ? 'menu-animate' : '']">
           <button type="button" ref="btnIndex" @click="jumplinkUrl(item.urlSelectOptionsValue || item.urlInputValue)">
-            <img :src="item.img_url" alt="">
+            <img :src="item.img_url +'?timer=007'" alt="">
           </button>
         </div>
       </div>
