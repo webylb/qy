@@ -318,24 +318,13 @@
         data.vipSystemId = this.vipTypeDefaultId
         let returnUrl = window.location.href.split(".html")[0]+'.html'+ this.$route.path + '?type='+ this.goodsLibraryName + this.vipTypeDefaultName
         data.returnUrl = returnUrl
-        let params = JSON.stringify(data)
-        core.vipPackagePay(params).then(res => {
+        core.vipPackagePay(data).then(res => {
           //console.log(res)
           if(res.code && '00' == res.code){
             if(res.result.goUrl){
               window.location.href = res.result.goUrl
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
-            // if(res.url){
-            //   var index = res.url.lastIndexOf("\/");
-            //   var str = res.url.substring(index, res.url.length);
-            //   let regIndex = /\?/gi;
-            //   if(str && regIndex.test(str)){
-            //     window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-            //   }else{
-            //     window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-            //   }
-            // }
             this.getLoginUrl()
           } else {
             this.$toastBox.showToastBox(res.message)

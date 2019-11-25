@@ -22,37 +22,37 @@ let removePending = url => {
   pending.splice(index, 1)
 }
 
-http.interceptors.request.use(config => {
-  if(!config.headers.noIntercept && isPending(config.url)){
+http.interceptors.request.use(request => {
+  // console.log(request)
+  if(!request.headers.noIntercept && isPending(request.url)){
     Toast('拼命请求中...')
     return Promise.reject(new Error("重复请求已被拦截!"))
   }
-  if(config.data) {
-    if(config.headers['Content-Type']){
-      if(config.headers['Content-Type'] !== 'multipart/form-data' ){
-        config.data = JSON.stringify(config.data)
-      }
+  if(request.data) {
+    if(request.headers['Content-Type'] && request.headers['Content-Type'] === 'application/json;charset=utf-8'){
+      request.data = JSON.stringify(request.data)
     } else {
-      config.data = qs.stringify(config.data)
+      request.data = qs.stringify(request.data)
     }
   }
-  pending.push(config.url)
-  return config
+  pending.push(request.url)
+  return request
 }, error => {
   return Promise.reject(error)
 })
 
 http.interceptors.response.use(response => {
+  console.log(response)
   removePending(response.config.url)
-  if(response.data && response.data.code === '01' && response.data.isLogin === false){
+  if(response.data && response.data.code === '01' && response.data.isLogin === 'false'){
     Toast(response.data.message)
     core.getLoginUrl({merchantId: window.infoData.merchantId}).then(res => {
       //console.log(res)
       if(res.code && '00' == res.code){
         if(res.result && res.result.url){
           window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-        }else {
-          this.$router.push('/login')
+        } else {
+          router.push('/login')
         }
       } else {
         Toast(res.message)
@@ -60,11 +60,6 @@ http.interceptors.response.use(response => {
     }).catch(error => {
       Toast("网络错误")
     })
-    // let timer = null
-    // clearTimeout(timer)
-    // timer = setTimeout(() => {
-    //   router.push('/login')
-    // }, 200)
   }
   return response
 }, error => {
@@ -77,12 +72,9 @@ export default {
     return http({method: 'GET', url, data})
   },
   post: function(url, data, params){
-    if(params && params.contentType){
-      return http({method: 'POST', url, data, headers: {'Content-Type':'application/json; charset=utf-8'}}) //转为json串
-    }else if(params && params.formData){
-      return http({method: 'POST', url, data, headers: {'Content-Type':'multipart/form-data'}}) //上传excel
-    }else if(params && params.responseType){
-      return http({method: 'POST', url, data, responseType: 'blob'}) //下载excel文件流
+    console.log(params)
+    if(params && params.contentType === 'json'){
+      return http({method: 'POST', url, data, headers: {'Content-Type':'application/json;charset=utf-8'}}) //转为json串
     }else{
       return http({method: 'POST', url, data}) //正常qs
     }

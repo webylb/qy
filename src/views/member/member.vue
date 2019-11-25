@@ -134,7 +134,6 @@
   import GiftPopup from '../../base/gift-popup/popup'
   import * as core from '../../api/member'
   import tool from '../../common/js/util'
-  import http from '../../common/js/http'
 
   export default {
     name: "member",
@@ -190,7 +189,7 @@
       }
     },
     mounted() {
-      console.log(http)
+  
     },
     methods: {
       jumplinkUrl(url) {
