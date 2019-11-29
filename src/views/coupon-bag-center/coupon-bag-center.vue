@@ -52,7 +52,7 @@
                           <coupon-banner 
                             :bannerList="item.configJson.coupon_entry"
                             @onLoaded="onLoaded"
-                            @jumplinkUrl="jumpChecklinkUrl">
+                            @jumpBagDetail="jumpBagDetail">
                           </coupon-banner>
                         </div>
                       </div>
@@ -60,16 +60,11 @@
                   </div>
                   <div class="coupon-cont" v-if="index === 1">
                     <div v-if="!showLoad" class="main-wrapper" :style="mainWrapperStyle">
-                      2222
-                      <!-- <div v-for="(item, index) in allData" :key="item.uid">
-                        <div v-if="item.moduleType === 'couponListBanner'">
-                          <coupon-banner 
-                            :bannerList="item.configJson.coupon_entry"
-                            @onLoaded="onLoaded"
-                            @jumplinkUrl="jumpChecklinkUrl">
-                          </coupon-banner>
-                        </div>
-                      </div> -->
+                      <coupon-banner 
+                        :bannerList="userBagList"
+                        @onLoaded="onLoaded"
+                        @jumpBagDetail="jumpBagDetail">
+                      </coupon-banner>
                     </div>
                   </div>
                   <loading v-if="showLoad" style="padding-top: 50%"></loading>
@@ -104,7 +99,7 @@
   import MemberBanner from '../../base/member-banner/member-banner'
   import MemberBtmfloat from '../../base/member-btmfloat/member-btmfloat'
   import CouponBanner from '../../base/coupon-banner/coupon-banner'
-  import * as core from '../../api/serviceCenter'
+  import * as core from '../../api/couponBag'
   import tool from '../../common/js/util'
   import wxShareMixin from '../../common/js/wxShareMixin'
   import Loading from '../../base/loading/loading'
@@ -134,7 +129,7 @@
         activeMeunIndex: 0,
         couponMeunData: [
           {
-            name: '礼包售卖',
+            name: '热卖礼包',
             id: '1'
           },
           {
@@ -155,7 +150,8 @@
         transitionName: 'slide-left',
         hasLabel: false,
         isShowFloat: null,
-        mainWrapperStyle: 'padding-bottom:0;'
+        mainWrapperStyle: 'padding-bottom:0;',
+        userBagList: []
       }
     },
     created () {
@@ -171,13 +167,6 @@
         this.showHeader=false
         this.couponCenterStyle = "top:0rem"
       }
-      if(this.$route.query.pageUuid){
-        this.giftPackagePageUuid = this.$route.query.pageUuid
-      }
-      if (this.giftPackagePageUuid) {
-        this.loaded = false
-        this.getNewShopTequan({pageUuid: this.giftPackagePageUuid})
-      }
     },
     mounted(){
 
@@ -191,6 +180,29 @@
       jumpChecklinkUrl(url){
         if(url){
           window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+        }
+      },
+      jumpBagDetail(i) {
+        if(i && i.orderId) {
+          switch (true) {
+            case /圣诞/.test(i.packageName):
+              this.$router.push({path: '/christmasCouponBag', query:{ packageId: i.urlSelectOptionsValue, type: 'vip', orderId: i.orderId}})
+              break;
+          
+            default:
+              this.$router.push({path: '/vipUserCouponBag', query:{ packageId: i.urlSelectOptionsValue, type: 'vip', orderId: i.orderId}})
+              break;
+          }
+        }else{
+          switch (true) {
+            case /圣诞/.test(i.packageName):
+              this.$router.push({path: '/christmasCouponBag', query:{ packageId: i.urlSelectOptionsValue}})
+              break;
+          
+            default:
+              this.$router.push({path: '/vipUserCouponBag', query:{ packageId: i.urlSelectOptionsValue}})
+              break;
+          }
         }
       },
       onLoaded() {
@@ -218,6 +230,28 @@
           }
         }).catch(e => {
           this.showLoad = false
+          this.$toastBox.showToastBox(e)
+        })
+      },
+      getUserBagList() {
+        core.getUserBagList().then(res => {
+          if (res.code && '00' === res.code) {
+            if (res.result) {
+              let data =  res.result
+              let arr = []
+              for(let i=0, length = data.length; i<length; i++){
+                arr[i] = { }
+                arr[i].orderId = data[i].id
+                arr[i].packageName = data[i].packageName
+                arr[i].urlSelectOptionsValue = data[i].packageId
+                arr[i].img_url = data[i].buyAfterBannerImageUrl
+              }
+              this.userBagList = arr
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(e => {
           this.$toastBox.showToastBox(e)
         })
       },
@@ -265,8 +299,8 @@
         }, 20)
       },
       refreshScroll(){
-        if(this.serveMeunData && this.serveMeunData.length > 1){
-          for(let i = 0; i<this.serveMeunData.length; i++){
+        if(this.couponMeunData && this.couponMeunData.length > 1){
+          for(let i = 0; i<this.couponMeunData.length; i++){
             setTimeout(() => {
               this.$refs.couponWrapper[i].refresh();
             }, 20)
@@ -284,6 +318,14 @@
     watch: {
     },
     activated(){
+      if(this.$route.query.pageUuid){
+        this.giftPackagePageUuid = this.$route.query.pageUuid
+      }
+      if (this.giftPackagePageUuid) {
+        this.loaded = false
+        this.getNewShopTequan({pageUuid: this.giftPackagePageUuid})
+        this.getUserBagList()
+      }
       if(this.$refs.couponWrapper){
         this.refreshScroll()
       }

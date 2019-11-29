@@ -10,17 +10,13 @@
 
 <script>
   import Scroll from '../../base/scroll/scroll'
-  import Loading from '../../base/loading/loading'
-  import Popup from '../../base/popup/popup';
   import * as core from '../../api/member'
   import tool from '../../common/js/util'
 
   export default {
     name: "userInfo",
     components: {
-      Scroll,
-      Loading,
-      Popup
+      Scroll
     },
     data() {
       return {

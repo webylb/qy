@@ -138,7 +138,7 @@
         this.$router.go(-1)
         return;
       }else{
-        this.merchantGiftPackageId = this.$route.query.merchantGiftPackageId
+        this.packageId = this.$route.query.packageId
         this.code = this.$route.query.code
       }
       this.getItemCouponSkuDetail()
@@ -227,8 +227,6 @@
             }else{
               this.rechargeType = 0
             }
-
-            this.showLoad = false
             this._initScroll()
             this.changeTitle()
           } else if (res.code && '02' === res.code){
@@ -240,10 +238,13 @@
             timer = setTimeout(() => {
               this.$router.go(-1)
             }, 1500)
+
           } else {
             this.$toastBox.showToastBox(res.message)
           }
+          this.showLoad = false
         }).catch(error => {
+          this.showLoad = false
           this.$toastBox.showToastBox("网络错误")
         })
       },
@@ -251,13 +252,13 @@
         let data = {}
         if(this.$refs.rechargeInputItem){
           if(this.rechargeNum){
-            this.$router.push({path: '/cashier', name: 'cashier', query: {code: this.code, merchantGiftPackageId: this.merchantGiftPackageId,account:this.rechargeNum}})
+            this.$router.push({path: '/cashier', name: 'cashier', query: {code: this.code, packageId: this.packageId,account:this.rechargeNum}})
           }else{
             this.$toastBox.showToastBox("请输入充值账号!")
             return;
           }
         } else {
-          this.$router.push({path: '/cashier', query: {code: this.code, merchantGiftPackageId: this.merchantGiftPackageId}})
+          this.$router.push({path: '/cashier', query: {code: this.code, packageId: this.packageId}})
         }
       },
       toServiceCall(){
@@ -287,7 +288,6 @@
       max-width 750PX
       height 3.063rem
       line-height 3.063rem
-      background-color rgb(252,212,148)
       color rgb(111,65,9)
       font-size 1.125rem
       text-align center
@@ -300,7 +300,8 @@
         background-size 100% 100%
         font-size 1.125rem
         font-weight 600
-        color #2d2b32
+        background-color rgba(196,143,73,1);
+        color #fff
         text-align center
         box-sizing border-box
 
@@ -477,16 +478,19 @@
             overflow hidden
             line-height 1.2rem
             padding-top 0.2rem
+            color rgba(102, 102, 102, 1)
             p
               text-align justify
               text-justify newspaper
               word-break normal
               overflow hidden
+              color rgba(102, 102, 102, 1)
             span
               text-align justify
               text-justify newspaper
               word-break normal
               overflow hidden
+              color rgba(102, 102, 102, 1)
 
 // 改变placeholder
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
@@ -508,17 +512,15 @@
 
 .good-descript-text >>> p > img
   //margin 0 auto
-  width 100%
-  height auto
-  padding 0.4rem
-  box-sizing border-box
-
+  vertical-align bottom
 
 .good-descript-text >>> b
-  font-weight bold !important
+  // font-weight bold !important
+  color rgba(61, 58, 57, 1)!important
 
 .good-descript-text >>> strong
-  font-weight bold
+  // font-weight bold
+  color rgba(61, 58, 57, 1)!important
 
 @-webkit-keyframes fadeIn {
     from {

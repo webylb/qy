@@ -13,11 +13,6 @@
             </div>
             <div class="coupon-bag-item" v-for="(item, index) in allData" :key="index">
               <div class="top-img">
-                <!-- <img v-if="index%5 == 0" src="./images/1.png" alt="">
-                <img v-else-if="index%5 == 1" src="./images/2.png" alt="">
-                <img v-else-if="index%5 == 2" src="./images/3.png" alt="">
-                <img v-else-if="index%5 == 3" src="./images/4.png" alt="">
-                <img v-else-if="index%5 == 4" src="./images/5.png" alt=""> -->
                 <div class="top-title">{{ item.categoryName }}</div>
               </div>
               <div class="prod-wrap" v-if="item.ticketType == 'ShangPinQuan'">
@@ -64,33 +59,32 @@
             </div>
           </div>
           <div class="customer-service">
-            <!-- 客服电话：<a href="tel:4006680091">4006680091</a> 转 2 -->
             <van-divider :style="{ fontSize: '0.75rem', borderColor: 'rgba(221, 221, 221, 1)', color: 'rgba(61, 58, 57, 1)', padding: '0 3rem' }">
               客服电话：<a href="tel:4006680091">4006680091</a>&nbsp;转&nbsp;<span>2</span>
             </van-divider>
           </div>
         </div>
-        <!-- 定位入口 -->
-        <div class="go-order-form fiexd-top" v-if="showVipInfo" @click="goOrderForm">
+        <div class="go-order-form absoulte-top" v-if="showVipInfo" @click="goOrderForm">
           <img src="./images/order.png" alt="">
-          <div>订单</div>
         </div>
-        <div class="go-my-coupon fiexd-top" v-if="showVipInfo" @click="goMyCoupon">
+        <div class="go-my-coupon absoulte-top" v-if="showVipInfo" @click="goMyCoupon">
           <img src="./images/coupon.png" alt="">
-          <div>卡券</div>
         </div>
         <loading v-show="loaded" style="padding-top: 50%"></loading>
       </div>
     </div>
-    <!-- 购买兑换入口 -->
     <div class="click-subAddVip" v-if="!showVipInfo">
       <div v-if="exchargeShow && openShow" class="left" @click="openExcharge">兑换码激活</div>
       <div v-if="openShow" class="right" @click="immediatePay">{{sellingPrice}}元/立即开通</div>
       <div v-if="exchargeShow && !openShow" class="only-left" @click="openExcharge">兑换码激活</div>
     </div>
-    <!-- 遮罩层 -->
+    <!-- 固定定位入口 -->
+    <div class="go-share fiexd-top" v-if="showVipInfo" @click="goShareRule">
+      <img src="./images/share.gif" alt="">
+    </div>
+    <!-- 遮罩 -->
     <div class="content-wrap fade" v-show="couponBagToast" @click="closeCouponBagToast"></div>
-    <!-- 弹出层商品信息 -->
+    <!-- 底部弹出商品信息 -->
     <div class="coupon-bag-toast" ref="couponBagToast">
       <div class="coupon-bag-toast-wrap" v-if="itemCouponDetail">
         <div class="coupon-bag-toast-title">
@@ -151,7 +145,24 @@
         </div>
       </div>
     </div>
-    <!-- 兑换入口 -->
+    <!-- 分享规则 -->
+    <div class="share-rule fade" v-show="showShareRules">
+      <img class="rule-img" src="./images/rules.png" alt="">
+      <div class="share-btn" @click="goShare"></div>
+      <span><img src="./images/success-close.png" alt="" @click="closeShareRules"></span>
+    </div>
+    <!-- 分享图片 -->
+    <div class="share-img fade" v-show="showShareImg">
+      <img :src="activeShareImgUrl" alt="">
+      <span @click="closeShareRules"></span>
+    </div>
+    <!-- 购买成功 -->
+    <div class="success-popup fade" v-show="showSuccessPopup">
+      <img class="success-img" src="./images/success-img.png" alt="">
+      <div class="share-btn" @click="goShare"></div>
+      <span><img src="./images/success-close.png" alt="" @click="closeShareRules"></span>
+    </div>
+    <!-- 兑换码 -->
     <ExchangePopup v-show="exchargeOpen" title="兑换码激活" confirmText="立即兑换" @cancel="hideExchargePopup" @confirm="goExcharge">
       <div class="exchange-open-top" style="padding:1.88rem 1.25rem 2.69rem;margin: 0;text-align:center;">
         <input type="text" v-model="exchargeInput" @click.stop="focusInput"  @blur="scrollToTop" class="exchange-input" placeholder="请输入兑换码" maxlength="32" />
@@ -175,7 +186,7 @@
   import wxShareMixin from '../../common/js/wxShareMixin'
 
   export default {
-    name: 'couponBag',
+    name: 'christmasCouponBag',
     components: {
       ShopHeader,
       Slider,
@@ -199,6 +210,9 @@
         usePageIndex: 0,
         useCode: null,
         couponBagToast: false,
+        showShareRules: false,
+        showShareImg: false,
+        showSuccessPopup: false,
         showHeader: false,
         activeType: null,
         exchargeOpen: false,
@@ -212,12 +226,12 @@
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
-        okLink: null,
         exchargeShow: false,
         openShow: false,
         showVipInfo: false,
         isPaying: true,
-        isHasAuthority: false
+        isHasAuthority: false,
+        activeShareImgUrl: null
       }
     },
     created () {
@@ -374,6 +388,40 @@
       bannerClick(){
         this.$router.push('/')
       },
+      goShareRule(){
+        this.couponBagToast = true
+        this.showShareRules = true
+      },
+      closeShareRules(){
+        this.couponBagToast = false
+        this.showShareRules = false
+        this.showSuccessPopup = false
+        this.showShareImg = false
+      },
+      goShare(){
+        this.$toast.loading({
+          message: '加载中...',
+          overlay: true,
+          forbidClick: true,
+          loadingType: 'spinner',
+          duration: 0
+        });
+        core.getShareImg({merchantId: this.merchantId, packageId: this.packageId}).then(res => {
+          if(res.code && '00' == res.code){
+            this.activeShareImgUrl = res.result
+            this.showShareRules = false
+            this.couponBagToast = true
+            this.showShareImg = true
+            this.$toast.clear()
+          } else if(res.code && '01' === res.code && res.isLogin == 'false'){
+            this.getLoginUrl()
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
+      },
       receive(type,id){
         if(this.isHasAuthority){
           this.activeType = type
@@ -387,7 +435,6 @@
       getItemCouponDetail(opts){
         this.itemCouponDetail = null
         core.getItemCouponDetail(opts).then(res => {
-          //console.log(res)
           if(res.code && '00' == res.code){
             const data = res.result
             let activeIndex = 0
@@ -414,7 +461,6 @@
               }
               pageIndex = 1
             }
-
             this.itemCouponDetail = data
             this.useIndex = activeIndex
             this.usePageIndex = pageIndex
@@ -430,23 +476,6 @@
               }, 20)
             }
           } else if(res.code && '01' === res.code && res.isLogin == 'false'){
-            // this.$toastBox.showToastBox('未登录用户')
-            // let timer = null
-            // clearTimeout(timer)
-            // timer = setTimeout(()=>{
-            //   if(res.url){
-            //     var index = res.url.lastIndexOf("\/");
-            //     var str = res.url.substring(index, res.url.length);
-            //     let regIndex = /\?/gi;
-            //     if(str && regIndex.test(str)){
-            //       window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-            //       clearTimeout(timer)
-            //     }else{
-            //       window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-            //       clearTimeout(timer)
-            //     }
-            //   }
-            // },1000)
             this.getLoginUrl()
           } else if(res.code && '100' === res.code){
             this.exchargeInfoOpen = true
@@ -491,6 +520,9 @@
         this.$refs.couponBagToast.style.bottom = "-100%"
         this.$refs.couponBagToast.style.transition = "bottom 0.5s ease"
         this.couponBagToast = false
+        this.showShareRules = false
+        this.showSuccessPopup = false
+        this.showShareImg = false
       },
       onLoaded(){
         this.scroll.refresh()
@@ -586,9 +618,8 @@
       isSuccess(){
         let status = this.$route.query.status
         if(status && status != 0){
-          this.exchargeInfoOpen = true
-          this.exchargeInfoTitle = '购买成功'
-          this.exchargeInfoText = '恭喜你购买成功,请前去体验~'
+          this.couponBagToast = true
+          this.showSuccessPopup = true
           let data = {}
           for(let item in this.$route.query){
             if(item == 'status'){
@@ -597,7 +628,7 @@
               data[item] = this.$route.query[item]
             }
           }
-          this.$router.push({path:'/vipUserCouponBag', query:data})
+          this.$router.push({path:'/christmasCouponBag', query:data})
         }
       }
     }
@@ -608,6 +639,7 @@
 <style lang="stylus" rel="stylesheet/stylus" scoped>
 .coupon-bag
   background-color #fff
+  position relative
   .coupon-bag-content
     position fixed
     left 0
@@ -615,7 +647,7 @@
     bottom 3rem
     right 0
     overflow hidden
-    background #f7f1e3
+    background rgba(243, 241, 241, 1)
     max-width 750PX
 
     .cont
@@ -631,7 +663,7 @@
         padding 0 0.75rem
         box-sizing border-box
         min-height 1rem
-        padding-top 0.94rem
+        // padding-top 0.94rem
         .top-banner
           width 100%
           margin-bottom 0.938rem
@@ -649,7 +681,7 @@
           .top-img
             width 100%
             height 3.125rem
-            background rgba(248,205,147,1)
+            background rgba(177, 17, 41, 1)
             position relative
             &::after
               content ""
@@ -704,14 +736,14 @@
                   .item-name
                     position relative
                     font-size 0.813rem
-                    color #666666
+                    color rgba(61, 58, 57, 1)
                     font-weight bold
                     height auto
                     padding-top 0.281rem
                     left -0.4rem
                   .sku-name
                     font-size 0.9375rem
-                    color $mian-color
+                    color rgba(177, 17, 41, 1)
                     margin 0.3rem 0
                     font-weight  bold
                     height auto
@@ -722,7 +754,7 @@
                     bottom 0.219rem
                     left 0
                     font-size 0.875rem
-                    color #b78231
+                    color rgba(61, 58, 57, 1)
                     padding-top 0.1rem
 
               button
@@ -763,14 +795,14 @@
                   text-overflow ellipsis
                 .item-name
                   font-size 0.813rem
-                  color #666666
+                  color rgba(61, 58, 57, 1)
                   font-weight bold
                   margin-top 0.983rem
                   height auto
                   padding-top 0.15rem
                 .sku-name
                   font-size 0.9375rem
-                  color $mian-color
+                  color rgba(177, 17, 41, 1)
                   margin 0.35rem 0
                   font-weight  bold
                   height auto
@@ -778,7 +810,7 @@
                   line-height 1.2
                 .ticket-name
                   font-size 0.875rem
-                  color #b78231
+                  color rgba(61, 58, 57, 1)
                   padding-top 0.1rem
       .customer-service
         font-size 0.75rem
@@ -798,7 +830,7 @@
     left 0
     height 3rem
     width 100%
-    background-color #2d2b32
+    background-color rgba(177, 17, 41, 1)
     max-width 750PX
     z-index 99
     display flex
@@ -809,7 +841,7 @@
     .right
       flex 1
       text-align center
-      background-color rgba(196,143,73,1)
+      background-color rgba(177, 17, 41, 1)
       // padding-left 3.5rem
       box-sizing border-box
 
@@ -817,35 +849,103 @@
       padding-left 1.5rem
       box-sizing border-box
       width 9.84rem
-      background rgba(196,143,73,1) url("./images/vip-code-btn.png") no-repeat center center
+      background #1B4239 url("./images/vip-code-btn.png") no-repeat center center
       background-size 100% 100%
     
     .only-left
       flex 1
       text-align center
-      background #3D3A39
+      background #1B4239
 
-  .fiexd-top
+  .absoulte-top
     position absolute
     top 4.983rem
     right 0
-    background-color #ffffff
-    border-radius 1.125rem 0 0 1.125rem
-    border solid 0.125rem #b78231
-    border-right none
-    display flex
-    justify-content center
-    align-items center
-    font-size 1rem
-    color #b78231
-    padding 0.5rem 0.75rem 0.5rem 1rem
     img
-      width 0.938rem
-      max-height 1.031rem
-      margin-right 0.25rem
+      width 4.38rem
+      height 2rem
   .go-my-coupon
     top 7.66rem
+
+  .go-share 
+    position fixed
+    top 23rem
+    right 0
+    img 
+      width 5.625rem
+      height 5.625rem
   
+  .share-rule
+    position fixed
+    top 50%
+    left 50%
+    transform translate(-50%, -50%)
+    height 30.44rem
+    width 20rem
+    z-index 101
+    .rule-img
+      width 100%
+      height auto
+    .share-btn
+      position absolute
+      left 50%
+      top 10.8rem
+      transform translateX(-50%)
+      width 15rem
+      height 3rem
+    span
+      position absolute
+      right 0
+      top -1.34rem
+      width 1.34rem
+      height 1.34rem
+      img 
+        width 100% 
+        height 100%
+  .share-img
+    position fixed
+    top 50%
+    left 50%
+    transform translate(-50%, -50%)
+    z-index 101
+    width 20.625rem
+    img
+      width 100%
+      height auto
+    span
+      position absolute
+      right 0.65rem
+      top 0.5rem
+      width 1.34rem
+      height 1.34rem
+
+  .success-popup
+    position fixed
+    top 5.9375rem
+    left 50%
+    transform translateX(-50%)
+    height 23.59rem
+    width 19.38rem
+    z-index 101
+    .success-img
+      width 100%
+      height auto
+    .share-btn
+      position absolute
+      left 50%
+      top 15rem
+      transform translateX(-50%)
+      width 12.5rem
+      height 2.5rem
+    span
+      position absolute
+      right 2rem
+      top 2rem
+      width 1.34rem
+      height 1.34rem
+      img 
+        width 100% 
+        height 100%
   // 弹窗遮罩
   .content-wrap
     position fixed
@@ -855,7 +955,7 @@
     bottom 0
     max-width 750PX
     z-index 100
-    background rgba(0,0,0,.4)
+    background rgba(0,0,0,.6)
 
   //底部弹出content
   .coupon-bag-toast

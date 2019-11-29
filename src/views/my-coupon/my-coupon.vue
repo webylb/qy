@@ -13,31 +13,61 @@
         <div>
           <transition-group tag="div" :name="transitionName">
             <div style="top:3.5rem;" v-show="activeLink === index" v-for="(i, index) in tabList" :key="i.id" class="validCoupon">
-              <scroll ref="validCouponScroll" class="validCouponScroll"
-                :data="couponsList"
-                :pullup="true"
-                @scrollToEnd="loadMore">
-                <div style="padding:0.75rem 0.75rem 0.25rem;box-sizing:border-box;">
-                  <div>
-                    <coupon-item class="nav-item"
-                      @handleItem="handleItem"
-                      @showDesText="showDesText"
-                      v-for="(item,index) in couponsList" :key="index"
-                      :coupondata="item"
-                      :valid="valid"
-                      @popupStatus="popupStatus"
-                      @showConfirmUse="showConfirmUse">
-                    </coupon-item>
-                    <div v-show="couponsList && couponsList.length > 0" class="coupon-customer-service">
-                      <!-- 客服电话：<a href="tel:4006680091">4006680091</a> 转 2 -->
-                      <van-divider :style="{ fontSize: '0.75rem', borderColor: 'rgba(221, 221, 221, 1)', color: 'rgba(61, 58, 57, 1)', padding: '0 3rem' }">
-                        客服电话：<a href="tel:4006680091">4006680091</a>&nbsp;转&nbsp;<span>2</span>
-                      </van-divider>
+              <div v-if="index === 0">
+                <scroll ref="validCouponScroll" class="validCouponScroll"
+                  :data="orderList"
+                  :pullup="true"
+                  @scrollToEnd="loadMore">
+                  <div style="padding:0.75rem 0.75rem 0.25rem;box-sizing:border-box;">
+                    <div>
+                      <div v-for="item in orderList" class="order-item-wrapper"
+                          :key="item.id">
+                        <OrderItem :item-data="item" @refshScroll="refshScroll"></OrderItem>
+                        <div class="order-price">
+                          共{{item.count}}件商品 实付款<span>¥</span><span class="money">{{price(0,item.money) || 0}}</span>
+                        </div>
+                        <div class="order-item-bottom">
+                          <!-- <div @click="quxiao(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'">申请退款</div> -->
+                          <div @click="activeOrder(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'" class="pay">立即激活</div>
+                        </div>
+                      </div>
+                      <div v-show="orderList && orderList.length > 0" class="coupon-customer-service">
+                        <van-divider :style="{ fontSize: '0.75rem', borderColor: 'rgba(221, 221, 221, 1)', color: 'rgba(61, 58, 57, 1)', padding: '0 3rem' }">
+                          客服电话：<a href="tel:4006680091">4006680091</a>&nbsp;转&nbsp;<span>2</span>
+                        </van-divider>
+                      </div>
+                      <loading style="padding: 1rem 0" v-show="showLoad" :title="loadingTitle"></loading>
                     </div>
-                    <loading style="padding:  1rem 0" v-show="showLoad" :title="loadingTitle"></loading>
                   </div>
-                </div>
-              </scroll>
+                </scroll>
+              </div>
+              <div v-else>
+                <scroll ref="validCouponScroll" class="validCouponScroll"
+                  :data="couponsList"
+                  :pullup="true"
+                  @scrollToEnd="loadMore">
+                  <div style="padding:0.75rem 0.75rem 0.25rem;box-sizing:border-box;">
+                    <div>
+                      <coupon-item class="nav-item"
+                        @handleItem="handleItem"
+                        @showDesText="showDesText"
+                        v-for="(item,index) in couponsList" :key="index"
+                        :coupondata="item"
+                        :valid="valid"
+                        @popupStatus="popupStatus"
+                        @showConfirmUse="showConfirmUse">
+                      </coupon-item>
+                      <div v-show="couponsList && couponsList.length > 0" class="coupon-customer-service">
+                        <!-- 客服电话：<a href="tel:4006680091">4006680091</a> 转 2 -->
+                        <van-divider :style="{ fontSize: '0.75rem', borderColor: 'rgba(221, 221, 221, 1)', color: 'rgba(61, 58, 57, 1)', padding: '0 3rem' }">
+                          客服电话：<a href="tel:4006680091">4006680091</a>&nbsp;转&nbsp;<span>2</span>
+                        </van-divider>
+                      </div>
+                      <loading style="padding: 1rem 0" v-show="showLoad" :title="loadingTitle"></loading>
+                    </div>
+                  </div>
+                </scroll>
+              </div>
             </div>
           </transition-group>
         </div>
@@ -53,6 +83,17 @@
             卡券确认已使用？
           </p>
         </popup>
+        <popup v-show="showActiveErrPopup" title="正在调取商品信息" confirmText="前去查看" @confirm="goOrderDetail" @cancel="cancelErr">
+          <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
+            您购买的商品太火爆了~<br/>
+            稍后可在“我的订单”中查看
+          </p>
+        </popup>
+        <popup v-show="showActivePopup" :isShowTitle="false" @confirm="confirmActiveOrder" @cancel="cancel">
+          <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
+            是否确认激活?
+          </p>
+        </popup>
       </div>
     </div>
   </div>
@@ -63,6 +104,7 @@
   import Scroll from '../../base/scroll/scroll'
   import ShopHeader from '../../base/shop-header/shop-header'
   import couponItem from '../../base/coupon-item/coupon-item'
+  import OrderItem from '../../base/order-item/order-item'
   import * as core from '../../api/myCoupon'
   import Loading from '../../base/loading/loading'
   import Popup from '../../base/popup/popup'
@@ -73,6 +115,9 @@
     data() {
       return {
         tabList: [{
+          name: '待激活',
+          id: 0
+        },{
           name: '有效期内',
           id: 1
         },
@@ -84,6 +129,7 @@
         myCouponStyle: "",
         activeLink: 0,
         valid: true,
+        orderList: [],
         couponsList: [],
         currentPage: 1,
         pageSize: 10,
@@ -93,6 +139,8 @@
         hasMore: null,
         popupClose: false,
         showConfirmPopup: false,
+        showActivePopup: false,
+        showActiveErrPopup: false,
         checkId: null,
         isShowCustome: null,
         scrollStyle: null,
@@ -103,6 +151,7 @@
       Scroll,
       ShopHeader,
       couponItem,
+      OrderItem,
       Loading,
       Popup,
       [Divider.name]: Divider
@@ -137,8 +186,14 @@
         this.showHeader=false
         this.myCouponStyle = "top:0rem"
       }
-
-      this.getValidCoupon({ currentPage: this.currentPage, pageSize: this.pageSize});
+      // this.getValidCoupon({ currentPage: this.currentPage, pageSize: this.pageSize});
+      this.getWaitActive({
+        currentPage: this.currentPage,
+        pageSize: this.pageSize,
+        status: 'SUCCESS',
+        isShip: 'N',
+        isActivated: 'N'
+      })
     },
     mounted(){
       if (window.history && window.history.pushState) {
@@ -154,6 +209,9 @@
       window.removeEventListener('popstate', this.goBack, false);
     },
     methods: {
+      price(a, b) {
+        return tool.priceStr(a, b)
+      },
       goBack () {
         // console.log("点击了浏览器的返回按钮");
         this.$couponToastBox.hideToastBox()
@@ -168,10 +226,22 @@
         }else if(index > this.activeLink){
           this.transitionName = 'slide-left'
         }
-        // this.noCoupon = false
+        this.couponsList = []
+        this.orderList = []
         this.activeLink = index
+        this.noCoupon = false
         this.currentPage = 1
-        if(index == 0){
+        if(index == 0) {
+          this.valid = null
+          this.orderList = []
+          this.getWaitActive({
+            currentPage: this.currentPage,
+            pageSize: this.pageSize,
+            status: 'SUCCESS',
+            isShip: 'N',
+            isActivated: 'N'
+          })
+        }else if(index == 1){
           this.valid = true
           this.couponsList = []
           this.getValidCoupon({
@@ -201,6 +271,14 @@
       loadMore() {
         if (!this.showLoad && this.hasMore) {
           if(this.activeLink === 0){
+            this.getWaitActive({
+              currentPage: this.currentPage,
+              pageSize: this.pageSize,
+              status: 'SUCCESS',
+              isShip: 'N',
+              isActivated: 'N'
+            })
+          }else if(this.activeLink === 1){
             this.getValidCoupon({
               currentPage: this.currentPage,
               pageSize: this.pageSize
@@ -215,6 +293,9 @@
       },
       loadImage() {
         this.$refs.validCouponScroll.refresh()
+      },
+      refshScroll() {
+        this.$refs.validCouponScroll[0].refresh()
       },
       showDesText(){
         // console.log(this.$refs.validCouponScroll)
@@ -239,6 +320,11 @@
       },
       cancel(){
         this.showConfirmPopup = false
+        this.showActivePopup = false
+      },
+      cancelErr() {
+        this.showActiveErrPopup = false
+        this.handelClick(0)
       },
       confirm(){
         if(this.checkId){
@@ -274,6 +360,72 @@
         }
 
       },
+      //激活订单
+      activeOrder(id) {
+        this.activeOrderId = null
+        this.activeOrderId = id
+        this.showActivePopup = true
+      },
+      confirmActiveOrder(id) {
+        core.activeOrder({orderId: this.activeOrderId}).then(res => {
+          if (res.code && '00' === res.code) {
+            this.showActivePopup = false
+            this.activeOrderId = null
+            if(res.result.isShip === 'Y'){
+              this.$toastBox.showToastBox('激活成功')
+              setTimeout(() => {
+                this.handelClick(1)
+              }, 200)
+            }else{
+              this.showActiveErrPopup = true
+            }
+          } else  {
+            this.showActivePopup = false
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(e => {
+          this.showActivePopup = false
+          this.$toastBox.showToastBox(e)
+        })
+      },
+      goOrderDetail() {
+        this.$router.push({path: '/orderForm', query:{index: 3}})
+      },
+      getWaitActive(opts){
+        core.allOrder(opts).then(res => {
+          //console.log(res)
+          if (res.code && '00' === res.code) {
+            if (res.result.data.length > 0) {
+              if(res.result.data && res.result.data.length > 0){
+                this.orderList = this.orderList.concat(res.result.data)
+              }
+              this.currentPage++;
+              if (this.orderList.length >= res.result.totalRecord) {
+                this.hasMore = false
+              }else{
+                 this.hasMore = true
+              }
+            } else {
+              this.hasMore = false
+            }
+            if(this.orderList.length < 1){
+              this.noCoupon = true
+            }else{
+              this.noCoupon = false
+            }
+            this.showLoad = false
+          }else if(res.code && '01' === res.code && res.isLogin == 'false'){
+            this.showLoad = false
+            this.getLoginUrl()
+          } else {
+            this.showLoad = false
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(e => {
+          this.showLoad = false
+          this.$toastBox.showToastBox(e)
+        })
+      },
       getValidCoupon(opts) {
         this.showLoad = true;
         core.getValidCoupon(opts).then(res => {
@@ -293,16 +445,6 @@
             }
             this.showLoad = false;
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
-            // if(res.url){
-            //   var index = res.url.lastIndexOf("\/");
-            //   var str = res.url.substring(index, res.url.length);
-            //   let regIndex = /\?/gi;
-            //   if(str && regIndex.test(str)){
-            //     window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-            //   }else{
-            //     window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-            //   }
-            // }
             this.getLoginUrl()
             this.showLoad = false;
           } else {
@@ -500,6 +642,37 @@
 .common-question /deep/ .van-collapse-item__content {
   padding-top 0
 }
+
+
+.order-item-wrapper
+  background-color #fff
+  box-sizing border-box
+  padding 0.75rem 0.75rem 
+  border-radius 0.5rem
+  .order-price
+    text-align right
+    font-size 0.75rem
+    color rgba(61,58,57,1)
+    padding-bottom 1rem
+    letter-spacing 0.02rem
+    span
+      color rgba(196, 143, 73, 1)
+    .money
+      font-size 1rem
+      font-family 'PingFang SC','DIN-BOLD'
+  .order-item-bottom
+    display flex
+    justify-content flex-end
+    div
+      font-size 0.81rem
+      border-radius 0.25rem
+      padding 0.53rem 0.94rem
+      margin-left 0.75rem
+      color #999
+      border 1px solid rgba(199, 199, 199, 1)
+    .pay
+      color rgba(196, 143, 73, 1)
+      border-color rgba(196, 143, 73, 1)
 .fadeIn {
     -webkit-animation: fadeIn .3s;
             animation: fadeIn .3s;

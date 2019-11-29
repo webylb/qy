@@ -127,7 +127,7 @@
         this.$router.go(-1)
         return;
       }else{
-        this.merchantGiftPackageId = this.$route.query.merchantGiftPackageId
+        this.packageId = this.$route.query.packageId
         this.code = this.$route.query.code
         this.account = this.$route.query.account
       }
@@ -304,10 +304,10 @@
             font-weight 600
       .pay-btn
         width 8.75rem
-        background-image: linear-gradient(90deg,#f6cf8d 0%,#fbe5b8 100%);
+        background-color rgba(196,143,73,1);
+        color #fff
         font-size 1.125rem
         font-weight 600
-        color #2d2b32
         text-align center
         box-sizing border-box
 

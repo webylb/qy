@@ -32,12 +32,7 @@
     },
     props: {
       numData: {
-        type: Object,
-        default: {
-          unPayOrderCount: 0,
-          unActiveOrderCount: 0,
-          unShipOrderCount: 0,
-        }
+        type: Object
       },
       activeIndex: {
         type: Number,

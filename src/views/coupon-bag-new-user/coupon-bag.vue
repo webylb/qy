@@ -213,7 +213,7 @@
     data () {
       return {
         merchantId: window.infoData.merchantId,
-        merchantGiftPackageId: '',
+        packageId: '',
         loaded: true,
         bannerImageUrl: null,
         allData: [],
@@ -262,9 +262,9 @@
       }
       //微信分享
       this.getShare();
-      if(this.$route.query.merchantGiftPackageId){
-        this.merchantGiftPackageId = this.$route.query.merchantGiftPackageId
-        this.getCouponBagDetail({merchantId: this.merchantId, merchantGiftPackageId: this.merchantGiftPackageId})
+      if(this.$route.query.packageId){
+        this.packageId = this.$route.query.packageId
+        this.getCouponBagDetail({merchantId: this.merchantId, packageId: this.packageId})
       }else{
         this.$toastBox.showToastBox('无效礼包')
       }
@@ -374,7 +374,7 @@
       },
       receive(type,id){
         this.activeType = type
-        this.getItemCouponDetail({merchantId: this.merchantId, ticketId: id, merchantGiftPackageId: this.merchantGiftPackageId})
+        this.getItemCouponDetail({merchantId: this.merchantId, ticketId: id, packageId: this.packageId})
       },
       getItemCouponDetail(opts){
         this.itemCouponDetail = null
@@ -455,7 +455,7 @@
       goUse(url){
         if(this.activeType == 'DiJiaQuan'){
           if(this.useCode){
-            this.$router.push({path:"/couponBagGoods",query:{code: this.useCode, merchantGiftPackageId: this.merchantGiftPackageId}})
+            this.$router.push({path:"/couponBagGoods",query:{code: this.useCode, packageId: this.packageId}})
           }else{
             this.$toastBox.showToastBox("已使用")
           }
@@ -504,7 +504,7 @@
       },
       goExcharge(){
         if(this.exchargeInput){
-          core.exchargeCouponBag({redeemCode: this.exchargeInput,merchantGiftPackageId: this.merchantGiftPackageId}).then(res => {
+          core.exchargeCouponBag({redeemCode: this.exchargeInput,packageId: this.packageId}).then(res => {
             console.log(res)
             if(res.code && '00' == res.code){
               this.exchargeOpen = false
@@ -553,7 +553,7 @@
           window.location.href = this.okLink + "?referer="+ encodeURIComponent(window.location.href)
           this.okLink = ''
         }else{
-          this.getCouponBagDetail({merchantId: this.merchantId, merchantGiftPackageId: this.merchantGiftPackageId})
+          this.getCouponBagDetail({merchantId: this.merchantId, packageId: this.packageId})
         }
       },
       timeFormat(param) {

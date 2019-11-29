@@ -108,11 +108,6 @@
         {{ hintInformation }}
       </p>
     </popup>
-    <popup v-show="showCallPopup" :showPopupTitle='showPopupTitle' :defaultBtn="showPopupTitle" phoneNum='4006680091' cancelCart="我知道了" confirmCart="呼叫客服" @confirm="confirmCall" @cancel="cancel">
-      <p style="padding: 1.25rem 0.8rem;font-size: 1rem;font-weight: normal;font-stretch: normal;letter-spacing: 0rem;color: #333333;text-align:left;">
-        客服电话：<a href="tel:4006680091" style="letter-spacing: 0rem;color: #ff4800;">4006680091 转 2 </a>（会员权益业务），如有疑问，请致电工作人员。
-      </p>
-    </popup>
     <popup v-show="notVip" @cancel="cancel" @confirm="openMember" :title="您暂不可使用此权益" confirmText="前去开卡">
       <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
         仅限会员用户，开通会员即可享受特权优惠权益
@@ -173,7 +168,6 @@
         providerId: null,
         isPaying: true,
         showPopup: false,
-        showCallPopup: false,
         showPopupTitle: false,
         hintInformation: '很抱歉，商品已抢光',
         cancelText: "我知道了",
@@ -607,18 +601,13 @@
         })
       },
       toServiceCall(){
-        // this.showCallPopup = true
         window.location.href = 'https://tb.53kf.com/code/client/10187208/1'
-      },
-      confirmCall(){
-        this.showCallPopup = false
       },
       confirm(){
         this.showPopup = false
       },
       cancel(){
         this.showPopup = false
-        this.showCallPopup = false
         this.notVip = false
       },
       openMember(){

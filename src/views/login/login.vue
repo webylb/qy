@@ -24,9 +24,12 @@
                 <button type="button" @click="getCode">{{ btnText }}</button>
               </div>
           </div>
-
           <div class="sub-wrap">
             <button type="button" @click="subLogin" :class="[classActive ? 'sub-active' : '']">登录</button>
+          </div>
+          <div class="hint" v-show="showInfo">
+            <p class="title">*温馨提示： </p>
+            <p>为了给您提供更好的服务，首次操作需手机号码登录。（以后均可直接登录哦~）</p>
           </div>
         </div>
 
@@ -76,7 +79,8 @@
         times: 60,
         timer: null,
         pengding: true,
-        referer: ''
+        referer: '',
+        showInfo: null
       }
     },
     created () {
@@ -87,8 +91,10 @@
       if (!isWeixin) {
         this.showHeader = true
         this.loginStyle = "top:2.75rem"
-         this.title = this.$route.meta.title
+        this.title = this.$route.meta.title
+        this.showInfo = false
       } else {
+        this.showInfo = true
         this.showHeader=false
         this.loginStyle = "top:0rem"
       }
@@ -375,7 +381,13 @@
               background-color rgba(221,221,221,1)
             .sub-active
               background-color rgba(61, 58, 57, 1)
-
+          .hint
+            margin-top 3.75rem
+            color rgba(194,194,194,1)
+            line-height 1.13rem
+            font-size 0.75rem
+            .title
+              margin-bottom 0.375rem
   .customer-service
     position absolute
     bottom 1.25rem

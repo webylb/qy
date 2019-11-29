@@ -40,7 +40,6 @@ module.exports = {
         }
       }
     }
-
   },
   configureWebpack: config => {
     if (process.env.NODE_ENV === 'production') {
@@ -55,7 +54,7 @@ module.exports = {
               threshold: 10240,
               minRatio: 0.8
           })
-      );
+      )
     } else {
       // 开发环境
     }

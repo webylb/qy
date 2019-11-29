@@ -447,7 +447,7 @@
           this.$toastBox.showToastBox('请输入兑换码')
         }
       },
-      isSuccess(){
+      isSuccessisSuccess(){
         let type = this.$route.query.type
         // console.log(type)
         if(type && type != 0){

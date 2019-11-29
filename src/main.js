@@ -8,11 +8,12 @@ import ToastBox from './common/js/toast' //提示弹窗
 import VueClipboard from 'vue-clipboard2' //复制功能
 import CouponToastBox from './common/js/couponToast'
 import VueJsonp from 'vue-jsonp'
+import { Toast } from 'vant';
 
 //调试工具
 import Vconsole from 'vconsole';
 
-
+Vue.use(Toast);
 Vue.use(VueJsonp);
 Vue.use(CouponToastBox);
 Vue.use(VueClipboard);
@@ -43,7 +44,7 @@ if(process.env.NODE_ENV === 'development'){
     privilegePageUuid: '891456d4e4de46ddade2d74602942bf5',
     openingPageUuid: '',
     personalCenterPageUuid: '67216783016a41a89ac706a8e0a93b02',
-    giftPackagePageUuid: 'f08342d536ab4200abc45bacced04edd'
+    giftPackagePageUuid: '3f61c625637041f2b45f60ae0e756124'
   }
   // document.cookie = "QY_COOKIE_PASSPORT_NAME="+"\"sessionId=5d4d7a3867bd42a2b50d98202ab80676&userId=113\""
   // const vConsole = new Vconsole();

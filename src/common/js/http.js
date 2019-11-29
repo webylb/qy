@@ -42,12 +42,11 @@ http.interceptors.request.use(request => {
 })
 
 http.interceptors.response.use(response => {
-  console.log(response)
+  // console.log(response)
   removePending(response.config.url)
   if(response.data && response.data.code === '01' && response.data.isLogin === 'false'){
     Toast(response.data.message)
     core.getLoginUrl({merchantId: window.infoData.merchantId}).then(res => {
-      //console.log(res)
       if(res.code && '00' == res.code){
         if(res.result && res.result.url){
           window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))

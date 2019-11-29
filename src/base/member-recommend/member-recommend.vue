@@ -14,7 +14,7 @@
               <span>¥<span>{{ priceToFixed(i.settlementPrice) }}</span></span>
               <img src="./images/label.png" alt="会员价">
             </span>
-            <!-- <button type="button">购买</button> -->
+            <button type="button">购买</button>
           </p>
         </div>
       </div>
@@ -190,10 +190,9 @@
           button
             outline none
             border none
-            background rgba(255,46,0,1)
-            border-radius 0.625rem
+            background rgba(179,151,93,1)
             font-size 0.75rem
-            color rgba(255,255,255,1)
+            color #fff
             padding 0
             margin 0
             min-width 3.0625rem

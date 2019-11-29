@@ -49,13 +49,13 @@ export default new Router({
     {
       path: '/myCenter',
       meta: {title: '会员中心',keepAlive:false},
-      component: () => import(/* webpackChunkName: "member" */ '../views/my-center/my-center.vue')
+      component: () => import(/* webpackChunkName: "myCenter" */ '../views/my-center/my-center.vue')
     },
     //会员个人信息
     {
       path: '/userInfo',
       meta: {title: '会员中心',keepAlive:false},
-      component: () => import(/* webpackChunkName: "member" */ '../views/user-info/user-info.vue')
+      component: () => import(/* webpackChunkName: "myCenter" */ '../views/user-info/user-info.vue')
     },
     //我喜欢
     {
@@ -89,19 +89,19 @@ export default new Router({
     {
       path: '/myBill',
       meta: {title: '我的优惠',keepAlive:false},
-      component: () => import(/* webpackChunkName: "center" */ '../views/my-bill/my-bill.vue')
+      component: () => import(/* webpackChunkName: "myCenter" */ '../views/my-bill/my-bill.vue')
     },
     //常见问题
     {
       path: '/commomQuestion',
       meta: {title: '常见问题',keepAlive:false},
-      component: () => import(/* webpackChunkName: "center" */ '../views/common-question/common-question.vue')
+      component: () => import(/* webpackChunkName: "myCenter" */ '../views/common-question/common-question.vue')
     },
      //用户保障
     {
       path: '/userSecurity',
       meta: {title: '会员保障',keepAlive:false},
-      component: () => import(/* webpackChunkName: "center" */ '../views/user-security/user-security.vue')
+      component: () => import(/* webpackChunkName: "myCenter" */ '../views/user-security/user-security.vue')
     },
     //订单
     {
@@ -128,7 +128,7 @@ export default new Router({
     {
       path: '/couponBagCenter',
       name: 'couponBagCenter',
-      meta: {title: '礼包中心',keepAlive:false},
+      meta: {title: '礼包中心',keepAlive: true},
       component: () => import(/* webpackChunkName: "couponBag" */ '@/views/coupon-bag-center/coupon-bag-center.vue')
     },
     //券包首页
@@ -163,8 +163,22 @@ export default new Router({
     {
       path: '/vipUserCouponBag',
       name: 'vipUserCouponBag',
-      meta: {title: '年卡礼包',keepAlive:false},
+      meta: {title: '会员礼包',keepAlive:false},
       component: () => import(/* webpackChunkName: "couponBag" */ '@/views/coupon-bag-vip-user/coupon-bag.vue')
     },
+    // 活动礼包Christmas
+    {
+      path: '/christmasCouponBag',
+      name: 'christmasCouponBag',
+      meta: {title: '圣诞礼包',keepAlive:false},
+      component: () => import(/* webpackChunkName: "activeCouponBag" */ '@/views/coupon-bag-active-temeplate/christmas-coupon-bag.vue')
+    },
+    // 活动礼包规则
+    {
+      path: '/couponBagActiveRules',
+      name: 'couponBagActiveRules',
+      meta: {title: '圣诞礼包',keepAlive:false},
+      component: () => import(/* webpackChunkName: "activeCouponBag" */ '@/views/coupon-bag-active-rules/coupon-bag-active-rules.vue')
+    }
   ]
 })
