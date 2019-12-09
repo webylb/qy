@@ -49,7 +49,7 @@
           </div>
         </div>
         <p class="customer-service-text">
-          客服电话: <a href="tel:4006680091" style="letter-spacing: 0rem;color: #42b0e9;font-size: 0.875rem;">4006680091 转 2 </a>
+          客服电话: <a href="tel:4006680091" style="letter-spacing: 0rem;color: #c48f49;font-size: 0.875rem;">4006680091 转 2 </a>
         </p>
       </div>
     </div>

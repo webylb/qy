@@ -20,17 +20,11 @@
                 <div>
                   <div class="coupon-cont" v-if="index === 0">
                     <div v-if="!showLoad" class="main-wrapper" :style="mainWrapperStyle">
-                      <div v-for="(item, index) in allData" :key="item.uid">
+                      <div v-for="item in allData" :key="item.uid">
                         <div v-if="item.moduleType === 'banner'">
                           <member-banner
-                            v-if="index === 0"
-                            style="padding-top:0.375rem"
-                            :bannerList="item.configJson.sub_entry"
-                            @onLoaded="onLoaded"
-                            @jumplinkUrl="jumpChecklinkUrl"
-                          ></member-banner>
-                          <member-banner
-                            v-else
+                            v-if="showBanner"
+                            ref="memberBanner"
                             :bannerList="item.configJson.sub_entry"
                             @onLoaded="onLoaded"
                             @jumplinkUrl="jumpChecklinkUrl"
@@ -73,6 +67,13 @@
             </div>
           </transition-group>
         </div>
+      </div>
+    </div>
+    <div v-show="noCoupon" class="no-coupon">
+      <div class="no-coupon-content fadeIn">
+        <img src="./images/no-coupon.png" alt="no coupon" class="">
+        <p class="no-coupon-text">暂无礼包~</p>
+        <button type="button" class="goShop" @click="goShop">去逛逛</button>
       </div>
     </div>
     <div class="float-wrap">
@@ -151,7 +152,9 @@
         hasLabel: false,
         isShowFloat: null,
         mainWrapperStyle: 'padding-bottom:0;',
-        userBagList: []
+        userBagList: [],
+        showBanner: true,
+        noCoupon: false
       }
     },
     created () {
@@ -167,6 +170,15 @@
         this.showHeader=false
         this.couponCenterStyle = "top:0rem"
       }
+
+      if(this.$route.query.pageUuid){
+        this.giftPackagePageUuid = this.$route.query.pageUuid
+      }
+      if (this.giftPackagePageUuid) {
+        this.loaded = false
+        this.getNewShopTequan({pageUuid: this.giftPackagePageUuid})
+        // this.getUserBagList()
+      }
     },
     mounted(){
 
@@ -180,17 +192,19 @@
       jumpChecklinkUrl(url){
         if(url){
           window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+    
+          tool.trackEvent('礼包页分享')
         }
       },
-      jumpBagDetail(i) {
+      jumpBagDetail(i, index) {
         if(i && i.orderId) {
           switch (true) {
             case /圣诞/.test(i.packageName):
-              this.$router.push({path: '/christmasCouponBag', query:{ packageId: i.urlSelectOptionsValue, type: 'vip', orderId: i.orderId}})
+              this.$router.push({path: '/christmasCouponBag', query:{ packageId: i.urlSelectOptionsValue, type: 'vip', orderId: i.orderId, isShowPopup: 'showPopup'}})
               break;
           
             default:
-              this.$router.push({path: '/vipUserCouponBag', query:{ packageId: i.urlSelectOptionsValue, type: 'vip', orderId: i.orderId}})
+              this.$router.push({path: '/vipUserCouponBag', query:{ packageId: i.urlSelectOptionsValue, type: 'vip', orderId: i.orderId,isShowPopup: 'showPopup'}})
               break;
           }
         }else{
@@ -201,6 +215,17 @@
           
             default:
               this.$router.push({path: '/vipUserCouponBag', query:{ packageId: i.urlSelectOptionsValue}})
+              break;
+          }
+          switch (index) {
+            case 0:
+              tool.trackEvent('9.9元抢购')
+              break;
+            case 1:
+              tool.trackEvent('兑换码兑换')
+              break;
+            default:
+              tool.trackEvent('礼包购买')
               break;
           }
         }
@@ -247,7 +272,14 @@
                 arr[i].img_url = data[i].buyAfterBannerImageUrl
               }
               this.userBagList = arr
+              if(this.userBagList.length < 1){
+                this.noCoupon = true
+              }else{
+                this.noCoupon = false
+              }
             }
+          } else if(res.code && '01' === res.code && res.isLogin == 'false'){
+            this.getLoginUrl()
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -255,27 +287,25 @@
           this.$toastBox.showToastBox(e)
         })
       },
+      goShop(){
+        this.clickMenuItem(0)
+      },
       _initScroll () {
-        if(this.$route.query.goodsLibraryId && this.$route.query.goodsLibraryId !=0){
-          let id = this.$route.query.goodsLibraryId
-          let defaultLibrary = null
-          for (let j = 0 ; j < this.serveMeunData.length; j++) {
-            if (this.serveMeunData[j].id === parseInt(id)) {
-              defaultLibrary = j
-            }
-          }
-          this.clickMenuItem(defaultLibrary)
-          this.$router.replace({path:'/serviceCenter', query:{goodsLibraryId: 0}})
+        if(this.$route.query.index > -1){
+          // console.log(this.$route.query.index)
+          this.clickMenuItem(parseInt(this.$route.query.index))
         }else{
-          if(this.$route.query.index > -1){
-            // console.log(this.$route.query.index)
-            this.clickMenuItem(parseInt(this.$route.query.index))
-          }else{
-            this.clickMenuItem(0)
-          }
+          this.clickMenuItem(0)
         }
       },
       clickMenuItem(index){
+        this.noCoupon = false
+        if(index === 1){
+          this.showBanner = false
+          this.getUserBagList()
+        }else{
+          this.showBanner = true
+        }
         if(index < this.activeMeunIndex){
           this.transitionName = 'slide-right'
         }else if(index > this.activeMeunIndex){
@@ -286,6 +316,21 @@
           this.tabsLineChange(index)
         })
         this.refreshScroll()
+      },
+      getLoginUrl(){
+        core.getLoginUrl({merchantId: this.merchantId}).then(res => {
+          if(res.code && '00' == res.code){
+            if(res.result && res.result.url){
+              window.location.href = res.result.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
+            }else {
+              this.$router.push('/login')
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(error => {
+          this.$toastBox.showToastBox("网络错误")
+        })
       },
       tabsLineChange(index){
         this.$refs.menuItem[index].style.animation = 'changeType 0.1s linear'
@@ -318,14 +363,6 @@
     watch: {
     },
     activated(){
-      if(this.$route.query.pageUuid){
-        this.giftPackagePageUuid = this.$route.query.pageUuid
-      }
-      if (this.giftPackagePageUuid) {
-        this.loaded = false
-        this.getNewShopTequan({pageUuid: this.giftPackagePageUuid})
-        this.getUserBagList()
-      }
       if(this.$refs.couponWrapper){
         this.refreshScroll()
       }
@@ -354,6 +391,35 @@
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   .coupon-center
     background-color rgba(245, 245, 245, 1)
+    .no-coupon
+      position absolute
+      top 3.5rem
+      left 0
+      right 0
+      bottom 0
+      z-index 100
+      .no-coupon-content
+        height: 100%;
+        padding-top 4rem
+        text-align center
+        background-color #fff
+        img
+          width 7.5rem
+          height 7.5rem
+        .no-coupon-text
+          margin 1.5rem 0
+          font-size 0.75rem
+          color rgba(153, 153, 153, 1)
+          font-size 1rem
+        .goShop
+          outline none
+          background rgba(196, 143, 73, 1)
+          color rgb(255,255,255)
+          border none
+          border-radius 0.25rem
+          padding 0.59rem 1.45rem
+          font-size 1.13rem;
+
     .couponCenterContent
       position fixed
       left 0

@@ -85,6 +85,7 @@
     },
     created () {
       document.title = this.$route.meta.title
+      this.getReferer()
       //判断是否为微信
       let ua = navigator.userAgent.toLowerCase();
       let isWeixin = ua.indexOf('micromessenger') != -1;
@@ -97,11 +98,14 @@
         this.showInfo = true
         this.showHeader=false
         this.loginStyle = "top:0rem"
+        if(!tool.getCookie('userInfo') && this.merchantId === '100000'){
+          this.getActiveWeixin()
+        }
       }
       this.showLoad = false
     },
     mounted(){
-      this.getReferer()
+      
     },
     watch: {
       phone(newVal){
@@ -268,6 +272,17 @@
           }else{
             this.scroll.refresh()
           }
+        })
+      },
+      getActiveWeixin () {
+        core.activeWeixin({merchantId: this.merchantId, referer: this.referer}).then(res => {
+          if(res.code && '00' == res.code){
+            window.location.href = res.result
+          } else {
+            this.$toastBox.showToastBox("网络错误")
+          }
+        }).catch(err=>{
+          this.$toastBox.showToastBox("网络错误")
         })
       }
     }

@@ -7,7 +7,9 @@
     <div :style="myCouponStyle" ref="myCouponScroll" class="myCouponScroll">
       <div>
         <div class="coupon-category">
-          <div class="coupon-tab" v-for="(item, index) in tabList" :key="item.id" :class="[index == activeLink ? 'coupon-tab-active' : '']" @click="handelClick(index)" ref="tabItem">{{ item.name }}</div>
+          <div class="coupon-tab" v-for="(item, index) in tabList" :key="item.id" :class="[index == activeLink ? 'coupon-tab-active' : '']" @click="handelClick(index)" ref="tabItem">{{ item.name }}
+            <span v-if="index === 0 && totalRecord > 0">{{ totalRecord > 99 ? '99+' : totalRecord }}</span>
+          </div>
           <div class="tabs-line" ref="tabsLine"></div>
         </div>
         <div>
@@ -89,9 +91,9 @@
             稍后可在“我的订单”中查看
           </p>
         </popup>
-        <popup v-show="showActivePopup" :isShowTitle="false" @confirm="confirmActiveOrder" @cancel="cancel">
+        <popup v-show="showActivePopup" title="温馨提示" @confirm="confirmActiveOrder" @cancel="cancel" cancelText="暂不激活" confirmText="立即激活使用">
           <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
-            是否确认激活?
+            激活后请在券码有效期内使用哦!
           </p>
         </popup>
       </div>
@@ -145,6 +147,7 @@
         isShowCustome: null,
         scrollStyle: null,
         transitionName: 'slide-left',
+        totalRecord: null
       }
     },
     components: {
@@ -186,29 +189,42 @@
         this.showHeader=false
         this.myCouponStyle = "top:0rem"
       }
-      // this.getValidCoupon({ currentPage: this.currentPage, pageSize: this.pageSize});
-      this.getWaitActive({
+    },
+    mounted(){
+      
+      this.handelClick(1)
+    
+      this.getWaitNum({
         currentPage: this.currentPage,
         pageSize: this.pageSize,
         status: 'SUCCESS',
         isShip: 'N',
         isActivated: 'N'
       })
-    },
-    mounted(){
+  
       if (window.history && window.history.pushState) {
         history.pushState(null, null, document.URL);
         window.addEventListener('popstate', this.goBack, false);
       }
-      setTimeout(() => {
-        //初始化tab
-        this.tabsLineChange(0)
-      }, 500)
     },
     destroyed(){
       window.removeEventListener('popstate', this.goBack, false);
     },
     methods: {
+      getWaitNum(opts){
+        core.allOrder(opts).then(res => {
+          //console.log(res)
+          if (res.code && '00' === res.code) {
+            this.totalRecord = res.result.totalRecord
+          }else if(res.code && '01' === res.code && res.isLogin == 'false'){
+            this.getLoginUrl()
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(e => {
+          this.$toastBox.showToastBox(e)
+        })
+      },
       price(a, b) {
         return tool.priceStr(a, b)
       },
@@ -220,7 +236,7 @@
         }
         this.popupClose = false
       },
-      handelClick(index){
+      handelClick(index, type){
         if(index < this.activeLink){
           this.transitionName = 'slide-right'
         }else if(index > this.activeLink){
@@ -247,7 +263,7 @@
           this.getValidCoupon({
             currentPage: this.currentPage,
             pageSize: this.pageSize
-          });
+          }, type);
         } else {
           this.valid = false
           this.couponsList=[]
@@ -371,10 +387,11 @@
           if (res.code && '00' === res.code) {
             this.showActivePopup = false
             this.activeOrderId = null
+            this.totalRecord -= 1
             if(res.result.isShip === 'Y'){
               this.$toastBox.showToastBox('激活成功')
               setTimeout(() => {
-                this.handelClick(1)
+                this.handelClick(1, 'showPopop')
               }, 200)
             }else{
               this.showActiveErrPopup = true
@@ -426,7 +443,7 @@
           this.$toastBox.showToastBox(e)
         })
       },
-      getValidCoupon(opts) {
+      getValidCoupon(opts, type) {
         this.showLoad = true;
         core.getValidCoupon(opts).then(res => {
           //console.log(res);
@@ -444,6 +461,12 @@
               this.noCoupon = false
             }
             this.showLoad = false;
+            if(type && type === 'showPopop' && this.couponsList && this.couponsList.length > 0){ //判断激活成功滑过弹出第一个二维码内容
+              let url = this.couponsList[0].qrCode
+              if(url){
+                this.showDefaultQrcode(url)
+              }
+            }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             this.getLoginUrl()
             this.showLoad = false;
@@ -518,6 +541,10 @@
         }).catch(error => {
           this.$toastBox.showToastBox("网络错误")
         })
+      },
+      showDefaultQrcode(url){
+        this.$emit("popupStatus", true)
+        this.$couponToastBox.showToastBox(url)
       }
     }
   }
@@ -573,6 +600,19 @@
           font-size 1rem
           text-align center
           color rgba(153, 153, 153, 1)
+          position relative
+          span 
+            position absolute
+            top 0.4rem
+            right -1rem
+            background-color rgba(226, 58, 55, 1)
+            min-width 1rem
+            height 1rem
+            border-radius 50%
+            color #fff
+            line-height 1rem
+            font-size 0.69rem
+            padding 0.05rem
       
         .coupon-tab-active
           color: rgba(196,143,73,1);

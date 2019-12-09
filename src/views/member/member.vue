@@ -29,12 +29,14 @@
               <member-banner
                 v-if="index === 0"
                 style="padding-top:0.375rem"
+                :intervals=3500
                 :bannerList="item.configJson.sub_entry"
                 @onLoaded="onLoaded"
                 @jumplinkUrl="jumpChecklinkUrl"
               ></member-banner>
               <member-banner
                 v-else
+                :intervals=5000
                 :bannerList="item.configJson.sub_entry"
                 @onLoaded="onLoaded"
                 @jumplinkUrl="jumpChecklinkUrl"
@@ -216,7 +218,11 @@
           //     this.$toastBox.showToastBox(e)
           //   })
           // }else{
-            window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+          window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+          let reg = /couponBagCenter/
+          if(reg.test(url)) {
+            tool.trackEvent('首页banner')
+          }  
           // }
         }
       },

@@ -140,6 +140,34 @@ const replaceUrlForUrpass = function(url){
 }
 
 /**
+ * 读取cookies
+ */
+
+const getCookie = name => {
+  var arr
+  var reg = new RegExp('(^| )' + name + '=([^;]*)(;|$)')
+
+  // eslint-disable-next-line no-cond-assign
+  if (arr = document.cookie.match(reg)) {
+    return unescape(arr[2])
+  } else {
+    return null
+  }
+}
+
+/**
+ * 删除cookies
+ */
+const delCookie = name => {
+  var exp = new Date()
+  exp.setTime(exp.getTime() - 1)
+  var cval = getCookie(name)
+  if (cval != null) {
+    document.cookie = name + '=' + cval + ';expires=' + exp.toGMTString()
+  }
+}
+
+/**
  * @description: 未登录跳转登陆页
  * @param {type} url 链接
  * @return: url
@@ -147,6 +175,23 @@ const replaceUrlForUrpass = function(url){
 // const toLogin = function(url)) {
 //   window.location.href = '/mp/weixin/jjbqb/autoLogin?sendURL=' + encodeURIComponent('https://m.51jujibao.com/v2/v3/index.html/#/middlePage?redirect=' + encodeURIComponent(event))
 // }
+
+
+/**
+ * @description: 添加百度统计事件追踪
+ * @param {type}:  label {String}
+ * @return: null
+ */
+const trackEvent = function (label) {
+  if(label) {
+      try {
+          window._hmt && window._hmt.push(['_trackEvent', label, 'click']);
+      } catch (error) {
+          console.log(label + '事件统计失败:' + error)
+      }
+  }
+}
+
 export default {
-  timeFormatting, formatDate, getPhoneModel, toWeiXinLogin, priceStr, replaceUrlMerchantId, replaceUrlForUrpass
+  timeFormatting, formatDate, getPhoneModel, toWeiXinLogin, priceStr, replaceUrlMerchantId, replaceUrlForUrpass, getCookie, trackEvent
 }

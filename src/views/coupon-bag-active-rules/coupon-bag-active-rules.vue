@@ -9,8 +9,8 @@
     </div>
     <!-- 分享图片 -->
     <div class="share-img fade" v-show="showShareImg">
-      <img :src="activeShareImgUrl" alt="">
-      <span @click="closeShareImg"></span>
+      <img class="bg-img" :src="activeShareImgUrl" alt="">
+      <span @click="closeShareImg"><img src="./images/success-close2.png" alt=""></span>
     </div>
   </div>
 </template>
@@ -56,6 +56,7 @@
         this.showShareImg = false
       },
       goShare(){
+        tool.trackEvent('规则页分享')
         this.$toast.loading({
           message: '加载中...',
           overlay: true,
@@ -146,15 +147,18 @@
     transform translate(-50%, -50%)
     z-index 101
     width 20.625rem
-    img
+    .bg-img
       width 100%
       height auto
     span
       position absolute
-      right 0.65rem
+      right 0.5rem
       top 0.5rem
       width 1.34rem
       height 1.34rem
+      img
+        width 100%
+        height 100%
 
 .fade  {
   -webkit-animation: fade 0.2s;

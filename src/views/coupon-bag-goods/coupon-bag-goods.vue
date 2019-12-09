@@ -31,6 +31,16 @@
         <div class="use-cont-hint">
           <div class="use-time">
             <div class="v-ext">
+              抵用券
+            </div>
+            <div class="v-time">
+              -¥ {{ priceToFixed(deductionPrice) || '--' }}
+            </div>
+          </div>
+        </div>
+        <div class="use-cont-hint">
+          <div class="use-time">
+            <div class="v-ext">
               发货时间
             </div>
             <div class="v-time">
@@ -62,7 +72,7 @@
     <loading v-show="showLoad" style="padding-top: 50%"></loading>
     <div class="to-service-wrap">
       <div class="to-service" @click="toServiceCall">
-        <i class="iconfont">&#xe629;</i>
+        <img src="./images/coustom_serve.png" alt="">
       </div>
     </div>
     <popup v-show="showCallPopup" :showPopupTitle="false" :defaultBtn="false" phoneNum='4006680091' cancelCart="我知道了" confirmCart="呼叫客服" @confirm="confirmCall" @cancel="cancel">
@@ -117,7 +127,8 @@
         codeStatus: null,
         rechargeType: null,
         rechargeNum: null,
-        rechargePlaceHolder: null
+        rechargePlaceHolder: null,
+        deductionPrice: null
       }
     },
     created () {
@@ -221,6 +232,7 @@
             this.skuId = res.result.qySkuResultList[0].id
             this.providerId = res.result.qySkuResultList[0].providerId
             this.outItemNo = res.result.qySkuResultList[0].outItemNo
+            this.deductionPrice = res.result.qySkuResultList[0].deductionPrice
             if(res.result.type && res.result.type === "直充"){
               this.rechargeType = 1
               this.rechargePlaceHolder = res.result.tips
@@ -262,7 +274,8 @@
         }
       },
       toServiceCall(){
-        this.showCallPopup = true
+        // this.showCallPopup = true
+        window.location.href = 'https://tb.53kf.com/code/client/10187208/1'
       },
       confirmCall(){
         this.showCallPopup = false
@@ -317,8 +330,9 @@
       box-shadow 0rem 0.2rem 0.35rem 0rem rgba(0, 0, 0, 0.08)
       text-align center
       color #3992ff
-      i
-        font-size 1.2rem
+      img 
+        width: 1.38rem;
+        height: 1.38rem;
 
     .couponGoodsContent
       position fixed
@@ -428,7 +442,7 @@
           padding 0 0.75rem
           box-sizing border-box
           background #ffffff
-          &:nth-child(3)
+          &:nth-child(4)
             .use-time
               border-bottom none
               .v-time
@@ -446,7 +460,7 @@
               color #333
             .v-time
               font-size 0.813rem
-              color #999999
+              color #ff1414
 
         .good-descript
           margin-top 0.5rem

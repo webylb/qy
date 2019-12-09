@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div class="popup">
+    <div class="ex-popup">
       <div class="popup-wrapper">
         <div class="popup-title" v-if="isShowTitle">{{ title }}</div>
         <div v-else class="no-title"></div>
@@ -56,7 +56,7 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
-  .popup
+  .ex-popup
     position fixed
     top 0
     bottom 0

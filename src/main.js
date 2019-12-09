@@ -8,10 +8,10 @@ import ToastBox from './common/js/toast' //提示弹窗
 import VueClipboard from 'vue-clipboard2' //复制功能
 import CouponToastBox from './common/js/couponToast'
 import VueJsonp from 'vue-jsonp'
-import { Toast } from 'vant';
+import { Toast } from 'vant'
 
 //调试工具
-import Vconsole from 'vconsole';
+import Vconsole from 'vconsole'
 
 Vue.use(Toast);
 Vue.use(VueJsonp);
@@ -24,7 +24,9 @@ Vue.config.productionTip = false;
  * @Description: 修复IOS点击困难
  */
 FastClick.prototype.focus = function (targetElement) {
-  var length;// Issue #160: on iOS 7, some input elements (e.g. date datetime month) throw a vague TypeError on setSelectionRange. These elements don't have an integer value for the selectionStart and selectionEnd properties, but unfortunately that can't be used for detection because accessing the properties also throws a TypeError. Just check the type instead. Filed as Apple bug #15122724.
+  let deviceIsWindowsPhone = navigator.userAgent.indexOf("Windows Phone") >= 0;
+  let deviceIsIOS = /iP(ad|hone|od)/.test(navigator.userAgent) && !deviceIsWindowsPhone;
+  let length;
   if (deviceIsIOS && targetElement.setSelectionRange && targetElement.type.indexOf('date') !== 0 && targetElement.type !== 'time' && targetElement.type !== 'month') {
     length = targetElement.value.length;
     targetElement.focus();
@@ -34,19 +36,17 @@ FastClick.prototype.focus = function (targetElement) {
   }
 };
 
-FastClick.attach(document.body);
-
 // dev数据
 if(process.env.NODE_ENV === 'development'){
   window.infoData = {
-    merchantId: 100036,
+    merchantId: 100059,
     merchantName: '测试账户',
-    privilegePageUuid: '891456d4e4de46ddade2d74602942bf5',
+    privilegePageUuid: '4af7386347024bb78db66b079b8df87b',
     openingPageUuid: '',
     personalCenterPageUuid: '67216783016a41a89ac706a8e0a93b02',
-    giftPackagePageUuid: '3f61c625637041f2b45f60ae0e756124'
+    giftPackagePageUuid: 'a78c9de1e9074dec9e57c48876222b18'
   }
-  // document.cookie = "QY_COOKIE_PASSPORT_NAME="+"\"sessionId=5d4d7a3867bd42a2b50d98202ab80676&userId=113\""
+  // // document.cookie = "QY_COOKIE_PASSPORT_NAME="+"\"sessionId=5d4d7a3867bd42a2b50d98202ab80676&userId=113\""
   // const vConsole = new Vconsole();
   // Vue.use(vConsole)
 }
@@ -57,7 +57,6 @@ Vue.directive('focus', {
     el.focus()
   }
 })
-
 
 //添加百度统计
 router.beforeEach((to, from, next) => {

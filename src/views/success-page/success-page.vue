@@ -10,7 +10,7 @@
         <p class="success-p">恭喜您购买成功!</p>
         <p class="success-p2">收到卡券内请在<span>一个月</span>内激活并使用！</p>
         <div class="operation-wrapper">
-          <div @click="toMoney" class="left">继续购买</div>
+          <!-- <div @click="toMoney" class="left">继续购买</div> -->
           <div @click="toRedemption" class="right">查看订单</div>
         </div>
         <loading v-show="showLoad" class="loading"
@@ -102,7 +102,7 @@
         margin 0 auto
         padding-top 3rem
         display flex
-        justify-content space-between
+        justify-content center
         div
           width 8.375rem
           height 2.5rem

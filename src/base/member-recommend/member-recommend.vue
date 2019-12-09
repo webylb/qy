@@ -136,7 +136,7 @@
       .info-wrapper
         width 100%
         height 100%
-        padding 0.75rem 0 0.75rem 10.125rem
+        padding 0.5rem 0 0.5rem 10.125rem
         box-sizing border-box
 
         .name
@@ -148,7 +148,7 @@
           line-height 1.2
 
         .price
-          margin 1.35rem 0 0.5875rem 0
+          margin 1.25rem 0 0.5rem 0
           color #999
           font-size: 0.8125rem
           line-height 1.2

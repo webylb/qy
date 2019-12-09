@@ -5,7 +5,8 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 // 导入compression-webpack-plugin
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
@@ -47,13 +48,16 @@ module.exports = {
       config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true //隐藏console
 
       config.plugins.push(
-          new CompressionWebpackPlugin({
-              filename: '[path].gz[query]',
-              algorithm: 'gzip',
-              test: new RegExp('\\.(' + productionGzipExtensions.join('|') + ')$'),
-              threshold: 10240,
-              minRatio: 0.8
-          })
+        new CompressionWebpackPlugin({
+          filename: '[path].gz[query]',
+          algorithm: 'gzip',
+          test: new RegExp('\\.(' + productionGzipExtensions.join('|') + ')$'),
+          threshold: 10240,
+          minRatio: 0.8
+        }),
+        // new MiniCssExtractPlugin({
+        //   ignoreOrder: true // Enable to remove warnings about conflicting order
+        // })
       )
     } else {
       // 开发环境

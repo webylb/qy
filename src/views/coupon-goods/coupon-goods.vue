@@ -108,7 +108,7 @@
         {{ hintInformation }}
       </p>
     </popup>
-    <popup v-show="notVip" @cancel="cancel" @confirm="openMember" :title="您暂不可使用此权益" confirmText="前去开卡">
+    <popup v-show="notVip" @cancel="cancel" @confirm="openMember" title="您暂不可使用此权益" confirmText="前去开卡">
       <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
         仅限会员用户，开通会员即可享受特权优惠权益
       </p>

@@ -6,7 +6,7 @@ Vue.use(Router)
 export default new Router({
   mode: 'history',
   // base: '/f/q/'+ window.infoData.merchantId + '.html/',
-  base: '/f/q/100036.html/',
+  base: '/f/q/100059.html/',
   routes: [
     {
       path: '/',
@@ -171,14 +171,14 @@ export default new Router({
       path: '/christmasCouponBag',
       name: 'christmasCouponBag',
       meta: {title: '圣诞礼包',keepAlive:false},
-      component: () => import(/* webpackChunkName: "activeCouponBag" */ '@/views/coupon-bag-active-temeplate/christmas-coupon-bag.vue')
+      component: () => import(/* webpackChunkName: "couponBag" */ '@/views/coupon-bag-active-temeplate/christmas-coupon-bag.vue')
     },
     // 活动礼包规则
     {
       path: '/couponBagActiveRules',
       name: 'couponBagActiveRules',
       meta: {title: '圣诞礼包',keepAlive:false},
-      component: () => import(/* webpackChunkName: "activeCouponBag" */ '@/views/coupon-bag-active-rules/coupon-bag-active-rules.vue')
+      component: () => import(/* webpackChunkName: "couponBag" */ '@/views/coupon-bag-active-rules/coupon-bag-active-rules.vue')
     }
   ]
 })

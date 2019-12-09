@@ -2,7 +2,7 @@
   <div>
     <div style="padding: 0.375rem 0.75rem" class="banner" v-if="bannerList.length > 0">
       <div class="banner-item" v-for="(item, index) in bannerList" :key="index">
-        <a @click.stop="jumpBagDetail(item)"><img @load="onLoaded" class="needsclick" :src="item.img_url" ></a>
+        <a @click.stop="jumpBagDetail(item, index)"><img @load="onLoaded" class="needsclick" :src="item.img_url" ></a>
       </div>
     </div>
   </div>
@@ -33,8 +33,9 @@
       onLoaded(){
         this.$emit('onLoaded')
       },
-      jumpBagDetail(item){
-        this.$emit('jumpBagDetail', item)
+      jumpBagDetail(item, index){
+
+        this.$emit('jumpBagDetail', item, index)
       }
     },
     destroyed() {

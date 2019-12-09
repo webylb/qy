@@ -21,7 +21,7 @@
                 <div class="top-title">{{ item.categoryName }}</div>
               </div>
               <div class="prod-wrap" v-if="item.ticketType == 'ShangPinQuan'">
-                <div class="prod-item" v-for="(i, index) in item.userticketDetails" :key="index">
+                <div class="prod-item" v-for="(i, index) in item.userTicketDetails" :key="index">
                   <div class="prod-attr">
                     <img @load="onLoaded" class="" :src="i.ticketImageUrl" />
                     <div>
@@ -44,7 +44,7 @@
                       </div>
                       <p class="item-name">【{{ single.itemName }}】</p>
                       <p class="sku-name">{{ single.skuName }}</p>
-                      <p class="ticket-name">{{ single.count }}张</p>
+                      <p class="ticket-name">{{ orderId ? '剩' : '共' }}{{ single.count }}张</p>
                     </div>
                   </div>
                 </slider>
@@ -56,7 +56,7 @@
                       </div>
                       <p class="item-name">【{{ single.itemName }}】</p>
                       <p class="sku-name">{{ single.skuName }}</p>
-                      <p class="ticket-name">{{ single.count }}张</p>
+                      <p class="ticket-name">{{ orderId ? '剩' : '共' }}{{ single.count }}张</p>
                     </div>
                   </div>
                 </slider>
@@ -85,7 +85,7 @@
     <!-- 购买兑换入口 -->
     <div class="click-subAddVip" v-if="!showVipInfo">
       <div v-if="exchargeShow && openShow" class="left" @click="openExcharge">兑换码激活</div>
-      <div v-if="openShow" class="right" @click="immediatePay">{{sellingPrice}}元/立即开通</div>
+      <div v-if="openShow" class="right" @click="immediatePay">{{sellingPrice}}元/立即抢购</div>
       <div v-if="exchargeShow && !openShow" class="only-left" @click="openExcharge">兑换码激活</div>
     </div>
     <!-- 遮罩层 -->
@@ -188,6 +188,7 @@
       return {
         merchantId: window.infoData.merchantId,
         packageId: '',
+        orderId: null,
         loaded: true,
         bannerImageUrl: null,
         allData: [],
@@ -236,10 +237,12 @@
       this.getShare();
       if(this.$route.query.packageId){
         this.packageId = this.$route.query.packageId
-        this.getCouponBagDetail({merchantId: this.merchantId, packageId: this.packageId})
       }else{
         this.$toastBox.showToastBox('无效礼包')
         this.loaded = false
+      }
+      if(this.$route.query.orderId){
+        this.orderId = this.$route.query.orderId
       }
       if(this.$route.query.type && this.$route.query.type === 'vip'){
         this.showVipInfo = true
@@ -249,6 +252,7 @@
       if(this.$route.query.status && this.$route.query.status === 'success'){
         this.isSuccess()
       }
+      this.getCouponBagDetail({merchantId: this.merchantId, packageId: this.packageId, orderId: this.orderId})
     },
     watch:{
       exchargeOpen(){
@@ -259,6 +263,7 @@
       }
     },
     mounted(){
+      // this.getCouponBagDetail({merchantId: this.merchantId, packageId: this.packageId})
       this.$nextTick(()=>{
         this._initScroll()
         setTimeout(() => {
@@ -289,81 +294,128 @@
         })
       },
       checkedDefault(){
-        if(this.$route.query.categoryId && String(this.$route.query.categoryId).length > 0 && this.$route.query.categoryId > 0){
-          for(let item in this.allData){
-            if(this.allData[item].categoryId == this.$route.query.categoryId){
-              let index = parseInt(item)
-              let li = this.$refs.couponBagList.getElementsByClassName('coupon-bag-item')[index]
-              let timer = null
-              timer = setTimeout(()=>{
-                this.scroll.scrollToElement(li, 500)
-                clearTimeout(timer)
-              },30)
-              let data = {}
-              for(let item in this.$route.query){
-                if(item == 'categoryId'){
-                  data[item] = 0
-                }else{
-                  data[item] = this.$route.query[item]
-                }
+        let li = this.$refs.couponBagList.getElementsByClassName('coupon-bag-item')[0]
+        let timer = null
+        timer = setTimeout(()=>{
+          this.scroll.scrollToElement(li, 500)
+          let id 
+          let type = this.allData && this.allData[0].ticketType
+          let data = JSON.parse(JSON.stringify(this.allData[0].couponList)) 
+          if(data && data.length > 0){
+            data[0].forEach((item, index) => {
+              if(index === 0){
+                id = item.ticketId
               }
-              this.$router.replace({path:'/vipUserCouponBag', query: data})
-              return
-            }
+            })
           }
-        }
+          this.receive(type, id)
+          clearTimeout(timer)
+        },30)
       },
       getCouponBagDetail(opts){
-        core.getCouponBagDetail(opts).then(res => {
-          if(res.code && '00' == res.code){
-            this.bannerImageUrl = res.result.merchantGiftPackageBannerImageUrl
-            this.sellingPrice = res.result.sellingPrice
-            if(res.result.salesModel) {
-              let reg = /\,/ig;
-              if(reg.test(res.result.salesModel)){
-                this.exchargeShow = true
-                this.openShow = true
-              } else {
-                if(res.result.salesModel === 'DuiHuanMa'){
+        if(this.showVipInfo){
+          core.getUserCouponBagDetail(opts).then(res => {
+            if(res.code && '00' == res.code){
+              this.bannerImageUrl = res.result.merchantGiftPackageBannerImageUrl
+              this.sellingPrice = res.result.sellingPrice
+              if(res.result.salesModel) {
+                let reg = /\,/ig;
+                if(reg.test(res.result.salesModel)){
                   this.exchargeShow = true
-                  this.openShow = false
-                }else{
-                  this.exchargeShow = false
                   this.openShow = true
-                }
-              }
-            }
-            const data = res.result.userCategoryDetails
-            for(let i = 0, length = data.length; i < length; i++){
-              if(data[i].ticketType == 'DiJiaQuan' && data[i].userTicketDetails && data[i].userTicketDetails.length > 0){
-                if(data[i].showType == 'ShuangHangZhanShi'){
-                  data[i].couponList = []
-                  for (let j = 0; j < Math.ceil(data[i].userTicketDetails.length / 6); j++) {
-                    data[i].couponList.push([])
-                    data[i].couponList[j] = data[i].userTicketDetails.slice(j * 6, j * 6 + 6)
-                  }
-                }else{
-                  data[i].couponList = []
-                  for (let j = 0; j < Math.ceil(data[i].userTicketDetails.length / 3); j++) {
-                    data[i].couponList.push([])
-                    data[i].couponList[j] = data[i].userTicketDetails.slice(j * 3, j * 3 + 3)
+                } else {
+                  if(res.result.salesModel === 'DuiHuanMa'){
+                    this.exchargeShow = true
+                    this.openShow = false
+                  }else{
+                    this.exchargeShow = false
+                    this.openShow = true
                   }
                 }
               }
-            }
-            this.allData = data
-            this.$nextTick(() => {
+              const data = res.result.userCategoryDetails
+              for(let i = 0, length = data.length; i < length; i++){
+                if(data[i].ticketType == 'DiJiaQuan' && data[i].userTicketDetails && data[i].userTicketDetails.length > 0){
+                  if(data[i].showType == 'ShuangHangZhanShi'){
+                    data[i].couponList = []
+                    for (let j = 0; j < Math.ceil(data[i].userTicketDetails.length / 6); j++) {
+                      data[i].couponList.push([])
+                      data[i].couponList[j] = data[i].userTicketDetails.slice(j * 6, j * 6 + 6)
+                    }
+                  }else{
+                    data[i].couponList = []
+                    for (let j = 0; j < Math.ceil(data[i].userTicketDetails.length / 3); j++) {
+                      data[i].couponList.push([])
+                      data[i].couponList[j] = data[i].userTicketDetails.slice(j * 3, j * 3 + 3)
+                    }
+                  }
+                }
+              }
+              this.allData = data
+              this.$nextTick(() => {
+                this.loaded = false
+                //this.checkedDefault()
+              })
+            } else {
               this.loaded = false
-              this.checkedDefault()
-            })
-          } else {
+              this.$toastBox.showToastBox(res.message)
+            }
+          }).catch(error => {
             this.loaded = false
-            this.$toastBox.showToastBox(res.message)
-          }
-        }).catch(error => {
-          this.loaded = false
-          this.$toastBox.showToastBox("网络错误")
-        })
+            this.$toastBox.showToastBox("网络错误")
+          })
+        }else{
+          core.getCouponBagDetail(opts).then(res => {
+            if(res.code && '00' == res.code){
+              this.bannerImageUrl = res.result.merchantGiftPackageBannerImageUrl
+              this.sellingPrice = res.result.sellingPrice
+              if(res.result.salesModel) {
+                let reg = /\,/ig;
+                if(reg.test(res.result.salesModel)){
+                  this.exchargeShow = true
+                  this.openShow = true
+                } else {
+                  if(res.result.salesModel === 'DuiHuanMa'){
+                    this.exchargeShow = true
+                    this.openShow = false
+                  }else{
+                    this.exchargeShow = false
+                    this.openShow = true
+                  }
+                }
+              }
+              const data = res.result.userCategoryDetails
+              for(let i = 0, length = data.length; i < length; i++){
+                if(data[i].ticketType == 'DiJiaQuan' && data[i].userTicketDetails && data[i].userTicketDetails.length > 0){
+                  if(data[i].showType == 'ShuangHangZhanShi'){
+                    data[i].couponList = []
+                    for (let j = 0; j < Math.ceil(data[i].userTicketDetails.length / 6); j++) {
+                      data[i].couponList.push([])
+                      data[i].couponList[j] = data[i].userTicketDetails.slice(j * 6, j * 6 + 6)
+                    }
+                  }else{
+                    data[i].couponList = []
+                    for (let j = 0; j < Math.ceil(data[i].userTicketDetails.length / 3); j++) {
+                      data[i].couponList.push([])
+                      data[i].couponList[j] = data[i].userTicketDetails.slice(j * 3, j * 3 + 3)
+                    }
+                  }
+                }
+              }
+              this.allData = data
+              this.$nextTick(() => {
+                this.loaded = false
+                //this.checkedDefault()
+              })
+            } else {
+              this.loaded = false
+              this.$toastBox.showToastBox(res.message)
+            }
+          }).catch(error => {
+            this.loaded = false
+            this.$toastBox.showToastBox("网络错误")
+          })
+        }
       },
       goMyCoupon() {
         this.$router.push("/myCoupon")
@@ -377,7 +429,7 @@
       receive(type,id){
         if(this.isHasAuthority){
           this.activeType = type
-          this.getItemCouponDetail({merchantId: this.merchantId, ticketId: id, packageId: this.packageId})
+          this.getItemCouponDetail({merchantId: this.merchantId, ticketId: id, packageId: this.packageId, orderId: this.orderId})
         } else {
           this.exchargeInfoOpen = true
           this.exchargeInfoTitle = '暂无使用权限'
@@ -387,10 +439,9 @@
       getItemCouponDetail(opts){
         this.itemCouponDetail = null
         core.getItemCouponDetail(opts).then(res => {
-          //console.log(res)
           if(res.code && '00' == res.code){
             const data = res.result
-            let activeIndex = 0
+            let activeIndex
             let pageIndex = 0
             if(data.count > 1 && data.ticketType == 'DiJiaQuan'){
               data.couponList = []
@@ -399,54 +450,37 @@
                 data.couponList[j] = data.recordResults.slice(j * 6, j * 6 + 6)
               }
               for (let i = 0, length = data.recordResults.length; i < length; i ++) {
-                if(data.recordResults[i].isUsed == 'Y'){
-                  activeIndex += 1
+                if(data.recordResults[i].isUsed === 'N'){
+                  activeIndex = i
+                  break;
                 }
               }
-              if(activeIndex > 6){
-                pageIndex = Math.ceil(activeIndex / 6)
+              if(activeIndex > 5){
+                pageIndex = Math.ceil((activeIndex + 1) / 6) -1
               }
             }else if(data.count == 1 && data.ticketType == 'DiJiaQuan'){
-              if(data.recordResults[0].isUsed == 'Y'){
+              if(data.recordResults[0].isUsed === 'Y'){
                 activeIndex = null
               }else{
                 activeIndex = 0
               }
               pageIndex = 1
             }
-
             this.itemCouponDetail = data
-            this.useIndex = activeIndex
+            this.useIndex = activeIndex % 6
             this.usePageIndex = pageIndex
-            if(data.recordResults[activeIndex]){
+            if(activeIndex > -1 && data.recordResults[activeIndex]){
               this.useCode = data.recordResults[activeIndex].code
             }
             this.openCouponBagToast()
-            if(pageIndex > 1){
+            if(pageIndex > 0){
               let timer = null
               clearTimeout(timer)
               timer = setTimeout(() => {
                 this.$refs.toastSlider.goToPage(pageIndex)
-              }, 20)
+              }, 200)
             }
           } else if(res.code && '01' === res.code && res.isLogin == 'false'){
-            // this.$toastBox.showToastBox('未登录用户')
-            // let timer = null
-            // clearTimeout(timer)
-            // timer = setTimeout(()=>{
-            //   if(res.url){
-            //     var index = res.url.lastIndexOf("\/");
-            //     var str = res.url.substring(index, res.url.length);
-            //     let regIndex = /\?/gi;
-            //     if(str && regIndex.test(str)){
-            //       window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-            //       clearTimeout(timer)
-            //     }else{
-            //       window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-            //       clearTimeout(timer)
-            //     }
-            //   }
-            // },1000)
             this.getLoginUrl()
           } else if(res.code && '100' === res.code){
             this.exchargeInfoOpen = true
@@ -456,7 +490,6 @@
             this.$toastBox.showToastBox(res.message)
           }
         }).catch(error => {
-          console.log(error)
           this.$toastBox.showToastBox("网络错误")
         })
       },
@@ -464,8 +497,11 @@
         if(this.activeType == 'DiJiaQuan'){
           if(this.useCode){
             this.$router.push({path:"/couponBagGoods",query:{code: this.useCode, packageId: this.packageId}})
+            setTimeout(() => {
+              this.useCode = null
+            }, 300)
           }else{
-            this.$toastBox.showToastBox("已使用")
+            this.$router.push({path:"/orderForm"})
           }
         }else{
           if (url) {
@@ -514,6 +550,19 @@
         if(this.exchargeInput){
           core.exchargeCouponBag({redeemCode: this.exchargeInput,packageId: this.packageId}).then(res => {
             if(res.code && '00' == res.code){
+              let data = {}
+              for(let item in this.$route.query){
+                data[item] = this.$route.query[item]
+              }
+              data.type = 'vip'
+              data.orderId = res.result
+              this.orderId = res.result
+              this.$router.replace({path:'/vipUserCouponBag', query:data})
+              this.isHasAuthority = true
+              this.showVipInfo = true
+              this.couponBagStyle = 'top:0rem; bottom: 0rem'
+              this.scroll.refresh()
+
               this.exchargeOpen = false
               this.exchargeInfoOpen = true
               this.exchargeInfoTitle = '兑换成功'
@@ -1035,6 +1084,7 @@
         box-sizing border-box
         padding 0 0.75rem
         text-align left
+        word-break: break-all;
         p
           line-height 1.375rem
           text-align left

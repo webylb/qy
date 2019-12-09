@@ -67,9 +67,9 @@
         是否确认支付?
       </p>
     </popup>
-    <popup v-show="showActivePopup" :isShowTitle="false" @confirm="confirmActiveOrder" @cancel="cancel">
+    <popup v-show="showActivePopup" title="温馨提示" @confirm="confirmActiveOrder" @cancel="cancel" cancelText="暂不激活" confirmText="立即激活使用">
       <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
-        是否确认激活?
+        激活后请在券码有效期内使用哦!
       </p>
     </popup>
     <popup v-show="showRechargePopup" :title="goodsName" :isShowCancel=false @cancel="cancel">
@@ -79,7 +79,7 @@
         <p>订单编号: {{ orderNum }}</p>
       </div>
     </popup>
-    <popup v-show="showCouponPopup" :title="goodsName" @confirm="cancel" @cancel="goMyCoupon" cancelText="我的卡券">
+    <CouponPopup v-show="showCouponPopup" :title="goodsName" @cancel="closeCouponPopup">
       <div class="coupon-info-wrap" v-if="couponList && couponList.length > 0">
         <div v-if="orderType !== '二维码' && orderType !== null" class="slider-box 1">
           <slider class="slider-wrapper" :loop=false :isClick=true>
@@ -120,12 +120,15 @@
             <div v-for="(item, index) in couponList" :key="index">
               <img class="coupon-item-img" :src="item.qrCode" alt="">
             </div>
-          </slider>  
+          </slider>
+          <p class="text-qr1">二维码点击可放大查看</p>
+          <p class="text-qr2">持二维码线下门店即可兑换</p>
         </div>
+        <div class="text-line"><img src="./images/line.png" alt=""></div>
         <p class="text-1">激活后的卡券将移至【我的卡券】内</p>
-        <p class="text-2" @click="goCoustomServe" style="margin-bottom: 2rem;"><span>无效卡券申诉</span><i class="iconfont">&#xe713;</i></p>
+        <p class="text-2" @click="goCoustomServe"><span>无效卡券申诉</span><i class="iconfont">&#xe713;</i></p>
       </div>
-    </popup>
+    </CouponPopup>
   </div>
 </template>
 
@@ -139,6 +142,7 @@
   import Loading from '../../base/loading/loading'
   import * as core from '../../api/orderForm'
   import Popup from '../../base/popup/popup'
+  import CouponPopup from '../../base/coupon-popup/coupon-popup'
   import { parse } from 'path'
 
   export default {
@@ -182,6 +186,7 @@
       OrderItem,
       Loading,
       Popup,
+      CouponPopup,
       Slider,
       [Divider.name]: Divider,
       [ImagePreview.name]: ImagePreview
@@ -201,6 +206,8 @@
       this.selectObj = { currentPage: this.currentPage, pageSize: this.pageSize}
     },
     activated() {
+      this.cancel()
+      this.closeCouponPopup()
       if(this.$route.query.index > -1){
         this.showLoad = false;
         this.handleNav(parseInt(this.$route.query.index), true)
@@ -209,7 +216,6 @@
         this.activeIndex = 0
         this.$refs.orderNavs.tabsLineChange(0)
       }
-      this.cancel()
     },
     methods: {
       formatDateing(e) {
@@ -222,7 +228,7 @@
           }
         }
       },
-      getAllOrder(opts) {
+      getAllOrder(opts, type) {
         core.allOrder(opts).then(res => {
           //console.log(res)
           if (res.code && '00' === res.code) {
@@ -238,21 +244,15 @@
                  this.hasMore = true
               }
               this.$refs.orderForm.refresh()
+              if(type && type === 'showPopop' && this.orderList && this.orderList.length > 0){ //判断激活成功滑过弹出第一个内容
+                let item = this.orderList[0]
+                this.showCouponDetail(item)
+              }
             } else {
               this.showLoad = false
               this.hasMore = false
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
-            // if(res.url){
-            //   var index = res.url.lastIndexOf("\/");
-            //   var str = res.url.substring(index, res.url.length);
-            //   let regIndex = /\?/gi;
-            //   if(str && regIndex.test(str)){
-            //     window.location.href = res.url + "&referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-            //   }else{
-            //     window.location.href = res.url + "?referer=" + encodeURIComponent(tool.replaceUrlForUrpass(window.location.href))
-            //   }
-            // }
             this.showLoad = true
             this.getLoginUrl()
           } else {
@@ -305,7 +305,7 @@
             this.$toastBox.showToastBox('激活成功')
             if(res.result.isShip === 'Y'){
               setTimeout(() => {
-                this.handleNav(4, true)
+                this.handleNav(4, true, 'showPopop')
               }, 200)
             }else{
               setTimeout(() => {
@@ -333,8 +333,10 @@
         this.showQueRenPopup = false
         this.showActivePopup = false
         this.showRechargePopup = false
-        this.showCouponPopup = false
         this.orderType = null
+      },
+      closeCouponPopup(){
+        this.showCouponPopup = false
       },
       showCouponDetail(item){
         this.couponList = null
@@ -362,7 +364,7 @@
       },
       goMyCoupon(){
         this.showCouponPopup = false
-        this.$router.push({path:'/myCoupon'})
+        this.$router.push({path:'/myCoupon', query: {index: 1}})
       },
       confirmReceipt(id) {
         this.querenId = null
@@ -400,7 +402,7 @@
           this.$toastBox.showToastBox("网络错误")
         })
       },
-      handleNav(e, state) {
+      handleNav(e, state, type) {
         if (this.showLoad) {
           return false
         }
@@ -455,7 +457,7 @@
               status: 'SUCCESS',
               isShip: 'Y'
             }
-            this.getAllOrder(this.selectObj)
+            this.getAllOrder(this.selectObj, type)
           }
         }
       },
@@ -624,17 +626,17 @@
     // margin: 1.88rem 1.25rem 2.38rem 1.25rem; 
     .slider-box
       margin-bottom 1rem
-      width 17.51rem!important
+      width 18rem!important
       overflow hidden
       position: relative;
       padding-bottom: 0.75rem;
       box-sizing border-box
       margin: 0 auto;
-      padding-top: 1.8rem;
-      // margin-top 1.88rem
+      padding-top: 1.5rem;
+      min-height 7rem
       .coupon-item-img
-        width 6.2rem!important
-        height auto
+        width auto!important
+        max-height 12rem
         margin 0 auto
       .item-wrap
         height 5rem
@@ -690,16 +692,53 @@
             line-height: 1.2;
             display: flex;
             align-items: center;
+    
+    .text-qr1
+      color rgba(153, 153, 153, 1)
+      font-size 0.75rem
+      margin-bottom 0.5rem
+    .text-qr2
+      color rgba(61, 58, 57, 1)
+      font-size 1.25rem
+      line-height 1.2
+      margin-bottom 0.5rem
+    .text-line
+      height 0.94rem
+      display flex
+      position relative
+      margin-bottom 1rem
+      &::after 
+        content ''
+        position absolute
+        width 0.94rem
+        height 0.94rem
+        border-radius 50%
+        background rgba(0,0,0,0.5)
+        left -0.47rem
+        top 0
+      &::before 
+        content ''
+        position absolute
+        width 0.94rem
+        height 0.94rem
+        border-radius 50%
+        background rgba(0,0,0,0.5)
+        right -0.47rem
+        top 0
+      img 
+        width 100%
+        height 100%
     .text-1
       color rgba(153, 153, 153, 1)
       font-size 1rem
       line-height 1.2
       margin-bottom 0.75rem
     .text-2
+      display inline-block
       color rgba(195,142,72,1)
       font-size 1rem
       line-height 1.2
-      margin-bottom 2.38rem
+      margin-bottom 2rem
 
   .coupon-customer-service
     background rgba(245, 245, 245, 1)

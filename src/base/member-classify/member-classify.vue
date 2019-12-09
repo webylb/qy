@@ -3,17 +3,15 @@
     <div class="privilege-wrapper">
       <div class="item-wrapper">
         <slider :dots-style="dotsStyle" class="slider-wrapper" :loop="false" :auto-play="false">
-
           <div class="item-wrapper" v-for="(item,index) in privilegeListData" :key="index">
             <div class="item" v-for="(i,index) in item" :key="index" @click.stop="jumplinkUrl(i.jumpUrl)">
               <img :src="i.icon" alt="">
               <div>
                 <p class="title">{{ i.title }}</p>
-                <p class="subhead">{{ i.subtitle }}</p>
+                <p class="subhead" :class="[ paddingStyle ? 'subTitle' : '']">{{ i.subtitle }}</p>
               </div>
             </div>
           </div>
-
         </slider>
       </div>
     </div>
@@ -26,7 +24,8 @@
     data() {
       return {
         dotsStyle: 'line',
-        privilegeListData: []
+        privilegeListData: [],
+        paddingStyle: false
       }
     },
     props: {
@@ -63,6 +62,9 @@
             pList[i] = this.privilegeList.slice(i * 4, i * 4 + 4)
           }
           this.privilegeListData = JSON.parse(JSON.stringify(pList))
+        }
+        if(this.privilegeList && this.privilegeList.length > 4){
+          this.paddingStyle = true
         }
       }
     },
@@ -140,10 +142,11 @@
 
           .subhead
             font-size 0.688rem
-            padding-bottom 1rem
             color #999
             padding-top 0.1rem
             text-align center
+          .subTitle
+            padding-bottom 1rem
 
           img
             height 3.125rem
