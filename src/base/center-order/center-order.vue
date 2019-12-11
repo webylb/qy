@@ -13,7 +13,7 @@
         </div>
         <div class="order-item" @click="goOrder('waitActive')">
           <img src="./images/order-wait-active.png" alt="">
-          <p>待使用</p>
+          <p>待激活</p>
           <div class="num-label" v-if="orderNumData && orderNumData.waitActivationCount > 0"> {{ orderNumData.waitActivationCount>99 ? '99+' : orderNumData.waitActivationCount }}</div>
         </div>
         <div class="order-item" @click="goOrder('waitDelivery')">

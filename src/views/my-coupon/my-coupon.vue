@@ -117,7 +117,7 @@
     data() {
       return {
         tabList: [{
-          name: '待使用',
+          name: '待激活',
           id: 0
         },{
           name: '有效期内',

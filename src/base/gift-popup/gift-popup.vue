@@ -41,14 +41,14 @@
     z-index 10000
     .content
       min-height 1rem
-      width 20.72rem
+      width 18.75rem
       position absolute
       left 50%
       top 15%
-      margin-left -10.36rem
+      margin-left -9.375rem
       .top
-        width 20.72rem
-        height 26.19rem
+        width 18.75rem
+        height 26rem
         font-size 0
         margin 0 auto
         position relative
@@ -57,14 +57,14 @@
           height 100%
         .btnWrap
           position absolute
-          left 3.85rem
+          left 2.85rem
           //transform translateX(-50%)
-          bottom 4rem
-          width 13.13rem
+          bottom 3.7rem
+          width 13.2rem
           height 3rem
       .close
         position absolute
-        right 1.59rem
+        right 0.6rem
         top -0.67rem
         width 1.34rem
         height 1.34rem

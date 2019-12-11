@@ -98,7 +98,7 @@
         this.showInfo = true
         this.showHeader=false
         this.loginStyle = "top:0rem"
-        if(!tool.getCookie('userInfo') && this.merchantId === '100000'){
+        if(!tool.getCookie('userInfo') && this.merchantId === '100036'){
           this.getActiveWeixin()
         }
       }

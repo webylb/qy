@@ -13,7 +13,7 @@
               <div class="title">{{ merchantName }}特权</div>
               <div class="state">
                 <span v-show="item.status==='WAIT'">待付款</span>
-                <span v-show="item.status==='SUCCESS' && item.isShip==='N' && item.isActivated === 'N'">待使用</span>
+                <span v-show="item.status==='SUCCESS' && item.isShip==='N' && item.isActivated === 'N'">待激活</span>
                 <span v-show="item.status==='SUCCESS' && item.isShip==='N' && item.isActivated === 'Y'">待发货</span>
                 <span v-show="item.status==='SUCCESS' && item.isShip==='Y'">已完成</span>
                 <span v-show="item.status==='CANCEL'">已取消</span>
@@ -31,6 +31,7 @@
               </div>
               <!-- <div @click="quxiao(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'">申请退款</div> -->
               <div @click="activeOrder(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'" class="pay">立即使用</div>
+              <div @click="showActiveDetail()" v-show="item.status==='SUCCESS' && item.isActivated==='Y' && item.isShip==='N' && item.type!=='直充'" class="pay">查看详情</div>
               <div @click="showRechargeDetail(item)" v-show="item.status==='SUCCESS' && item.isActivated==='Y' && item.type==='直充'">查看详情</div>
               <div @click="showCouponDetail(item)"
                   v-show="item.status==='SUCCESS' && item.isShip==='Y' && item.type !='直充' && item.isActivated === 'Y' " class="pay">
@@ -70,6 +71,12 @@
     <popup v-show="showActivePopup" title="温馨提示" @confirm="confirmActiveOrder" @cancel="cancel" cancelText="暂不使用" confirmText="立即使用">
       <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
         激活后请在券码有效期内使用哦!
+      </p>
+    </popup>
+    <popup v-show="showActiveErrPopup" :isShowCancel=false title="正在调取商品信息" confirmText="我知道了" @cancel="cancel">
+      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
+        您购买的商品太火爆了~<br/>
+        稍后可在“我的订单”中查看
       </p>
     </popup>
     <popup v-show="showRechargePopup" :title="goodsName" :isShowCancel=false @cancel="cancel">
@@ -169,6 +176,7 @@
         isPaying: true,
         activeOrderId: null,
         showActivePopup: false,
+        showActiveErrPopup: false,
         showRechargePopup: false,
         goodsName: null,
         rechargeTime: null,
@@ -321,6 +329,9 @@
           this.$toastBox.showToastBox(e)
         })
       },
+      showActiveDetail(){
+        this.showActiveErrPopup = true
+      },
       showRechargeDetail(item){
         this.showRechargePopup = true
         this.goodsName = item.skuName
@@ -332,6 +343,7 @@
         this.showQuXiaoPopup = false
         this.showQueRenPopup = false
         this.showActivePopup = false
+        this.showActiveErrPopup = false
         this.showRechargePopup = false
         this.orderType = null
       },
