@@ -29,11 +29,11 @@
               <van-collapse-item name="3" :border=false>
                 <div slot="title">
                   <div class="q-title">
-                    <span class="num">Q3</span> <span class="text">卡券商品点击“激活并使用”后未收到卡券怎么办？ </span>
+                    <span class="num">Q3</span> <span class="text">卡券商品点击“立即使用”后未收到卡券怎么办？ </span>
                   </div>
                 </div>
                 <div  class="des">
-                  卡券商品购买后点击“激活并使用”后未收到卡券，请联系人工客服为您解决。
+                  卡券商品购买后点击“立即使用”后未收到卡券，请联系人工客服为您解决。
                 </div>
               </van-collapse-item>
             </van-collapse>

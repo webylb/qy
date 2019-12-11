@@ -192,27 +192,30 @@
       jumpChecklinkUrl(url){
         if(url){
           window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
-    
           tool.trackEvent('礼包页分享')
         }
       },
       jumpBagDetail(i, index) {
         if(i && i.orderId) {
           switch (true) {
+            case /联通/.test(i.packageName):
+              this.$router.push({path: '/wofenCouponBag', query:{ packageId: i.urlSelectOptionsValue, type: 'vip', orderId: i.orderId, isShowPopup: 'showPopup'}})
+              break;
             case /圣诞/.test(i.packageName):
               this.$router.push({path: '/christmasCouponBag', query:{ packageId: i.urlSelectOptionsValue, type: 'vip', orderId: i.orderId, isShowPopup: 'showPopup'}})
               break;
-          
             default:
               this.$router.push({path: '/vipUserCouponBag', query:{ packageId: i.urlSelectOptionsValue, type: 'vip', orderId: i.orderId,isShowPopup: 'showPopup'}})
               break;
           }
         }else{
           switch (true) {
+            case /联通/.test(i.packageName):
+              this.$router.push({path: '/wofenCouponBag', query:{ packageId: i.urlSelectOptionsValue}})
+              break;
             case /圣诞/.test(i.packageName):
               this.$router.push({path: '/christmasCouponBag', query:{ packageId: i.urlSelectOptionsValue}})
               break;
-          
             default:
               this.$router.push({path: '/vipUserCouponBag', query:{ packageId: i.urlSelectOptionsValue}})
               break;

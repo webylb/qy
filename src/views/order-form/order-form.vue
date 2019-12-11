@@ -13,7 +13,7 @@
               <div class="title">{{ merchantName }}特权</div>
               <div class="state">
                 <span v-show="item.status==='WAIT'">待付款</span>
-                <span v-show="item.status==='SUCCESS' && item.isShip==='N' && item.isActivated === 'N'">待激活</span>
+                <span v-show="item.status==='SUCCESS' && item.isShip==='N' && item.isActivated === 'N'">待使用</span>
                 <span v-show="item.status==='SUCCESS' && item.isShip==='N' && item.isActivated === 'Y'">待发货</span>
                 <span v-show="item.status==='SUCCESS' && item.isShip==='Y'">已完成</span>
                 <span v-show="item.status==='CANCEL'">已取消</span>
@@ -30,7 +30,7 @@
                 立即支付
               </div>
               <!-- <div @click="quxiao(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'">申请退款</div> -->
-              <div @click="activeOrder(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'" class="pay">立即激活</div>
+              <div @click="activeOrder(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'" class="pay">立即使用</div>
               <div @click="showRechargeDetail(item)" v-show="item.status==='SUCCESS' && item.isActivated==='Y' && item.type==='直充'">查看详情</div>
               <div @click="showCouponDetail(item)"
                   v-show="item.status==='SUCCESS' && item.isShip==='Y' && item.type !='直充' && item.isActivated === 'Y' " class="pay">
@@ -67,7 +67,7 @@
         是否确认支付?
       </p>
     </popup>
-    <popup v-show="showActivePopup" title="温馨提示" @confirm="confirmActiveOrder" @cancel="cancel" cancelText="暂不激活" confirmText="立即激活使用">
+    <popup v-show="showActivePopup" title="温馨提示" @confirm="confirmActiveOrder" @cancel="cancel" cancelText="暂不使用" confirmText="立即使用">
       <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
         激活后请在券码有效期内使用哦!
       </p>
@@ -302,7 +302,7 @@
           if (res.code && '00' === res.code) {
             this.showActivePopup = false
             this.activeOrderId = null
-            this.$toastBox.showToastBox('激活成功')
+            // this.$toastBox.showToastBox('激活成功')
             if(res.result.isShip === 'Y'){
               setTimeout(() => {
                 this.handleNav(4, true, 'showPopop')

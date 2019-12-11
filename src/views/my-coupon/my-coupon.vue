@@ -30,7 +30,7 @@
                         </div>
                         <div class="order-item-bottom">
                           <!-- <div @click="quxiao(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'">申请退款</div> -->
-                          <div @click="activeOrder(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'" class="pay">立即激活</div>
+                          <div @click="activeOrder(item.id)" v-show="item.status==='SUCCESS' && item.isActivated==='N' && item.isShip==='N'" class="pay">立即使用</div>
                         </div>
                       </div>
                       <div v-show="orderList && orderList.length > 0" class="coupon-customer-service">
@@ -91,7 +91,7 @@
             稍后可在“我的订单”中查看
           </p>
         </popup>
-        <popup v-show="showActivePopup" title="温馨提示" @confirm="confirmActiveOrder" @cancel="cancel" cancelText="暂不激活" confirmText="立即激活使用">
+        <popup v-show="showActivePopup" title="温馨提示" @confirm="confirmActiveOrder" @cancel="cancel" cancelText="暂不使用" confirmText="立即使用">
           <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
             激活后请在券码有效期内使用哦!
           </p>
@@ -117,7 +117,7 @@
     data() {
       return {
         tabList: [{
-          name: '待激活',
+          name: '待使用',
           id: 0
         },{
           name: '有效期内',
@@ -389,7 +389,7 @@
             this.activeOrderId = null
             this.totalRecord -= 1
             if(res.result.isShip === 'Y'){
-              this.$toastBox.showToastBox('激活成功')
+              // this.$toastBox.showToastBox('激活成功')
               setTimeout(() => {
                 this.handelClick(1, 'showPopop')
               }, 200)

@@ -50,7 +50,15 @@
     </div>
 
     <div class="addVipWrap fade" v-show=false></div>
-    <div class="success-open-popup  fade" v-show="successOpen">
+    <OpenSuccessPopup v-show="successOpen" :successTitle="successTitle" @hideSuccessPopup="hideSuccessPopup">
+      <p class="success-mon-info" v-show="!isExcharge">恭喜您成功开通{{ successMonth }}</p>
+      <p class="success-mon-info" style="margin: 2rem 0;" v-show="isExcharge">恭喜您,兑换成功{{ successMonth }}</p>
+      <p class="success-text-info" v-show="!isExcharge">开始享受您精彩的会员之旅吧!</p>
+      <p class="success-btnWrap">
+        <button type="button" class="success-btn" @click="goBack">购买商品</button>
+      </p>
+    </OpenSuccessPopup>
+    <!-- <div class="success-open-popup  fade" v-show="successOpen">
       <div class="success-content">
         <div class="success-open-top">
           <div class="success-open-topImg">
@@ -70,7 +78,7 @@
           <i class="iconfont">&#xe63f;</i>
         </div>
       </div>
-    </div>
+    </div> -->
     <ExchangePopup v-show="exchangeOpen" title="兑换码激活" confirmText="立即兑换" @cancel="hideSuccessPopup" @confirm="goExcharge">
       <div class="exchange-open-top" style="padding:1.88rem 1.25rem 2.69rem;margin: 0;text-align:center;">
         <input type="text" v-model="exchangeInput" @click.stop="focusInput"  @blur="scrollToTop" class="exchange-input" placeholder="请输入兑换码" maxlength="16" />
@@ -87,6 +95,7 @@
   import Loading from '../../base/loading/loading'
   import ShopHeader from '../../base/shop-header/shop-header'
   import ExchangePopup from '../../base/exchange-popup/exchange-popup'
+  import OpenSuccessPopup from '../../base/open-success-popup/open-success-popup'
   import * as core from '../../api/openMembers'
   import tool from '../../common/js/util'
   import wxShareMixin from '../../common/js/wxShareMixin'
@@ -95,7 +104,8 @@
     components: {
       ShopHeader,
       Loading,
-      ExchangePopup
+      ExchangePopup,
+      OpenSuccessPopup
     },
     mixins:[wxShareMixin],
     data () {
@@ -447,7 +457,7 @@
           this.$toastBox.showToastBox('请输入兑换码')
         }
       },
-      isSuccessisSuccess(){
+      isSuccess(){
         let type = this.$route.query.type
         // console.log(type)
         if(type && type != 0){
@@ -716,86 +726,39 @@
       background rgba(196,143,73,1) url("./images/vip-code-btn.png") no-repeat center center
       background-size 100% 100%
 
-  .success-open-popup
-    position fixed
-    bottom 0
-    left 0
-    right 0
-    top 0
-    background rgba(0,0,0,0.5)
-    z-index 100
-    .success-content
-      min-height 1rem
-      width 20rem
-      position absolute
-      left 50%
-      top 50%
-      transform translate(-50%,-50%)
-      .success-open-top
-        width 100%
-        min-height 19.72rem
-        font-size 0
-        border-radius 0.5rem
-        background-color #fff
-        padding 0 1.25rem
-        box-sizing border-box
-        .success-open-topImg
-          padding-top 1.88rem
-          text-align center
-          .success-title
-            color rgb(245,217,166)
-            width 100%
-            text-align center
-            font-size 1.13rem
-            margin 0
-            font-weight 600
-            color rgba(61,58,57,1)
-          .success-img
-            width 11.69rem
-            height 10.81rem
-            margin-top 1.84rem
-
-        .success-open-btmImg
-          padding-top 1.4rem
-          padding-bottom 1.88rem
-          display flex
-          flex-direction column
-          .success-mon-info
-            width 100%
-            text-align center
-            color rgba(61,58,57,1)
-            line-height 1.5rem
-            font-size 1rem
-            margin-top 1rem
-            font-weight 500
-          .success-text-info
-            color rgba(61,58,57,1)
-            width 100%
-            text-align center
-            font-size 1rem
-            font-weight 500
-            line-height 1.5rem
-          .success-btnWrap
-            text-align center
-            margin-top 2.3rem
-            .success-btn
-              padding 0.95rem 1.81rem
-              background rgba(183,130,49,1)
-              color rgba(255,255,255,1)
-              text-align center
-              font-size 1.13rem
-              font-weight 600
-              outline none
-              border none
-              border-radius 0.25rem
-      .success-open-close
-        margin-top 1.25rem
-        width 100%
+  .success-open-btmImg
+    padding-top 1.4rem
+    padding-bottom 1.88rem
+    display flex
+    flex-direction column
+    .success-mon-info
+      width 100%
+      text-align center
+      color rgba(61,58,57,1)
+      line-height 1.5rem
+      font-size 1rem
+      margin-top 1rem
+      font-weight 500
+    .success-text-info
+      color rgba(61,58,57,1)
+      width 100%
+      text-align center
+      font-size 1rem
+      font-weight 500
+      line-height 1.5rem
+    .success-btnWrap
+      text-align center
+      margin-top 2.3rem
+      .success-btn
+        padding 0.95rem 1.81rem
+        background rgba(183,130,49,1)
+        color rgba(255,255,255,1)
         text-align center
-        i
-          color rgb(255,255,255,1)
-          font-size 1.75rem
-
+        font-size 1.13rem
+        font-weight 600
+        outline none
+        border none
+        border-radius 0.25rem
   
   .exchange-open-top
     width 100%

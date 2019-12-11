@@ -109,15 +109,28 @@
     <div class='error-wrap' v-show="showErrWrap">
       <p>页面未配置,请前往配置</p>
     </div>
-    <div class="gift-wrap" v-show="showGiftCont">
+    <!-- <div class="gift-wrap" v-show="showGiftCont">
       <div class="gift" v-if="isNewUser" @click="handleNewUserGift">
         <img src="./images/new-user-gift.gif" alt="newUserGift">
       </div>
       <div class="gift" v-else @click="handleMyGift">
         <img src="./images/my-gift.gif" alt="myGift">
       </div>
+    </div> -->
+    <!-- <gift-popup v-show="showGiftPopup" @receiveGift="receiveGift" @hidePopup="hidePopup"></gift-popup> -->
+    <div class="gift-wrap wofen-gift-wrap" v-show="showGiftCont">
+      <div class="gift" v-if="isNewUser" @click="handleNewUserGift">
+        <img src="./images/wofen-gift.gif" alt="newUserGift">
+      </div>
     </div>
-    <gift-popup v-show="showGiftPopup" @receiveGift="receiveGift" @hidePopup="hidePopup"></gift-popup>
+    <gift-popup v-show="showGiftPopup" @receiveGift="goVipPay" @hidePopup="hidePopup"></gift-popup>
+    <OpenSuccessPopup v-show="successOpen" :successTitle="successTitle" @hideSuccessPopup="hideSuccessPopup">
+      <p class="success-mon-info">点击下方领取爱奇艺免费券码</p>
+      <!-- <p class="success-text-info">开始享受您精彩的会员之旅吧!</p> -->
+      <p class="success-btnWrap">
+        <button type="button" class="success-btn" @click="goToCouponList">领取券码</button>
+      </p>
+    </OpenSuccessPopup>
   </div>
 </template>
 
@@ -133,7 +146,8 @@
   import MemberLine from '../../base/member-line/member-line'
   import MemberBtmfloat from '../../base/member-btmfloat/member-btmfloat'
   import MemberMenu from '../../base/member-menu/member-menu'
-  import GiftPopup from '../../base/gift-popup/popup'
+  import GiftPopup from '../../base/gift-popup/gift-popup'
+  import OpenSuccessPopup from '../../base/open-success-popup/open-success-popup'
   import * as core from '../../api/member'
   import tool from '../../common/js/util'
 
@@ -151,7 +165,8 @@
       MemberLine,
       GiftPopup,
       MemberBtmfloat,
-      MemberMenu
+      MemberMenu,
+      OpenSuccessPopup
     },
     data() {
       return {
@@ -175,7 +190,12 @@
         merchantGiftPackageId: null ,//礼包id,
         passIdList: null ,//要过滤掉的商品id
         mainWrapperStyle: 'padding-bottom:0;',
-        isShowFloat: null
+        isShowFloat: null,
+        goodsLibraryId: null,
+        vipSystemId: null,
+        userId: null,
+        successOpen: false,
+        successTitle: '恭喜您沃粉会员开通'
       }
     },
     created() {
@@ -188,6 +208,10 @@
         this.getPassId({merchantId: this.merchantId})
       } else {
         this.showErrWrap = true
+      }
+      //开通成功返回
+      if(this.$route.query.type && this.$route.query.type != 0){
+        this.isSuccess()
       }
     },
     mounted() {
@@ -221,7 +245,9 @@
           window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
           let reg = /couponBagCenter/
           if(reg.test(url)) {
-            tool.trackEvent('首页banner')
+            if(this.merchantId === '100000'){
+              tool.trackEvent('首页banner')
+            }
           }  
           // }
         }
@@ -326,16 +352,19 @@
             }else{
               if(res.result.recriveXinShouLiBao){ //已领取新人礼包
                 this.showGiftPopup = false //礼包popup
-                this.showGiftCont = true
+                this.showGiftCont = false
               }
             }
 
-            this.packageConfigId = res.result.packageConfigId
-            this.merchantGiftPackageId = res.result.merchantGiftPackageId
+            // this.packageConfigId = res.result.packageConfigId
+            // this.merchantGiftPackageId = res.result.merchantGiftPackageId
+
+            this.goodsLibraryId = res.result.goodsLibraryAndVipCardId
+            this.vipSystemId = res.result.qyMerchantVipSystemId
+            this.userId = res.result.id
 
           } else if(res.code && '01' === res.code) {
             this.isMember = false
-            // this.$toastBox.showToastBox(res.message)
           } else {
             this.$toastBox.showToastBox(res.message)
           }
@@ -377,6 +406,36 @@
           this.$router.push({path: '/newUserCouponBag', query: {merchantGiftPackageId:this.merchantGiftPackageId, packageConfigId:this.packageConfigId}})
         }
       },
+      goVipPay(){
+        let data = {channelNumber: null,outOrderId: null};
+        data.goodsLibraryId = this.goodsLibraryId
+        data.userId = this.userId
+        data.vipSystemId = this.vipSystemId
+        let returnUrl = window.location.href
+        let reg = /\?/
+        if(reg.test(returnUrl)){
+          returnUrl = returnUrl + "&type=opensuccess"
+        }else{
+          returnUrl = returnUrl + "?type=opensuccess"
+        }
+        data.returnUrl = returnUrl
+        core.vipPackagePay(data).then(res => {
+          //console.log(res)
+          if(res.code && '00' == res.code){
+            if(res.result.goUrl){
+              window.location.href = res.result.goUrl
+            }
+          }else if(res.code && '01' === res.code && res.isLogin == 'false'){
+            this.getLoginUrl()
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+          this.isPaying = true
+        }).catch(error => {
+          this.$toastBox.showToastBox(error)
+          this.isPaying = true
+        })
+      },
       getLoginUrl(){
         core.getLoginUrl({merchantId: this.merchantId}).then(res => {
           //console.log(res)
@@ -405,6 +464,24 @@
         }).catch(error => {
           this.$toastBox.showToastBox("网络错误")
         })
+      },
+      hideSuccessPopup(){
+        this.successOpen = false
+      },
+      isSuccess(){
+        let type = this.$route.query.type
+        if(type && type != 0){
+          this.successOpen = true
+          let data = {}
+          for(let item in this.$route.query){
+            if(item == 'type'){
+              data[item] = 0
+            }else{
+              data[item] = this.$route.query[item]
+            }
+          }
+          this.$router.replace({path:'/member', query: data})
+        }
       }
     }
   }
@@ -447,10 +524,65 @@
       top 13.75rem
       width 4.875rem
       height 4.875rem
-      z-index: 11;
-
+      z-index 10
       .gift
         width 100%
         height auto
+
+    .wofen-gift-wrap
+      position absolute
+      right 0.44rem
+      top auto
+      bottom 8.75rem
+      width 5.375rem
+      height 4.03rem
+      z-index 10
+
+    .success-open-btmImg
+      padding-top 1.4rem
+      padding-bottom 1.88rem
+      display flex
+      flex-direction column
+      .success-mon-info
+        width 100%
+        text-align center
+        color rgba(61,58,57,1)
+        line-height 1.5rem
+        font-size 1rem
+        margin-top 1rem
+        font-weight 500
+      .success-text-info
+        color rgba(61,58,57,1)
+        width 100%
+        text-align center
+        font-size 1rem
+        font-weight 500
+        line-height 1.5rem
+      .success-btnWrap
+        text-align center
+        margin-top 2.3rem
+        .success-btn
+          padding 0.95rem 1.81rem
+          background rgba(183,130,49,1)
+          color rgba(255,255,255,1)
+          text-align center
+          font-size 1.13rem
+          font-weight 600
+          outline none
+          border none
+          border-radius 0.25rem
+  
+
+.animate-swing {
+  animation: swing 1.2s ease-in-out infinite;
+  transform: rotate(-5deg);
+  transform-origin: center;
+}
+
+@keyframes swing {
+  0% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg);}
+  100% { transform: rotate(-5deg);}
+}
 
 </style>

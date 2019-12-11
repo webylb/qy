@@ -6,7 +6,7 @@ Vue.use(Router)
 export default new Router({
   mode: 'history',
   // base: '/f/q/'+ window.infoData.merchantId + '.html/',
-  base: '/f/q/100059.html/',
+  base: '/f/q/100036.html/',
   routes: [
     {
       path: '/',
@@ -179,6 +179,23 @@ export default new Router({
       name: 'couponBagActiveRules',
       meta: {title: '圣诞礼包',keepAlive:false},
       component: () => import(/* webpackChunkName: "couponBag" */ '@/views/coupon-bag-active-rules/coupon-bag-active-rules.vue')
+    },
+    /**
+     * @description: 定制化开始
+     */    
+    //联通登录
+    {
+      path: '/wofenLogin',
+      name: 'wofenLogin',
+      meta: {title: '登录',keepAlive:false},
+      component: () => import(/* webpackChunkName: "login" */ '../views/login/wofen-login.vue')
+    },
+    // 联通活动礼包Christmas
+    {
+      path: '/wofenCouponBag',
+      name: 'wofenCouponBag',
+      meta: {title: '圣诞礼包',keepAlive:false},
+      component: () => import(/* webpackChunkName: "couponBag" */ '@/views/coupon-bag-active-temeplate/wofen-coupon-bag.vue')
     }
   ]
 })

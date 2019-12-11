@@ -1,14 +1,12 @@
 <template>
-  <div class="gift-popup">
-    <div class="content zoomIn">
+  <div class="gift-popup" @click="hidePopup">
+    <div class="content zoomIn" @click.stop>
       <div class="top">
-        <img src="./images/gift.png" alt="">
-        <p class="btnWrap" @click.prevent="receiveGift">
-          <button type="button" class="btn">立即领取</button>
-        </p>
+        <img src="./images/wofen-gift.png" alt="">
+        <p class="btnWrap" @click.prevent="receiveGift"></p>
       </div>
       <div class="close" @click.prevent="hidePopup">
-        <i class="iconfont">&#xe63f;</i>
+        <img src="./images/success-close.png" alt="">
       </div>
     </div>
   </div>
@@ -43,14 +41,14 @@
     z-index 10000
     .content
       min-height 1rem
-      width 16.91rem
+      width 20.72rem
       position absolute
       left 50%
-      top 9.84rem
-      margin-left -8.455rem
+      top 15%
+      margin-left -10.36rem
       .top
-        width 16.91rem
-        height 18.97rem
+        width 20.72rem
+        height 26.19rem
         font-size 0
         margin 0 auto
         position relative
@@ -59,31 +57,21 @@
           height 100%
         .btnWrap
           position absolute
-          left 1.89rem
+          left 3.85rem
           //transform translateX(-50%)
-          bottom 1rem
+          bottom 4rem
           width 13.13rem
-          height 2.75rem
-          .btn
-            width 100%
-            height 2.75rem
-            line-height 2.75rem
-            outline none
-            border none
-            text-align center
-            font-size 1.125rem
-            font-weight bold
-            border-radius 0.313rem
-            background rgba(250,226,179,1)
-            color rgba(140,82,42,1)
+          height 3rem
       .close
-        margin-top 1rem
-        width 100%
-        text-align center
-        i
-          color rgb(188,188,188)
-          font-size 1.75rem
-
+        position absolute
+        right 1.59rem
+        top -0.67rem
+        width 1.34rem
+        height 1.34rem
+        img 
+          width 100%
+          height 100%
+    
   .fade  {
     -webkit-animation: scale 1s;
             animation: scale 1s;

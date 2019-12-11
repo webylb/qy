@@ -3,8 +3,12 @@
     <!-- 遮罩 -->
     <div class="content-wrap fade" @click="closeShareImg"></div>
     <!-- 分享规则 -->
-    <div class="share-rule fade">
+    <div class="share-rule fade" v-if="merchantId === 100000">
       <img class="rule-img" src="./images/rules.png" alt="">
+      <div class="share-btn" @click="goShare"></div>
+    </div>
+    <div class="share-rule wofen-share fade" v-if="merchantId === 100036">
+      <img class="rule-img" src="./images/wofen-rules.png" alt="">
       <div class="share-btn" @click="goShare"></div>
     </div>
     <!-- 分享图片 -->
@@ -129,6 +133,9 @@
       img 
         width 100% 
         height 100%
+  .wofen-share
+    .share-btn
+      top 21.8rem
   // 弹窗遮罩
   .content-wrap
     position fixed

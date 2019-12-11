@@ -81,7 +81,7 @@
     </div>
     <!-- 固定定位入口 -->
     <div class="go-share fiexd-top" v-if="showVipInfo" @click="goShareRule">
-      <img src="./images/share.gif" alt="">
+      <img src="./images/wofen-share.gif" alt="">
     </div>
     <!-- 遮罩 -->
     <div class="content-wrap fade" v-show="couponBagToast" @click="closeCouponBagToast"></div>
@@ -145,7 +145,7 @@
     </div>
     <!-- 分享规则 -->
     <div class="share-rule fade" v-show="showShareRules">
-      <img class="rule-img" src="./images/rules.png" alt="">
+      <img class="rule-img" src="./images/wofen-rules.png" alt="">
       <div class="share-btn" @click="goShare('ruleAfter')"></div>
       <span><img src="./images/success-close.png" alt="" @click="closeShareRules"></span>
     </div>
@@ -156,7 +156,8 @@
     </div>
     <!-- 购买成功 -->
     <div class="success-popup fade" v-show="showSuccessPopup">
-      <img class="success-img" src="./images/success-img.png" alt="">
+      <img class="success-img" src="./images/wofen-success-img.png" alt="">
+      <div class="check-btn" @click="closeSuccessPopup"></div>
       <div class="share-btn" @click="goShare('buyAfter')"></div>
       <span><img src="./images/success-close.png" alt="" @click="closeSuccessPopup"></span>
     </div>
@@ -184,7 +185,7 @@
   import wxShareMixin from '../../common/js/wxShareMixin'
 
   export default {
-    name: 'christmasCouponBag',
+    name: 'wofenCouponBag',
     components: {
       ShopHeader,
       Slider,
@@ -331,7 +332,7 @@
                 data[item] = this.$route.query[item]
               }
             }
-            this.$router.push({path:'/christmasCouponBag', query:data})
+            this.$router.push({path:'/wofenCouponBag', query:data})
           }
           clearTimeout(timer)
         },30)
@@ -640,7 +641,7 @@
               data.type = 'vip'
               data.orderId = res.result
               this.orderId = res.result
-              this.$router.replace({path:'/christmasCouponBag', query:data})
+              this.$router.replace({path:'/wofenCouponBag', query:data})
               this.isHasAuthority = true
               this.showVipInfo = true
               this.couponBagStyle = 'top:0rem; bottom: 0rem'
@@ -730,7 +731,7 @@
               data[item] = this.$route.query[item]
             }
           }
-          this.$router.push({path:'/christmasCouponBag', query:data})
+          this.$router.push({path:'/wofenCouponBag', query:data})
         }
       }
     }
@@ -986,7 +987,7 @@
     right 0
     img 
       width 5.625rem
-      height 5.625rem
+      height auto
   
   .share-rule
     position fixed
@@ -1002,7 +1003,7 @@
     .share-btn
       position absolute
       left 50%
-      top 10.8rem
+      top 21.8rem
       transform translateX(-50%)
       width 15rem
       height 3rem
@@ -1040,16 +1041,23 @@
     top 5.9375rem
     left 50%
     transform translateX(-50%)
-    height 23.59rem
-    width 19.38rem
+    height 23.77rem
+    width 19.33rem
     z-index 101
     .success-img
       width 100%
       height auto
+    .check-btn
+      position absolute
+      left 50%
+      top 14.5rem
+      transform translateX(-50%)
+      width 12.5rem
+      height 2.5rem
     .share-btn
       position absolute
       left 50%
-      top 15rem
+      top 17.65rem
       transform translateX(-50%)
       width 12.5rem
       height 2.5rem
