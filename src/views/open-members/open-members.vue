@@ -28,6 +28,9 @@
                   <div class="item" v-for="(i, index) in item.qyMerchantVipSystemResultList" :key="index" :class="[index == activeVipIndex ? 'item-active' : '']" @click="changeVipActiveIndex(index, i)" ref="titleItem">
                     <div class="item-title">{{ i.vipCardType }}</div>
                     <div class="item-price"><span>￥</span>{{ avg(i.sellingPrice) }}</div>
+                    <div v-if="merchantId === '100000' && i.vipCardType === '月卡'" class="item-label">
+                      <img src="./images/label.png" alt="label">
+                    </div>
                   </div>
                 </div>
               </transition-group>
@@ -623,7 +626,8 @@
           border: 0.05rem solid rgba(183,130,49,1);
           border-radius: 0.5rem;
           margin: 1rem 0.75rem 0 0;
-          overflow: hidden;
+          // overflow: hidden;
+          position relative
           &:nth-child(3n+3) 
             margin-right 0
           .item-title 
@@ -636,6 +640,7 @@
             font-size: 1.13rem;
             color: rgba(183,130,49,1);
             text-align: center;
+            border-radius: 0.45rem 0.45rem 0 0;
           .item-price
             font-family: 'PingFang SC','DIN-BOLD';
             height: 5.63rem;
@@ -647,6 +652,15 @@
             span 
               font-size: 0.94rem;
               font-weight bold
+          .item-label 
+            position absolute
+            right -0.344rem
+            top -0.72rem
+            height 1.25rem
+            width 3.5rem
+            img 
+              width 100%
+              height 100%
         .item-active
           background: rgba(252,243,231,1);
           box-shadow: 0rem 0.2rem 0.2rem 0rem rgba(255,223,173,0.5);

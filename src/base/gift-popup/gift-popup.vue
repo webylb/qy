@@ -44,7 +44,7 @@
       width 18.75rem
       position absolute
       left 50%
-      top 15%
+      top 12%
       margin-left -9.375rem
       .top
         width 18.75rem

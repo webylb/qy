@@ -3,13 +3,15 @@
     <!-- 遮罩 -->
     <div class="content-wrap fade" @click="closeShareImg"></div>
     <!-- 分享规则 -->
-    <div class="share-rule fade" v-if="merchantId === 100000">
-      <img class="rule-img" src="./images/rules.png" alt="">
-      <div class="share-btn" @click="goShare"></div>
-    </div>
-    <div class="share-rule wofen-share fade" v-if="merchantId === 100036">
-      <img class="rule-img" src="./images/wofen-rules.png" alt="">
-      <div class="share-btn" @click="goShare"></div>
+    <div v-show="showShareRules">
+      <div class="share-rule fade" v-if="merchantId === '100000'">
+        <img class="rule-img" src="./images/rules.png" alt="">
+        <div class="share-btn" @click="goShare"></div>
+      </div>
+      <div class="share-rule wofen-share fade" v-if="merchantId === '100036'">
+        <img class="rule-img" src="./images/wofen-rules.png" alt="">
+        <div class="share-btn" @click="goShare"></div>
+      </div>
     </div>
     <!-- 分享图片 -->
     <div class="share-img fade" v-show="showShareImg">
@@ -36,7 +38,8 @@
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         activeShareImgUrl: '',
-        showShareImg: false
+        showShareImg: false,
+        showShareRules: true
       }
     },
     created () {
@@ -57,10 +60,10 @@
     },
     methods: {
       closeShareImg(){
+        this.showShareRules = true
         this.showShareImg = false
       },
       goShare(){
-        tool.trackEvent('规则页分享')
         this.$toast.loading({
           message: '加载中...',
           overlay: true,
@@ -70,8 +73,14 @@
         });
         core.getShareImg({merchantId: this.merchantId, packageId: this.packageId}).then(res => {
           if(res.code && '00' == res.code){
+            if(this.merchantId === '100036'){
+              tool.trackEvent('去分享页')
+            }else if(this.merchantId === '100000'){
+              tool.trackEvent('规则页分享')
+            }
             this.activeShareImgUrl = res.result
             this.showShareImg = true
+            this.showShareRules = false
             this.$toast.clear()
           } else if(res.code && '01' === res.code && res.isLogin == 'false'){
             this.getLoginUrl()

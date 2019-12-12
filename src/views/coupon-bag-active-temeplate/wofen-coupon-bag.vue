@@ -5,7 +5,7 @@
       <div class="cont">
         <div v-show="!loaded">
           <div class="coupon-top-img">
-            <img src="./images/top.png" alt="" @load="onLoaded">
+            <img src="./images/wofen-top.png" alt="" @load="onLoaded">
           </div>
           <div class="coupon-bag-list" ref="couponBagList">
             <div class="coupon-bag-item" v-for="(item, index) in allData" :key="index">
@@ -157,7 +157,7 @@
     <!-- 购买成功 -->
     <div class="success-popup fade" v-show="showSuccessPopup">
       <img class="success-img" src="./images/wofen-success-img.png" alt="">
-      <div class="check-btn" @click="closeSuccessPopup"></div>
+      <div class="check-btn" @click="goGiftCenter"></div>
       <div class="share-btn" @click="goShare('buyAfter')"></div>
       <span><img src="./images/success-close.png" alt="" @click="closeSuccessPopup"></span>
     </div>
@@ -450,14 +450,22 @@
         this.$router.push("/orderForm")
       },
       bannerClick(){
-        this.$router.push('/')
-        tool.trackEvent('跳转首页')
+        if(this.merchantId === '100036'){
+          window.location.href = 'https://c1.51jujibao.com/static/mkt/2019/11/upass/wofen-useRule.html'
+          tool.trackEvent('抵扣券使用说明')
+        }else if(this.merchantId === '100000'){
+          this.$router.push('/')
+          tool.trackEvent('跳转首页')
+        }
       },
       goShareRule(){
         this.couponBagToast = true
         this.showShareRules = true
-
-        tool.trackEvent('分享有礼')
+        if(this.merchantId === '100036'){
+          tool.trackEvent('分享')
+        }else if(this.merchantId === '100000'){
+          tool.trackEvent('分享有礼')
+        }
       },
       closeShareRules(){
         this.couponBagToast = false
@@ -469,11 +477,25 @@
         this.showSuccessPopup = false
         this.$router.push({path: '/couponBagCenter', query: {index: 1}})
       },
+      goGiftCenter(){
+        this.$router.push({path: '/couponBagCenter', query: {index: 1}})
+        if(this.merchantId === '100036'){
+          tool.trackEvent('查看礼包')
+        }
+      },
       goShare(type){
         if(type === 'buyAfter'){
-          tool.trackEvent('分享好友')
+          if(this.merchantId === '100036'){
+            tool.trackEvent('购买后分享')
+          }else if(this.merchantId === '100000'){
+            tool.trackEvent('分享好友')
+          }
         }else if(type === 'ruleAfter'){
-          tool.trackEvent('规则页分享')
+          if(this.merchantId === '100036'){
+            tool.trackEvent('去分享页')
+          }else if(this.merchantId === '100000'){
+            tool.trackEvent('规则页分享')
+          }
         }
         this.$toast.loading({
           message: '加载中...',
@@ -700,7 +722,11 @@
           let returnUrl = window.location.href + '&type=vip&status=success'
           core.buyCouponBag({merchantId: this.merchantId, packageId: this.packageId, returnUrl: returnUrl}).then(res => {
             if(res.code && '00' == res.code){
-              tool.trackEvent('立即抢购')
+              if(this.merchantId === '100036'){
+                tool.trackEvent('9.9开通')
+              }else if(this.merchantId === '100000'){
+                tool.trackEvent('立即抢购')
+              }
               if(res.result.goUrl){
                 window.location.href = res.result.goUrl
               }

@@ -71,8 +71,8 @@
         showPhoneClose: false,
         showCodeClose: false,
         classActive: false,
-        shareUrl: location.href.split('#')[0],
-        shareLink:  window.location.href.split("#")[0]+'#'+window.location.href.split("#")[1],  //分享出去的链接
+        shareUrl: location.href,
+        shareLink:  window.location.href,  //分享出去的链接
         shareTitle: '',  //分享的标题
         shareDesc: '', //分享的详情介绍
         shareImgUrl: '',
@@ -172,8 +172,8 @@
       },
       changeSize(){
         // 要做长度判断
-        if (this.$refs.code.value.length > 6) {
-          this.$refs.code.value = this.$refs.code.value.slice(0, 6)
+        if (this.$refs.code.value.length > 4) {
+          this.$refs.code.value = this.$refs.code.value.slice(0, 4)
           this.code = this.$refs.code.value
         }
       },
@@ -231,8 +231,8 @@
           return false
         }
         if(this.code){
-          if(!/^\d{4,6}$/.test(this.code)) {
-            this.$toastBox.showToastBox('请输入4-6位数字验证码')
+          if(!/^\d{4}$/.test(this.code)) {
+            this.$toastBox.showToastBox('请输入4位数字验证码')
             return false
           }
         }else{

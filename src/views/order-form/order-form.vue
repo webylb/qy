@@ -316,6 +316,7 @@
                 this.handleNav(4, true, 'showPopop')
               }, 200)
             }else{
+              this.showActiveDetail()
               setTimeout(() => {
                 this.handleNav(3, true)
               }, 200)

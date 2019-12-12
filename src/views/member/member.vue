@@ -422,6 +422,9 @@
         core.vipPackagePay(data).then(res => {
           //console.log(res)
           if(res.code && '00' == res.code){
+            if(this.merchantId === '100036'){
+              tool.trackEvent('立即开通按钮')
+            }
             if(res.result.goUrl){
               window.location.href = res.result.goUrl
             }
