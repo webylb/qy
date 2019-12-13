@@ -136,6 +136,17 @@
         <p class="text-2" @click="goCoustomServe"><span>无效卡券申诉</span><i class="iconfont">&#xe713;</i></p>
       </div>
     </CouponPopup>
+    <div class="float-wrap">
+      <div v-for="item in allData" :key="item.uid">
+        <div v-if="item.moduleType === 'Menu'">
+          <member-menu
+            :menuList="item.configJson.menu_entry"
+            :merchantId="merchantId"
+            @jumplinkUrl="jumplinkUrl"
+          ></member-menu>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -150,6 +161,7 @@
   import * as core from '../../api/orderForm'
   import Popup from '../../base/popup/popup'
   import CouponPopup from '../../base/coupon-popup/coupon-popup'
+  import MemberMenu from '../../base/member-menu/member-menu'
   import { parse } from 'path'
 
   export default {
@@ -157,6 +169,8 @@
     data() {
       return {
         merchantName: window.infoData.merchantName,
+        merchantId: window.infoData.merchantId,
+        privilegePageUuid: window.infoData.privilegePageUuid || '',
         activeIndex: 0,
         orderList: [],
         showLoad: true,
@@ -185,7 +199,8 @@
         showCouponPopup: false,
         couponList: null,
         orderType: null,
-        imgPrevList: []
+        imgPrevList: [],
+        allData: []
       }
     },
     components: {
@@ -196,6 +211,7 @@
       Popup,
       CouponPopup,
       Slider,
+      MemberMenu,
       [Divider.name]: Divider,
       [ImagePreview.name]: ImagePreview
     },
@@ -212,6 +228,7 @@
     created() {
       document.title = this.$route.meta.title
       this.selectObj = { currentPage: this.currentPage, pageSize: this.pageSize}
+      this.getNewShopTequan({pageUuid: this.privilegePageUuid})
     },
     activated() {
       this.cancel()
@@ -511,6 +528,26 @@
         }).catch(error => {
           this.$toastBox.showToastBox("网络错误")
         })
+      },
+      getNewShopTequan(opts) {
+        core.newShopTequan(opts).then(res => {
+          // console.log(res)
+          if (res.code && '00' === res.code) {
+            if (res.result.data) {
+              let data = JSON.parse(res.result.data)
+              this.allData = data
+            }
+          } else {
+            this.$toastBox.showToastBox(res.message)
+          }
+        }).catch(e => {
+          this.$toastBox.showToastBox(e)
+        })
+      },
+      jumplinkUrl(url) {
+        if (url) {
+          window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+        }
       }
     }
   }

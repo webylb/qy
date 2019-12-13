@@ -341,13 +341,19 @@
             // this.isMember = res.result.id ? true : false
             this.isHaveFavorite = res.result.like
             this.isNewUser = res.result.xinShou
+           
             if(res.result.xinShou){
               if(res.result.recriveXinShouLiBao){ //已领取新人礼包
                 this.showGiftPopup = false //礼包popup
-                this.showGiftCont = true
-              }else{ //未领取新人礼包
-                this.showGiftPopup = true
                 this.showGiftCont = false
+              }else{ //未领取新人礼包
+                if(!tool.getCookie('isShowGift')){
+                  this.showGiftPopup = true
+                  this.showGiftCont = false
+                }else{
+                  this.showGiftPopup = false
+                  this.showGiftCont = true
+                }
               }
             }else{
               if(res.result.recriveXinShouLiBao){ //已领取新人礼包
@@ -355,7 +361,7 @@
                 this.showGiftCont = false
               }
             }
-
+            
             // this.packageConfigId = res.result.packageConfigId
             // this.merchantGiftPackageId = res.result.merchantGiftPackageId
 
@@ -378,6 +384,7 @@
       hidePopup() {
         this.showGiftPopup = false
         this.showGiftCont = true
+        tool.setCookie('isShowGift', '0', 1)
       },
       receiveGift() {
         if(this.packageConfigId){
@@ -408,6 +415,10 @@
       },
       goVipPay(){
         let data = {channelNumber: null,outOrderId: null};
+        if(!this.goodsLibraryId || !this.vipSystemId || !this.userId){
+          this.getLoginUrl()
+          return
+        }
         data.goodsLibraryId = this.goodsLibraryId
         data.userId = this.userId
         data.vipSystemId = this.vipSystemId
@@ -522,7 +533,7 @@
         max-width 750PX
 
     .gift-wrap
-      position absolute
+      position fixed
       right 0.66rem
       top 13.75rem
       width 4.875rem

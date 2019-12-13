@@ -156,6 +156,20 @@ const getCookie = name => {
 }
 
 /**
+ * 设置cookies
+ */
+
+const setCookie = (name, value, exdays) => {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  var expires = "expires=" + d.toUTCString();
+  // console.info(name + "=" + value + "; " + expires);
+  document.cookie = name + "=" + value + "; " + expires;
+  // console.info(document.cookie);
+}
+
+
+/**
  * 删除cookies
  */
 const delCookie = name => {
@@ -193,5 +207,5 @@ const trackEvent = function (label) {
 }
 
 export default {
-  timeFormatting, formatDate, getPhoneModel, toWeiXinLogin, priceStr, replaceUrlMerchantId, replaceUrlForUrpass, getCookie, trackEvent
+  timeFormatting, formatDate, getPhoneModel, toWeiXinLogin, priceStr, replaceUrlMerchantId, replaceUrlForUrpass, getCookie, setCookie, trackEvent
 }

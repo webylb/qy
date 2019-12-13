@@ -103,6 +103,7 @@
         }
       }
       this.showLoad = false
+      this.innerHeight = window.innerHeight && window.innerHeight
     },
     mounted(){
       
@@ -248,6 +249,9 @@
           }).then(res => {
             //console.log(res)
             if(res.code && '00' == res.code){
+              if(this.innerHeight - window.innerHeight >= 200){
+                window.reload()
+              }
               window.location.href = res.result
             } else {
               this.$toastBox.showToastBox(res.message)

@@ -364,7 +364,7 @@
           if (res.code && '00' === res.code) {
             this.orderNumData = res.result
           } else {
-            this.$toastBox.showToastBox(res.message)
+            // this.$toastBox.showToastBox(res.message)
           }
         }).catch(e => {
           this.$toastBox.showToastBox(e)

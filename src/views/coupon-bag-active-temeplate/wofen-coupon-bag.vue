@@ -86,61 +86,65 @@
     <!-- 遮罩 -->
     <div class="content-wrap fade" v-show="couponBagToast" @click="closeCouponBagToast"></div>
     <!-- 底部弹出商品信息 -->
-    <div class="coupon-bag-toast" ref="couponBagToast">
-      <div class="coupon-bag-toast-wrap" v-if="itemCouponDetail">
-        <div class="coupon-bag-toast-title">
-          <div class="left-line"></div>
-          <div class="title-text">
-            【{{ itemCouponDetail.itemName }}】
-          </div>
-          <div class="right-line"></div>
-        </div>
-        <div class="coupon-bag-toast-sub-title" v-if="itemCouponDetail.ticketType == 'DiJiaQuan'">
-          <div class="title-text">
-            {{ itemCouponDetail.skuName }}
-          </div>
-        </div>
-        <div class="coupon-bag-toast-sub-title coupon-bag-toast-sub-title2">
-          <div class="title-text">
-            {{ itemCouponDetail.ticketName }}
-          </div>
-        </div>
-        <div class="img-list">
-          <div v-if="itemCouponDetail.count > 1">
-            <slider class="slider-toast-warp" :loop="false" :auto-play="false" ref="toastSlider">
-              <div class="slider-toast-page" v-for="(item, index) in itemCouponDetail.couponList" :key="index">
-                <div class="slider-toast-item" v-for="(i, index2) in item" :key="index2">
-                  <div class="default-coupon" :class="[index2 === useIndex && index == usePageIndex ? 'actice-coupon' : '', i.isUsed == 'N' ? '' : 'used-coupon']">
-                    <div class="used" v-if="i.isUsed == 'Y'">
-                        <div class="used-text">已使用</div>
-                        <div class="used-time">
-                          {{ formatDate(i.useTime) }}
-                        </div>
-                    </div>
-                    <img :src="itemCouponDetail.ticketImageUrl" alt="">
-                    <span></span>
-                  </div>
-                </div>
+    <div class="coupon-bag-toast" ref="couponBagToast" :style="couponBagToastStyle">
+      <Scorll ref="toastScroll" class="toast-scroll">
+        <div>
+          <div class="coupon-bag-toast-wrap" v-if="itemCouponDetail">
+            <div class="coupon-bag-toast-title">
+              <div class="left-line"></div>
+              <div class="title-text">
+                【{{ itemCouponDetail.itemName }}】
               </div>
-            </slider>
-          </div>
-          <div v-else class="single-coupon" :class="[itemCouponDetail.recordResults[0].isUsed == 'N' ? 'actice-coupon' : 'used-coupon']">
-            <div class="used" v-if="itemCouponDetail.recordResults[0].isUsed == 'Y'">
-                <div class="used-text">已使用</div>
-                <div class="used-time">
-                  {{ formatDate(itemCouponDetail.recordResults[0].useTime) }}
-                </div>
+              <div class="right-line"></div>
             </div>
-            <img :src="itemCouponDetail.ticketImageUrl" alt="">
-            <span></span>
+            <div class="coupon-bag-toast-sub-title" v-if="itemCouponDetail.ticketType == 'DiJiaQuan'">
+              <div class="title-text">
+                {{ itemCouponDetail.skuName }}
+              </div>
+            </div>
+            <div class="coupon-bag-toast-sub-title coupon-bag-toast-sub-title2">
+              <div class="title-text">
+                {{ itemCouponDetail.ticketName }}
+              </div>
+            </div>
+            <div class="img-list">
+              <div v-if="itemCouponDetail.count > 1">
+                <slider class="slider-toast-warp" :loop="false" :auto-play="false" ref="toastSlider">
+                  <div class="slider-toast-page" v-for="(item, index) in itemCouponDetail.couponList" :key="index">
+                    <div class="slider-toast-item" v-for="(i, index2) in item" :key="index2">
+                      <div class="default-coupon" :class="[index2 === useIndex && index == usePageIndex ? 'actice-coupon' : '', i.isUsed == 'N' ? '' : 'used-coupon']">
+                        <div class="used" v-if="i.isUsed == 'Y'">
+                            <div class="used-text">已使用</div>
+                            <div class="used-time">
+                              {{ formatDate(i.useTime) }}
+                            </div>
+                        </div>
+                        <img :src="itemCouponDetail.ticketImageUrl" alt="">
+                        <span></span>
+                      </div>
+                    </div>
+                  </div>
+                </slider>
+              </div>
+              <div v-else class="single-coupon" :class="[itemCouponDetail.recordResults[0].isUsed == 'N' ? 'actice-coupon' : 'used-coupon']">
+                <div class="used" v-if="itemCouponDetail.recordResults[0].isUsed == 'Y'">
+                    <div class="used-text">已使用</div>
+                    <div class="used-time">
+                      {{ formatDate(itemCouponDetail.recordResults[0].useTime) }}
+                    </div>
+                </div>
+                <img :src="itemCouponDetail.ticketImageUrl" alt="">
+                <span></span>
+              </div>
+            </div>
+            <div class="instructions" v-html="itemCouponDetail.instructions">
+            </div>
           </div>
         </div>
-        <div class="instructions" v-html="itemCouponDetail.instructions">
-        </div>
-        <div class="use-btn">
-          <button  v-if="itemCouponDetail.count > 1" type="button" @click="goUse()">前去使用</button>
-          <button  v-else type="button" @click="goUse(itemCouponDetail.recordResults[0].receiveImmediatelyUrl)">前去使用</button>
-        </div>
+      </Scorll>
+      <div class="use-btn">
+        <button  v-if="itemCouponDetail && itemCouponDetail.count > 1" type="button" @click="goUse()">前去使用</button>
+        <button  v-if="itemCouponDetail && itemCouponDetail.count == 1" type="button" @click="goUse(itemCouponDetail.recordResults[0].receiveImmediatelyUrl)">前去使用</button>
       </div>
     </div>
     <!-- 分享规则 -->
@@ -176,6 +180,7 @@
 <script>
   import { Divider } from 'vant';
   import BScroll  from 'better-scroll'
+  import Scorll from '../../base/scroll/scroll'
   import ShopHeader from '../../base/shop-header/shop-header'
   import ExchangePopup from '../../base/exchange-popup/exchange-popup'
   import Slider from '../../base/slider/slider'
@@ -191,6 +196,7 @@
       Slider,
       Loading,
       ExchangePopup,
+      Scorll,
       [Divider.name]: Divider
     },
     mixins:[wxShareMixin],
@@ -231,7 +237,8 @@
         showVipInfo: false,
         isPaying: true,
         isHasAuthority: false,
-        activeShareImgUrl: null
+        activeShareImgUrl: null,
+        couponBagToastStyle: 'height:50vh;'
       }
     },
     created () {
@@ -569,6 +576,11 @@
             this.usePageIndex = pageIndex
             if(activeIndex > -1 && data.recordResults[activeIndex]){
               this.useCode = data.recordResults[activeIndex].code
+            }
+            if(data.recordResults && data.recordResults.length > 3){
+              this.couponBagToastStyle = "height: 55vh";
+            }else{
+              this.couponBagToastStyle = "height: 45vh";
             }
             this.openCouponBagToast()
             if(pageIndex > 0){
@@ -1116,14 +1128,25 @@
     width 100%
     max-width 750PX
     z-index 101
-
+    background #fff
+    overflow hidden
+    border-radius 0.5rem 0.5rem 0rem 0rem
+    .toast-scroll
+      position absolute
+      top 0
+      bottom 3rem
+      left 0
+      right 0
+      text-align center
+      width 100%
+      max-width 750PX
+      z-index 101
     .coupon-bag-toast-wrap
       height 100%
       width 100%
       max-width 750PX
       background #fff
-      border-radius 0.5rem 0.5rem 0rem 0rem
-      padding-top 1.25rem
+      padding 1.25rem 0
       box-sizing border-box
       .coupon-bag-toast-title
         height 1rem
@@ -1281,11 +1304,13 @@
                   background-size 100% 100%
 
       .instructions
-        margin-top 1.875rem
+        margin-top 0.85rem
         box-sizing border-box
         padding 0 0.75rem
         text-align left
-        word-break: break-all;
+        word-break break-all
+        line-height 1.2
+        font-size 0.938rem
         p
           line-height 1.375rem
           text-align left
@@ -1296,16 +1321,21 @@
             span
               color #b78231
               margin-right 0.281rem
-      .use-btn
-        margin-top 3.563rem
-        button
-          outline none
-          border none
-          width 100%
-          height 3.063rem
-          background-color rgba(196,143,73,1);
-          color #fff
-          font-size 1.125rem
+    .use-btn
+      position absolute
+      bottom 0
+      left 0
+      width 100%
+      max-width 750PX
+      z-index 102
+      button
+        outline none
+        border none
+        width 100%
+        height 3rem
+        background-color rgba(196,143,73,1);
+        color #fff
+        font-size 1.125rem
 
   .exchange-open-top
     width 100%

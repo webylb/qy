@@ -1,5 +1,5 @@
 <template>
-  <div class="gift-popup" @click="hidePopup">
+  <div class="gift-popup">
     <div class="content zoomIn" @click.stop>
       <div class="top">
         <img src="./images/wofen-gift.png" alt="">

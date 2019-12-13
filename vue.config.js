@@ -6,7 +6,7 @@ function resolve(dir) {
 }
 
 // const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+// const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 // 导入compression-webpack-plugin
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
@@ -46,7 +46,6 @@ module.exports = {
     if (process.env.NODE_ENV === 'production') {
       // 生产环境
       config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true //隐藏console
-
       config.plugins.push(
         new CompressionWebpackPlugin({
           filename: '[path].gz[query]',
@@ -54,18 +53,20 @@ module.exports = {
           test: new RegExp('\\.(' + productionGzipExtensions.join('|') + ')$'),
           threshold: 10240,
           minRatio: 0.8
-        }),
-        // new MiniCssExtractPlugin({
-        //   ignoreOrder: true // Enable to remove warnings about conflicting order
-        // })
+        })
       )
     } else {
       // 开发环境
     }
   },
   chainWebpack: config => {
-    const types = ['vue-modules', 'vue', 'normal-modules', 'normal']
-    //types.forEach(type => addStyleResource(config.module.rule('stylus').oneOf(type)))
+    // 移除 prefetch 插件
+    config.plugins.delete('prefetch')
+
+    /* 添加分析工具*/
+    // config.plugin('webpack-bundle-analyzer')
+    //   .use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin)
+ 
     config.resolve.alias.set('@', resolve('src')) // key,value自行定义，比如.set('@@', resolve('src/components'))
 
     config.module
@@ -75,18 +76,4 @@ module.exports = {
       .loader('html-loader')
       .end()
   }
-}
-
-function addStyleResource(rule) {
-  rule.use('style-resource')
-    .loader('style-resources-loader')
-    .options({
-      patterns: [
-        path.resolve(__dirname, 'src/common/stylus/variable.styl'), // 需要全局导入
-        path.resolve(__dirname, 'src/common/stylus/mixin.styl'),
-        path.resolve(__dirname, 'src/common/stylus/reset.styl'),
-        path.resolve(__dirname, 'src/common/stylus/base.styl'),
-        path.resolve(__dirname, 'src/common/stylus/iconfont.styl')
-      ],
-    })
 }
