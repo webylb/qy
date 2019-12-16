@@ -5,8 +5,8 @@ Vue.use(Router)
 
 export default new Router({
   mode: 'history',
-  base: '/f/q/'+ window.infoData.merchantId + '.html/',
-  // base: '/f/q/100036.html/',
+  // base: '/f/q/'+ window.infoData.merchantId + '.html/',
+  base: '/f/q/100036.html/',
   routes: [
     {
       path: '/',
@@ -182,7 +182,7 @@ export default new Router({
     },
     /**
      * @description: 定制化开始
-     */    
+     */
     //联通登录
     {
       path: '/wofenLogin',

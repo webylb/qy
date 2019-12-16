@@ -74,9 +74,9 @@
         core.getShareImg({merchantId: this.merchantId, packageId: this.packageId}).then(res => {
           if(res.code && '00' == res.code){
             if(this.merchantId === '100036'){
-              tool.trackEvent('去分享页')
+              tool.trackEvent('去分享页', '联通2019圣诞活动')
             }else if(this.merchantId === '100000'){
-              tool.trackEvent('规则页分享')
+              tool.trackEvent('规则页分享', '优加2019圣诞活动')
             }
             this.activeShareImgUrl = res.result
             this.showShareImg = true

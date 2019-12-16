@@ -246,7 +246,7 @@
           let reg = /couponBagCenter/
           if(reg.test(url)) {
             if(this.merchantId === '100000'){
-              tool.trackEvent('首页banner')
+              tool.trackEvent('首页banner', '优加2019圣诞活动')
             }
           }  
           // }
@@ -434,7 +434,7 @@
           //console.log(res)
           if(res.code && '00' == res.code){
             if(this.merchantId === '100036'){
-              tool.trackEvent('立即开通按钮')
+              tool.trackEvent('立即开通按钮', '联通2019新人活动')
             }
             if(res.result.goUrl){
               window.location.href = res.result.goUrl

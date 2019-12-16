@@ -40,15 +40,15 @@ FastClick.prototype.focus = function (targetElement) {
 
 // dev数据
 if(process.env.NODE_ENV === 'development'){
-  // window.infoData = {
-  //   merchantId: 100036,
-  //   merchantName: '测试账户',
-  //   privilegePageUuid: '4af7386347024bb78db66b079b8df87b',
-  //   openingPageUuid: '',
-  //   personalCenterPageUuid: '67216783016a41a89ac706a8e0a93b02',
-  //   giftPackagePageUuid: 'a78c9de1e9074dec9e57c48876222b18'
-  // }
-  // // document.cookie = "QY_COOKIE_PASSPORT_NAME="+"\"sessionId=5d4d7a3867bd42a2b50d98202ab80676&userId=113\""
+  window.infoData = {
+    merchantId: 100036,
+    merchantName: '测试账户',
+    privilegePageUuid: '4af7386347024bb78db66b079b8df87b',
+    openingPageUuid: '',
+    personalCenterPageUuid: '67216783016a41a89ac706a8e0a93b02',
+    giftPackagePageUuid: 'a78c9de1e9074dec9e57c48876222b18'
+  }
+  // document.cookie = "QY_COOKIE_PASSPORT_NAME="+"\"sessionId=5d4d7a3867bd42a2b50d98202ab80676&userId=113\""
   // const vConsole = new Vconsole();
   // Vue.use(vConsole)
 }

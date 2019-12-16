@@ -193,9 +193,9 @@
         if(url){
           window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
           if(this.merchantId === '100036'){
-            tool.trackEvent('活动规则')
+            tool.trackEvent('活动规则', '联通2019圣诞活动')
           }else if(this.merchantId === '100000'){
-            tool.trackEvent('礼包页分享')
+            tool.trackEvent('礼包页分享', '优加2019圣诞活动')
           }
         }
       },
@@ -213,7 +213,7 @@
               break;
           }
           if(this.merchantId === '100036'){
-            tool.trackEvent('我的礼包立即使用')
+            tool.trackEvent('我的礼包立即使用', '联通2019圣诞活动')
           }
         }else{ //热卖礼包
           switch (true) {
@@ -230,22 +230,22 @@
           if(this.merchantId === '100036'){
             switch (index) {
               case 0:
-                tool.trackEvent('热卖礼包立即抢购')
+                tool.trackEvent('热卖礼包立即抢购', '联通2019圣诞活动')
                 break;
               default:
-                tool.trackEvent('礼包购买')
+                tool.trackEvent('礼包购买', '联通2019圣诞活动')
                 break;
             }
           }else if(this.merchantId === '100000'){
             switch (index) {
               case 0:
-                tool.trackEvent('9.9元抢购')
+                tool.trackEvent('9.9元抢购', '优加2019圣诞活动')
                 break;
               case 1:
-                tool.trackEvent('兑换码兑换')
+                tool.trackEvent('兑换码兑换', '优加2019圣诞活动')
                 break;
               default:
-                tool.trackEvent('礼包购买')
+                tool.trackEvent('礼包购买', '优加2019圣诞活动')
                 break;
             }
           }

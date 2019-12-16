@@ -57,7 +57,6 @@
       "no-console": "off",
       "no-unused-vars": "off",
       "no-mixed-spaces-and-tabs": "off",
-      "no-dupe-keys": "off",
       "no-useless-escape": "off",
       "no-redeclare": "off",
       "no-extra-boolean-cast": "off"

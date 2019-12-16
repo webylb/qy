@@ -339,7 +339,7 @@
                 data[item] = this.$route.query[item]
               }
             }
-            this.$router.push({path:'/wofenCouponBag', query:data})
+            this.$router.replace({path:'/wofenCouponBag', query:data})
           }
           clearTimeout(timer)
         },30)
@@ -459,19 +459,19 @@
       bannerClick(){
         if(this.merchantId === '100036'){
           window.location.href = 'https://c1.51jujibao.com/static/mkt/2019/11/upass/wofen-useRule.html'
-          tool.trackEvent('抵扣券使用说明')
+          tool.trackEvent('抵扣券使用说明', '联通2019圣诞活动')
         }else if(this.merchantId === '100000'){
           this.$router.push('/')
-          tool.trackEvent('跳转首页')
+          tool.trackEvent('跳转首页', '优加2019圣诞活动')
         }
       },
       goShareRule(){
         this.couponBagToast = true
         this.showShareRules = true
         if(this.merchantId === '100036'){
-          tool.trackEvent('分享')
+          tool.trackEvent('分享', '联通2019圣诞活动')
         }else if(this.merchantId === '100000'){
-          tool.trackEvent('分享有礼')
+          tool.trackEvent('分享有礼', '优加2019圣诞活动')
         }
       },
       closeShareRules(){
@@ -487,21 +487,21 @@
       goGiftCenter(){
         this.$router.push({path: '/couponBagCenter', query: {index: 1}})
         if(this.merchantId === '100036'){
-          tool.trackEvent('查看礼包')
+          tool.trackEvent('查看礼包', '联通2019圣诞活动')
         }
       },
       goShare(type){
         if(type === 'buyAfter'){
           if(this.merchantId === '100036'){
-            tool.trackEvent('购买后分享')
+            tool.trackEvent('购买后分享', '联通2019圣诞活动')
           }else if(this.merchantId === '100000'){
-            tool.trackEvent('分享好友')
+            tool.trackEvent('分享好友', '优加2019圣诞活动')
           }
         }else if(type === 'ruleAfter'){
           if(this.merchantId === '100036'){
-            tool.trackEvent('去分享页')
+            tool.trackEvent('去分享页', '联通2019圣诞活动')
           }else if(this.merchantId === '100000'){
-            tool.trackEvent('规则页分享')
+            tool.trackEvent('规则页分享', '优加2019圣诞活动')
           }
         }
         this.$toast.loading({
@@ -735,9 +735,9 @@
           core.buyCouponBag({merchantId: this.merchantId, packageId: this.packageId, returnUrl: returnUrl}).then(res => {
             if(res.code && '00' == res.code){
               if(this.merchantId === '100036'){
-                tool.trackEvent('9.9开通')
+                tool.trackEvent('9.9开通', '联通2019圣诞活动')
               }else if(this.merchantId === '100000'){
-                tool.trackEvent('立即抢购')
+                tool.trackEvent('立即抢购', '优加2019圣诞活动')
               }
               if(res.result.goUrl){
                 window.location.href = res.result.goUrl
@@ -769,7 +769,7 @@
               data[item] = this.$route.query[item]
             }
           }
-          this.$router.push({path:'/wofenCouponBag', query:data})
+          this.$router.replace({path:'/wofenCouponBag', query:data})
         }
       }
     }

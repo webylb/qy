@@ -196,10 +196,12 @@ const delCookie = name => {
  * @param {type}:  label {String}
  * @return: null
  */
-const trackEvent = function (label) {
-  if(label) {
+const trackEvent = function (label, opt_label) {
+  let url = window.location.href
+  let reg = /prev-vip.guijitech.com/gi;
+  if(label && !reg.test(url)) {
       try {
-          window._hmt && window._hmt.push(['_trackEvent', label, 'click']);
+          window._hmt && window._hmt.push(['_trackEvent', label, 'click', opt_label]);
       } catch (error) {
           console.log(label + '事件统计失败:' + error)
       }

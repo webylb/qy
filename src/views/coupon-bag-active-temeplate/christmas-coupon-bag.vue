@@ -338,7 +338,7 @@
                 data[item] = this.$route.query[item]
               }
             }
-            this.$router.push({path:'/christmasCouponBag', query:data})
+            this.$router.replace({path:'/christmasCouponBag', query:data})
           }
           clearTimeout(timer)
         },30)
@@ -457,13 +457,13 @@
       },
       bannerClick(){
         this.$router.push('/')
-        tool.trackEvent('跳转首页')
+        tool.trackEvent('跳转首页', '优加2019圣诞活动')
       },
       goShareRule(){
         this.couponBagToast = true
         this.showShareRules = true
 
-        tool.trackEvent('分享有礼')
+        tool.trackEvent('分享有礼', '优加2019圣诞活动')
       },
       closeShareRules(){
         this.couponBagToast = false
@@ -477,9 +477,9 @@
       },
       goShare(type){
         if(type === 'buyAfter'){
-          tool.trackEvent('分享好友')
+          tool.trackEvent('分享好友', '优加2019圣诞活动')
         }else if(type === 'ruleAfter'){
-          tool.trackEvent('规则页分享')
+          tool.trackEvent('规则页分享', '优加2019圣诞活动')
         }
         this.$toast.loading({
           message: '加载中...',
@@ -711,7 +711,7 @@
           let returnUrl = window.location.href + '&type=vip&status=success'
           core.buyCouponBag({merchantId: this.merchantId, packageId: this.packageId, returnUrl: returnUrl}).then(res => {
             if(res.code && '00' == res.code){
-              tool.trackEvent('立即抢购')
+              tool.trackEvent('立即抢购', '优加2019圣诞活动')
               if(res.result.goUrl){
                 window.location.href = res.result.goUrl
               }
@@ -742,7 +742,7 @@
               data[item] = this.$route.query[item]
             }
           }
-          this.$router.push({path:'/christmasCouponBag', query:data})
+          this.$router.replace({path:'/christmasCouponBag', query:data})
         }
       }
     }
