@@ -113,7 +113,10 @@
                   <div class="slider-toast-page" v-for="(item, index) in itemCouponDetail.couponList" :key="index">
                     <div class="slider-toast-item" v-for="(i, index2) in item" :key="index2">
                       <div class="default-coupon" :class="[index2 === useIndex && index == usePageIndex ? 'actice-coupon' : '', i.isUsed == 'N' ? '' : 'used-coupon']">
-                        <div class="used" v-if="i.isUsed == 'Y'">
+                        <div class="used" v-if="i.isUsed === 'Y' && i.orderStatus === 'WAIT'">
+                            <div class="used-text used-wait-text">待支付</div>
+                        </div>
+                        <div class="used" v-if="i.isUsed === 'Y' && i.orderStatus === 'SUCCESS'">
                             <div class="used-text">已使用</div>
                             <div class="used-time">
                               {{ formatDate(i.useTime) }}
@@ -127,7 +130,10 @@
                 </slider>
               </div>
               <div v-else class="single-coupon" :class="[itemCouponDetail.recordResults[0].isUsed == 'N' ? 'actice-coupon' : 'used-coupon']">
-                <div class="used" v-if="itemCouponDetail.recordResults[0].isUsed == 'Y'">
+                <div class="used" v-if="itemCouponDetail.recordResults[0].isUsed == 'Y' && itemCouponDetail.recordResults[0].orderStatus === 'WAIT'">
+                    <div class="used-text used-wait-text">待支付</div>
+                </div>
+                <div class="used" v-if="itemCouponDetail.recordResults[0].isUsed == 'Y' && itemCouponDetail.recordResults[0].orderStatus === 'SUCCESS'">
                     <div class="used-text">已使用</div>
                     <div class="used-time">
                       {{ formatDate(itemCouponDetail.recordResults[0].useTime) }}
@@ -1177,6 +1183,9 @@
               background rgba(0,0,0,0.5)
               border-radius 50%
               font-size 0.688rem
+            .used-wait-text
+              top 50%
+              transform translate(-50%, -50%)
             .used-time
               position absolute
               left 0
@@ -1245,6 +1254,9 @@
                     background rgba(0,0,0,0.5)
                     border-radius 50%
                     font-size 0.688rem
+                  .used-wait-text
+                    top 50%
+                    transform translate(-50%, -50%)
                   .used-time
                     position absolute
                     left 0

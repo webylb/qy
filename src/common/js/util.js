@@ -193,7 +193,7 @@ const delCookie = name => {
 
 /**
  * @description: 添加百度统计事件追踪
- * @param {type}:  label {String}
+ * @param {type}:  label {String} 类型
  * @return: null
  */
 const trackEvent = function (label, opt_label) {
@@ -208,6 +208,19 @@ const trackEvent = function (label, opt_label) {
   }
 }
 
+/**
+ * @description: 添加百度统计事件追踪
+ * @param {type}:  id {String} 商户id
+ * @return: null
+ */
+const callService = function (id) {
+  if(id === '100036') { //联通客服
+    window.location.href = 'https://tb.53kf.com/code/client/10187208/2'
+  } else { //默认走优加
+    window.location.href = 'https://tb.53kf.com/code/client/10187208/1'
+  }
+}
+
 export default {
-  timeFormatting, formatDate, getPhoneModel, toWeiXinLogin, priceStr, replaceUrlMerchantId, replaceUrlForUrpass, getCookie, setCookie, trackEvent
+  timeFormatting, formatDate, getPhoneModel, toWeiXinLogin, priceStr, replaceUrlMerchantId, replaceUrlForUrpass, getCookie, setCookie, trackEvent, callService
 }

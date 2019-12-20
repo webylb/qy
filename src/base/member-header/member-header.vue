@@ -61,8 +61,7 @@
     },
     props: {
       merchantId: {
-        type: Number,
-        default: 0
+        type: String
       },
       isMember: {
         type: Boolean,
@@ -140,7 +139,8 @@
         this.$emit('toMyLike')
       },
       goCardSecurity(){
-        window.location.href = 'https://tb.53kf.com/code/client/10187208/1'
+        tool.callService(this.merchantId)
+        // window.location.href = 'https://tb.53kf.com/code/client/10187208/1'
       }
     },
     destroyed() {

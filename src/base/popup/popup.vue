@@ -100,10 +100,13 @@
       .popup-operation
         position relative
         display flex
+        align-items center
+        justify-content flex-start
         color #999
-        height 3rem
         width 100%
         line-height 3rem
+        border-radius 0 0 0.5rem 0.5rem
+        overflow hidden
         &:after
           content: " "
           position: absolute
@@ -123,6 +126,7 @@
           background-color rgba(183,130,49,1)
           font-size 1.13rem
         div
+          height 3rem
           flex 1
           letter-spacing 0.05rem
         .cancel

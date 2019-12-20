@@ -70,7 +70,7 @@
     </popup>
     <popup v-show="showActivePopup" title="温馨提示" @confirm="confirmActiveOrder" @cancel="cancel" cancelText="暂不使用" confirmText="立即使用">
       <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
-        激活后请在券码有效期内使用哦!
+        点击立即使用后请在券码有效期内使用!<br/>若商品过期后客服小蜜将无法为您售后哦!
       </p>
     </popup>
     <popup v-show="showActiveErrPopup" :isShowCancel=false title="正在调取商品信息" confirmText="我知道了" @cancel="cancel">
@@ -91,7 +91,7 @@
         <div v-if="orderType !== '二维码' && orderType !== null" class="slider-box 1">
           <slider class="slider-wrapper" :loop=false :isClick=true>
             <div v-for="item in couponList" :key="item.id">
-              <div class="item-wrap">
+              <div class="item-wrap" v-if="goUseUrl">
                 <div class="left">
                   <div v-if="item.card && item.pwd">
                     <p>卡号: {{item.card}}</p>
@@ -113,9 +113,32 @@
                     </p>
                   </div>
                 </div>
-                <div class="right" @click="goMyCoupon">
+                <div class="right" @click="goUse(goUseUrl)">
                   <div>
                     前<br>去<br>使<br>用
+                  </div>
+                </div>
+              </div>
+              <div class="item-wrap only-left" v-else>
+                <div class="left">
+                  <div v-if="item.card && item.pwd">
+                    <p>卡号: {{item.card}}</p>
+                    <p>
+                      <span>密码: {{item.pwd}}</span> 
+                      <button type="button" class="coupon-copy"
+                          v-clipboard:copy="item.card+' '+item.pwd"
+                          v-clipboard:success="onCopySuccess"
+                          v-clipboard:error="onCopyError">复制</button>
+                    </p>
+                  </div>
+                  <div v-else>
+                    <p>
+                      <span>卡密: {{item.card || item.pwd}}</span> 
+                      <button type="button" class="coupon-copy"
+                        v-clipboard:copy="item.card || item.pwd"
+                        v-clipboard:success="onCopySuccess"
+                        v-clipboard:error="onCopyError">复制</button>
+                    </p>
                   </div>
                 </div>
               </div>
@@ -132,7 +155,7 @@
           <p class="text-qr2">持二维码线下门店即可兑换</p>
         </div>
         <div class="text-line"><img src="./images/line.png" alt=""></div>
-        <p class="text-1">激活后的卡券将移至【我的卡券】内</p>
+        <!-- <p class="text-1">激活后的卡券将移至【我的卡券】内</p> -->
         <p class="text-2" @click="goCoustomServe"><span>无效卡券申诉</span><i class="iconfont">&#xe713;</i></p>
       </div>
     </CouponPopup>
@@ -200,7 +223,9 @@
         couponList: null,
         orderType: null,
         imgPrevList: [],
-        allData: []
+        allData: [],
+        goUseUrl: null,
+        ImagePreviewDialog: null
       }
     },
     components: {
@@ -229,6 +254,10 @@
       document.title = this.$route.meta.title
       this.selectObj = { currentPage: this.currentPage, pageSize: this.pageSize}
       this.getNewShopTequan({pageUuid: this.privilegePageUuid})
+    },
+    beforeRouteLeave(to,from,next){
+        this.ImagePreviewDialog.close()
+        next()
     },
     activated() {
       this.cancel()
@@ -370,10 +399,12 @@
       },
       showCouponDetail(item){
         this.couponList = null
+        this.goUseUrl = null
         this.orderType = null
 
         this.goodsName = item.skuName
         this.couponList = item.qyCardTicketResults
+        this.goUseUrl = item.goUseUrl
         this.orderType = item.type
         this.showCouponPopup = true
         if(this.couponList && this.couponList.length > 0){
@@ -384,7 +415,7 @@
         }
       },
       showImgPrev() {
-        ImagePreview({
+        this.ImagePreviewDialog = ImagePreview({
           images: this.imgPrevList,
           startPosition: 0,
           onClose() {
@@ -492,7 +523,8 @@
         }
       },
       goCoustomServe(){
-        window.location.href = 'https://tb.53kf.com/code/client/10187208/1'
+        // window.location.href = 'https://tb.53kf.com/code/client/10187208/1'
+        tool.callService(this.merchantId)
       },
       onCopySuccess(){
         this.$toastBox.showToastBox("复制成功")
@@ -545,6 +577,11 @@
         })
       },
       jumplinkUrl(url) {
+        if (url) {
+          window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
+        }
+      },
+      goUse(url){
         if (url) {
           window.location.href = tool.replaceUrlMerchantId(url, this.merchantId)
         }
@@ -742,7 +779,12 @@
             line-height: 1.2;
             display: flex;
             align-items: center;
-    
+      .only-left
+        .left
+          flex 1
+          height 5rem
+          background #F9EFE2 
+          border-radius 0.25rem
     .text-qr1
       color rgba(153, 153, 153, 1)
       font-size 0.75rem

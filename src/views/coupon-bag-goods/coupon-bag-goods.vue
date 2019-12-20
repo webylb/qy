@@ -275,7 +275,8 @@
       },
       toServiceCall(){
         // this.showCallPopup = true
-        window.location.href = 'https://tb.53kf.com/code/client/10187208/1'
+        // window.location.href = 'https://tb.53kf.com/code/client/10187208/1'
+        tool.callService(this.merchantId)
       },
       confirmCall(){
         this.showCallPopup = false

@@ -59,6 +59,7 @@
       z-index 502
       border-radius 0.5rem
       overflow hidden
+      min-height: 5rem;
       .popup-title
         font-size 1.13rem
         color rgba(61,58,57,1)

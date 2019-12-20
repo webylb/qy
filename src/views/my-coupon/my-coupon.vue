@@ -57,6 +57,7 @@
                         :coupondata="item"
                         :valid="valid"
                         @popupStatus="popupStatus"
+                        @showQrcode="showQrcode"
                         @showConfirmUse="showConfirmUse">
                       </coupon-item>
                       <div v-show="couponsList && couponsList.length > 0" class="coupon-customer-service">
@@ -80,8 +81,8 @@
             <button type="button" class="goShop" @click="goShop">去逛逛</button>
           </div>
         </div>
-        <popup v-show="showConfirmPopup" :isShowTitle="false" @confirm="confirm" @cancel="cancel">
-          <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: rgba(61,58,57,1); line-height: 1.2;">
+        <popup v-show="showConfirmPopup" :isShowTitle=false @confirm="confirm" @cancel="cancel">
+          <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: rgba(61,58,57,1);">
             卡券确认已使用？
           </p>
         </popup>
@@ -93,20 +94,71 @@
         </popup>
         <popup v-show="showActivePopup" title="温馨提示" @confirm="confirmActiveOrder" @cancel="cancel" cancelText="暂不使用" confirmText="立即使用">
           <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
-            激活后请在券码有效期内使用哦!
+            点击立即使用后请在券码有效期内使用!<br/>若商品过期后客服小蜜将无法为您售后哦!
           </p>
         </popup>
+        <CouponPopup v-show="showCouponPopup" :title="goodsName" @cancel="closeCouponPopup">
+          <div class="coupon-info-wrap" v-if="popupCouponList && popupCouponList.length > 0">
+            <!-- <div v-if="orderType !== '二维码' && orderType !== null" class="slider-box 1">
+              <slider class="slider-wrapper" :loop=false :isClick=true>
+                <div v-for="item in couponList" :key="item.id">
+                  <div class="item-wrap">
+                    <div class="left">
+                      <div v-if="item.card && item.pwd">
+                        <p>卡号: {{item.card}}</p>
+                        <p>
+                          <span>密码: {{item.pwd}}</span> 
+                          <button type="button" class="coupon-copy"
+                              v-clipboard:copy="item.card+' '+item.pwd"
+                              v-clipboard:success="onCopySuccess"
+                              v-clipboard:error="onCopyError">复制</button>
+                        </p>
+                      </div>
+                      <div v-else>
+                        <p>
+                          <span>卡密: {{item.card || item.pwd}}</span> 
+                          <button type="button" class="coupon-copy"
+                            v-clipboard:copy="item.card || item.pwd"
+                            v-clipboard:success="onCopySuccess"
+                            v-clipboard:error="onCopyError">复制</button>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="right" @click="goMyCoupon">
+                      <div>
+                        前<br>去<br>使<br>用
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </slider>   
+            </div> -->
+            <div class="slider-box 2" @click="showImgPrev">
+              <slider class="slider-wrapper" :isClick=true :loop=false :autoPlay=false>
+                <div v-for="(item, index) in popupCouponList" :key="index">
+                  <img class="coupon-item-img" :src="item" alt="">
+                </div>
+              </slider>
+              <p class="text-qr1">二维码点击可放大查看</p>
+              <p class="text-qr2">持二维码线下门店即可兑换</p>
+            </div>
+            <div class="text-line"><img src="./images/line.png" alt=""></div>
+            <p class="text-2" @click="goCoustomServe"><span>无效卡券申诉</span><i class="iconfont">&#xe713;</i></p>
+          </div>
+        </CouponPopup>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import { Divider } from 'vant';
+  import { Divider, ImagePreview } from 'vant';
   import Scroll from '../../base/scroll/scroll'
+  import Slider from '../../base/slider/slider'
   import ShopHeader from '../../base/shop-header/shop-header'
   import couponItem from '../../base/coupon-item/coupon-item'
   import OrderItem from '../../base/order-item/order-item'
+  import CouponPopup from '../../base/coupon-popup/coupon-popup'
   import * as core from '../../api/myCoupon'
   import Loading from '../../base/loading/loading'
   import Popup from '../../base/popup/popup'
@@ -116,6 +168,7 @@
     name: 'myCoupon',
     data() {
       return {
+        merchantId: window.infoData.merchantId,
         tabList: [{
           name: '待激活',
           id: 0
@@ -147,17 +200,24 @@
         isShowCustome: null,
         scrollStyle: null,
         transitionName: 'slide-left',
-        totalRecord: null
+        totalRecord: null,
+        showCouponPopup: false,
+        goodsName: null,
+        popupCouponList: [],
+        ImagePreviewDialog: null
       }
     },
     components: {
       Scroll,
+      Slider,
       ShopHeader,
       couponItem,
       OrderItem,
       Loading,
       Popup,
-      [Divider.name]: Divider
+      CouponPopup,
+      [Divider.name]: Divider,
+      [ImagePreview.name]: ImagePreview
     },
     watch: {
       // 弹框监听，当弹框显示的时候，pushState添加一个历史，供返回键使用
@@ -206,6 +266,10 @@
         history.pushState(null, null, document.URL);
         window.addEventListener('popstate', this.goBack, false);
       }
+    },
+    beforeRouteLeave(to,from,next){
+        this.ImagePreviewDialog.close()
+        next()
     },
     destroyed(){
       window.removeEventListener('popstate', this.goBack, false);
@@ -463,8 +527,9 @@
             this.showLoad = false;
             if(type && type === 'showPopop' && this.couponsList && this.couponsList.length > 0){ //判断激活成功滑过弹出第一个二维码内容
               let url = this.couponsList[0].qrCode
+              let name = this.couponsList[0].skuName
               if(url){
-                this.showDefaultQrcode(url)
+                this.showDefaultQrcode(url, name)
               }
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
@@ -543,8 +608,33 @@
         })
       },
       showDefaultQrcode(url){
-        this.$emit("popupStatus", true)
-        this.$couponToastBox.showToastBox(url)
+        this.popupCouponList=[]
+        this.goodsName = name
+        this.popupStatus = true
+        this.popupCouponList.push(url)
+        this.showCouponPopup = true
+      },
+      showQrcode(url, name){
+        this.popupCouponList=[]
+        this.goodsName = name
+        this.popupStatus = true
+        this.popupCouponList.push(url)
+        this.showCouponPopup = true
+      },
+      closeCouponPopup(){
+        this.showCouponPopup = false
+      },
+      goCoustomServe(){
+        tool.callService(this.merchantId)
+      },
+      showImgPrev() {
+        this.ImagePreviewDialog = ImagePreview({
+          images: this.popupCouponList,
+          startPosition: 0,
+          onClose() {
+            // do something
+          }
+        });
       }
     }
   }
@@ -713,6 +803,123 @@
     .pay
       color rgba(196, 143, 73, 1)
       border-color rgba(196, 143, 73, 1)
+
+.coupon-info-wrap
+  .slider-box
+    margin-bottom 1rem
+    width 18rem!important
+    overflow hidden
+    position: relative;
+    padding-bottom: 0.75rem;
+    box-sizing border-box
+    margin: 0 auto;
+    padding-top: 1.5rem;
+    min-height 7rem
+    .coupon-item-img
+      width auto!important
+      max-height 12rem
+      margin 0 auto
+    .item-wrap
+      height 5rem
+      width 100%
+      margin 0 auto
+      display flex
+      justify-content center
+      .left 
+        width 14.88rem
+        height 5rem
+        background url('./images/popup-left.png') no-repeat center
+        background-size 100% 100%
+        div
+          width 100%
+          height 5rem
+          padding 1.25rem 0.75rem
+          box-sizing border-box
+          p
+            margin-bottom 0.5rem
+            width 100%
+            display: flex;
+            justify-content space-between
+            align-items: center;
+            font-size:0.88rem;
+            line-height: 1.2;
+            &:last-child
+              margin-bottom 0
+            span
+              overflow hidden
+              text-overflow ellipsis
+              white-space nowrap
+            .coupon-copy
+              margin-left 0.25rem
+              outline none
+              background-color transparent
+              border-radius 0.13rem
+              line-height 1.2
+              padding 0.15rem 0.34rem
+              font-size 0.75rem
+              border 0.0625rem solid rgba(195, 142, 72, 1)
+              color rgba(195, 142, 72, 1)
+      .right 
+        width 2.63rem
+        height 5rem
+        background url('./images/popup-right.png') no-repeat center
+        background-size 100% 100%
+        color #fff
+        font-size 0.88rem
+        div
+          width 1rem
+          height 5rem
+          margin: 0 auto;  
+          line-height: 1.2;
+          display: flex;
+          align-items: center;
+  
+  .text-qr1
+    color rgba(153, 153, 153, 1)
+    font-size 0.75rem
+    margin-bottom 0.5rem
+  .text-qr2
+    color rgba(61, 58, 57, 1)
+    font-size 1.25rem
+    line-height 1.2
+    margin-bottom 0.5rem
+  .text-line
+    height 0.94rem
+    display flex
+    position relative
+    margin-bottom 1rem
+    &::after 
+      content ''
+      position absolute
+      width 0.94rem
+      height 0.94rem
+      border-radius 50%
+      background rgba(0,0,0,0.5)
+      left -0.47rem
+      top 0
+    &::before 
+      content ''
+      position absolute
+      width 0.94rem
+      height 0.94rem
+      border-radius 50%
+      background rgba(0,0,0,0.5)
+      right -0.47rem
+      top 0
+    img 
+      width 100%
+      height 100%
+  .text-1
+    color rgba(153, 153, 153, 1)
+    font-size 1rem
+    line-height 1.2
+    margin-bottom 0.75rem
+  .text-2
+    display inline-block
+    color rgba(195,142,72,1)
+    font-size 1rem
+    line-height 1.2
+    margin-bottom 2rem
 .fadeIn {
     -webkit-animation: fadeIn .3s;
             animation: fadeIn .3s;

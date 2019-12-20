@@ -27,6 +27,7 @@
             <div v-if="item.moduleType === 'centerServe'">
               <center-serve
                 :isLogin="isLogin"
+                :merchantId="merchantId"
                 :isSupportRefund="isSupportRefund"
                 @onLoaded="onLoaded"
                 @goLogin="getLoginUrl"
@@ -98,7 +99,6 @@
         <div v-if="item.moduleType === 'Menu'">
           <member-menu
             :menuList="item.configJson.menu_entry"
-            :merchantId="merchantId"
             @jumplinkUrl="jumplinkUrl"
           ></member-menu>
         </div>

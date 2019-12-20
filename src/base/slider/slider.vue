@@ -16,6 +16,7 @@
   import BScroll from 'better-scroll'
   import { addClass } from '../../common/js/dom.js'
   export default {
+    name: 'slider',
     data() {
       return {
         dots: [],

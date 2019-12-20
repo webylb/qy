@@ -32,7 +32,7 @@
         default: '/'
       },
       merchantId: {
-        type: Number
+        type: String
       }
     },
     components: {

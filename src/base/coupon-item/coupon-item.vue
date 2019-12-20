@@ -34,7 +34,7 @@
         <div v-if="coupondata.qrCode" >
           <div class="coupon-option">
             <span>二维码</span>
-            <button type="button" class="qr-btn"  @click="showQrcode(coupondata.qrCode)">点击出示券码</button>
+            <button type="button" class="qr-btn"  @click="showQrcode(coupondata.qrCode, coupondata.skuName)">点击出示券码</button>
           </div>
         </div>
       </div>
@@ -110,8 +110,9 @@
         this.$emit("showDesText")
       },
       showQrcode(url){
-        this.$emit("popupStatus", true)
-        this.$couponToastBox.showToastBox(url)
+        // this.$emit("popupStatus", true)
+        this.$emit("showQrcode", url, name)
+        // this.$couponToastBox.showToastBox(url)
       },
       showConfirmUse(id){
         this.$emit("showConfirmUse",id)

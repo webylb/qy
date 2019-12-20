@@ -23,6 +23,7 @@
 
 <script>
   export default {
+    name: 'meun',
     data() {
       return {
         switchStatus: 'off'
@@ -31,9 +32,6 @@
     props: {
       menuList: {
         type: Array
-      },
-      merchantId: {
-        type: Number
       }
     },
     mounted() {

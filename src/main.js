@@ -41,7 +41,7 @@ FastClick.prototype.focus = function (targetElement) {
 // dev数据
 if(process.env.NODE_ENV === 'development'){
   window.infoData = {
-    merchantId: 100036,
+    merchantId: '100036',
     merchantName: '测试账户',
     privilegePageUuid: '4af7386347024bb78db66b079b8df87b',
     openingPageUuid: '',
@@ -62,7 +62,9 @@ Vue.directive('focus', {
 
 //添加百度统计
 router.beforeEach((to, from, next) => {
-  if (to.path) {
+  let url = window.location.href
+  let reg = /prev-vip.guijitech.com/gi;
+  if (to.path && !reg.test(url)) {
     try {
       window._hmt && window._hmt.push(['_trackPageview', '/f/q/' + window.infoData.merchantId + '.html' + to.fullPath]);
     } catch (e) {

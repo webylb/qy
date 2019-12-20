@@ -104,13 +104,13 @@
       </div>
     </div>
     <popup v-show="showPopup" :showPopupTitle='showPopupTitle' :cancelText="cancelText" :confirmText="okText" @confirm="confirm" @cancel="cancel">
-      <p style="padding: 1.5rem 0rem; font-size: 1.125rem; color:#333;">
+      <p style="padding: 2rem 0rem; font-size: 1rem; color:#333;">
         {{ hintInformation }}
       </p>
     </popup>
     <popup v-show="notVip" @cancel="cancel" @confirm="openMember" title="您暂不可使用此权益" confirmText="前去开卡">
-      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
-        仅限会员用户，开通会员即可享受特权优惠权益
+      <p style="padding:2rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
+        仅限会员用户<br/>开通会员即可享受特权优惠权益
       </p>
     </popup>
   </div>
@@ -169,7 +169,7 @@
         isPaying: true,
         showPopup: false,
         showPopupTitle: false,
-        hintInformation: '很抱歉，商品已抢光',
+        hintInformation: '此款商品太火爆了，逛逛其他宝贝吧',
         cancelText: "我知道了",
         okText:"到货提醒",
         itemId: null,
@@ -471,27 +471,29 @@
           if(res.code && '00' == res.code){
             if(res.result.goUrl){
               window.location.href = res.result.goUrl
-              this.isPaying = true
             }
           }else if(res.code && '01' === res.code && res.isLogin == 'false'){
             this.getLoginUrl()
           }else if(res.code && '02' === res.code) {
-            this.isPaying = true
             this.notVip = true
-          }else if(res.code == 'err_not_enough_stock_out' || res.code == 'err_not_enough_stock'){
+          }else if(res.code == 'err_not_enough_stock_out'){
             this.stock = 0
-            this.showPopup = true
-            this.hintInformation = res.message
-            this.isPaying = true
+            // this.showPopup = true
+            // this.hintInformation = res.message
             for(let i in this.swiperList){
               if(this.swiperList[i].id == data.sku){
                 this.swiperList[i].stock = 0
               }
             }
+            this.$toastBox.showToastBox(res.message)
+          }else if(res.code == 'error_upper_limit'){
+            // this.showPopup = true
+            // this.hintInformation = res.message
+            this.$toastBox.showToastBox(res.message)
           } else {
-            this.isPaying = true
             this.$toastBox.showToastBox(res.message)
           }
+          this.isPaying = true
         }).catch(err=>{
           this.isPaying = true
           this.$toastBox.showToastBox("网络错误")
@@ -601,7 +603,7 @@
         })
       },
       toServiceCall(){
-        window.location.href = 'https://tb.53kf.com/code/client/10187208/1'
+        tool.callService(this.merchantId)
       },
       confirm(){
         this.showPopup = false

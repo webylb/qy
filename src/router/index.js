@@ -177,7 +177,7 @@ export default new Router({
     {
       path: '/couponBagActiveRules',
       name: 'couponBagActiveRules',
-      meta: {title: '圣诞礼包',keepAlive:false},
+      meta: {title: '圣诞礼包规则',keepAlive:false},
       component: () => import(/* webpackChunkName: "couponBag" */ '@/views/coupon-bag-active-rules/coupon-bag-active-rules.vue')
     },
     /**
