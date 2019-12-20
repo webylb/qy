@@ -68,6 +68,21 @@
         是否确认支付?
       </p>
     </popup>
+    <popup v-show="showRefundPopup" title="退费原因" @confirm="cancel" @cancel="confirmRefundOrder" cancelText="提交" confirmText="再想想">
+      <p style="padding:2rem 0.8rem; font-size: 1rem; color: #333333;">
+        <van-field
+            class="refund-input"
+            v-model="refundMessage"
+            rows="5"
+            autosize
+            type="textarea"
+            maxlength="100"
+            placeholder="请描述您的退费原因（写够15字才是好同志~）"
+            show-word-limit
+          />
+        <span style="color: rgba(195, 142, 72, 1);font-size:0.81rem;margin-top:1.5rem;display: inline-block;">申请退款的金额将在5个工作日内退还给您</span>
+      </p>
+    </popup>
     <popup v-show="showActivePopup" title="温馨提示" @confirm="confirmActiveOrder" @cancel="cancel" cancelText="暂不使用" confirmText="立即使用">
       <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
         点击立即使用后请在券码有效期内使用!<br/>若商品过期后客服小蜜将无法为您售后哦!
@@ -79,7 +94,7 @@
         稍后可在“我的订单”中查看
       </p>
     </popup>
-    <popup v-show="showRechargePopup" :title="goodsName" :isShowCancel=false @cancel="cancel">
+    <popup v-show="showRechargeInfoPopup" :title="goodsName" :isShowCancel=false @cancel="cancel">
       <div class="recharge-info-wrap">
         <p>充值账号: {{ rechargeNum }}</p>
         <p>充值时间: {{ rechargeTime }}</p>
@@ -174,7 +189,7 @@
 </template>
 
 <script>
-  import { Divider, ImagePreview } from 'vant';
+  import { Divider, ImagePreview, Field } from 'vant';
   import Slider from '../../base/slider/slider'
   import OrderItem from '../../base/order-item/order-item'
   import OrderNav from '../../base/order-nav/order-nav'
@@ -211,10 +226,11 @@
         querenId: null,
         hasMore: null,
         isPaying: true,
+        showRefundPopup: false,
         activeOrderId: null,
         showActivePopup: false,
         showActiveErrPopup: false,
-        showRechargePopup: false,
+        showRechargeInfoPopup: false,
         goodsName: null,
         rechargeTime: null,
         rechargeNum: null,
@@ -225,7 +241,8 @@
         imgPrevList: [],
         allData: [],
         goUseUrl: null,
-        ImagePreviewDialog: null
+        ImagePreviewDialog: null,
+        refundMessage: ''
       }
     },
     components: {
@@ -238,7 +255,8 @@
       Slider,
       MemberMenu,
       [Divider.name]: Divider,
-      [ImagePreview.name]: ImagePreview
+      [ImagePreview.name]: ImagePreview,
+      [Field.name]: Field
     },
     watch: {
       numData: {
@@ -380,18 +398,22 @@
         this.showActiveErrPopup = true
       },
       showRechargeDetail(item){
-        this.showRechargePopup = true
+        this.showRechargeInfoPopup = true
         this.goodsName = item.skuName
         this.rechargeTime = tool.formatDate(item.payTime, 'Y/M/DH')
         this.rechargeNum = item.rechargeInterface
         this.orderNum = item.id
+      },
+      confirmRefundOrder(){
+
       },
       cancel(){
         this.showQuXiaoPopup = false
         this.showQueRenPopup = false
         this.showActivePopup = false
         this.showActiveErrPopup = false
-        this.showRechargePopup = false
+        this.showRechargeInfoPopup = false
+        this.showRefundPopup = false
         this.orderType = null
       },
       closeCouponPopup(){
@@ -849,10 +871,18 @@
       color: rgba(73, 109, 94, 1)
     span
       color: rgba(73, 109, 94, 1)
+
+.refund-input 
+  border 1px solid rgba(199,199,199,1)
+  border-radius 0.25rem
+
 .common-question /deep/ .van-collapse-item__content {
   padding-top 0
 }
 
+.order-form /deep/ .van-cell:not(:last-child)::after {
+  border: none;
+}
 .fadeIn {
     -webkit-animation: fadeIn .3s;
             animation: fadeIn .3s;

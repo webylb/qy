@@ -41,7 +41,7 @@ FastClick.prototype.focus = function (targetElement) {
 // dev数据
 if(process.env.NODE_ENV === 'development'){
   window.infoData = {
-    merchantId: '100036',
+    merchantId: '100000',
     merchantName: '测试账户',
     privilegePageUuid: '4af7386347024bb78db66b079b8df87b',
     openingPageUuid: '',

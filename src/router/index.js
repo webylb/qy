@@ -6,7 +6,7 @@ Vue.use(Router)
 export default new Router({
   mode: 'history',
   // base: '/f/q/'+ window.infoData.merchantId + '.html/',
-  base: '/f/q/100036.html/',
+  base: '/f/q/100000.html/',
   routes: [
     {
       path: '/',
