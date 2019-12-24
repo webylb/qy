@@ -174,7 +174,7 @@
     <!-- 兑换码 -->
     <ExchangePopup v-show="exchargeOpen" title="兑换码激活" confirmText="立即兑换" @cancel="hideExchargePopup" @confirm="goExcharge">
       <div class="exchange-open-top" style="padding:1.88rem 1.25rem 2.69rem;margin: 0;text-align:center;">
-        <input type="text" v-model="exchargeInput" @click.stop="focusInput"  @blur="scrollToTop" class="exchange-input" placeholder="请输入兑换码" maxlength="32" />
+        <input type="text" v-model="exchargeInput" @click.stop="focusInput"  @blur="scrollToTop" class="exchange-input" placeholder="请输入兑换码" />
       </div>
     </ExchangePopup>
     <ExchangePopup v-show="exchargeInfoOpen" :title="exchargeInfoTitle" :isShowCancel=false confirmText="我知道了" @cancel="sureExcharge">

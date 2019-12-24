@@ -6,12 +6,12 @@
         <div v-if="swiperList.length" class="goods-list" ref="goodsList" :class="[rechargeType == 1 ? 'recharge-good-list' : '']">
           <div class="goodsList-wrapper" ref="goodsListWrapper">
             <div v-for="(item,index) in swiperList" :key="index" class="goods-item" ref="goodsItem">
-              <div @click.stop="checkGoods(index,item.id,item.settlementPrice,item.buyLimitModelStr,item.marketPrice,item.useExpireTimeLimit,item.stock,item.singleBuyAmount,item.outItemNo,item.providerId)" class="good-item-content" :class="[ index === activeIndex ? 'good-active-item-content' : '' ]">
+              <div @click.stop="checkGoods(index,item.id,item.salePrice,item.buyLimitModelStr,item.marketPrice,item.useExpireTimeLimit,item.stock,item.singleBuyAmount,item.outItemNo,item.providerId)" class="good-item-content" :class="[ index === activeIndex ? 'good-active-item-content' : '' ]">
                 <img class="good-item-img" :src="item.cover" :alt="item.title" @load="onLoaded">
                 <p class="good-item-title" style="-webkit-box-orient: vertical">{{ item.title }}</p>
                 <p class="good-item-cashPrice">
                   <span class="good-item-moneylable">¥</span>
-                  <span> {{ priceToFixed(item.settlementPrice) }}</span>
+                  <span> {{ priceToFixed(item.salePrice) }}</span>
                   <img class="good-item-lable" src="./images/label.png" />
                 </p>
                 <p class="good-item-oldPrice">
@@ -104,12 +104,12 @@
       </div>
     </div>
     <popup v-show="showPopup" :showPopupTitle='showPopupTitle' :cancelText="cancelText" :confirmText="okText" @confirm="confirm" @cancel="cancel">
-      <p style="padding: 2rem 0rem; font-size: 1rem; color:#333;">
+      <p style="padding: 2rem 0rem; font-size: 1rem; color:#333;line-height:1.5;">
         {{ hintInformation }}
       </p>
     </popup>
     <popup v-show="notVip" @cancel="cancel" @confirm="openMember" title="您暂不可使用此权益" confirmText="前去开卡">
-      <p style="padding:2rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
+      <p style="padding:2rem 0.8rem 3rem; font-size: 1rem; color: #333333;line-height:1.5;">
         仅限会员用户<br/>开通会员即可享受特权优惠权益
       </p>
     </popup>
@@ -232,7 +232,7 @@
       },
       swiperList(newval){
         //this.goodsSku = newval[0].id
-        //this.goodsPrice = newval[0].settlementPrice
+        //this.goodsPrice = newval[0].salePrice
       },
       goodsPrice(newval){
         if(this.goodsOldPrice*100 > newval*100){
@@ -387,8 +387,8 @@
       },
       checkDefaultSku(){
         this.goodsSku = this.swiperList[0].id;
-        this.goodsPrice = this.swiperList[0].settlementPrice
-        this.allGoodsPrice = this.swiperList[0].settlementPrice
+        this.goodsPrice = this.swiperList[0].salePrice
+        this.allGoodsPrice = this.swiperList[0].salePrice
         this.goodsOldPrice = this.swiperList[0].marketPrice
         this.maxNum = this.swiperList[0].singleBuyAmount || 1
         this.maxNumText = this.swiperList[0].buyLimitModelStr
@@ -637,7 +637,7 @@
               let data = this.swiperList[item]
               let index = parseInt(item)
 
-              this.checkGoods(index,data.id,data.settlementPrice,data.buyLimitModelStr,data.marketPrice,data.useExpireTimeLimit,data.stock,data.singleBuyAmount,data.outItemNo,data.providerId)
+              this.checkGoods(index,data.id,data.salePrice,data.buyLimitModelStr,data.marketPrice,data.useExpireTimeLimit,data.stock,data.singleBuyAmount,data.outItemNo,data.providerId)
               return
             }
           }

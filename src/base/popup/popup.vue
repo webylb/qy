@@ -95,7 +95,7 @@
         padding-top 1rem
       .popup-info
         font-size 1rem
-        line-height 1.5rem
+        // line-height 1.5rem
         color rgba(61,58,57,1)
       .popup-operation
         position relative

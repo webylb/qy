@@ -76,7 +76,7 @@
       </div>
     </div>
     <popup v-show="showCallPopup" :showPopupTitle="false" :defaultBtn="false" phoneNum='4006680091' cancelCart="我知道了" confirmCart="呼叫客服" @confirm="confirmCall" @cancel="cancel">
-      <p style="padding: 1.25rem 0.8rem;font-size: 1rem;font-weight: normal;font-stretch: normal;line-height: 1.375rem;letter-spacing: 0rem;color: #333333;text-align:left;">
+      <p style="padding: 1.25rem 0.8rem;font-size: 1rem;font-weight: normal;font-stretch: normal;line-height: 1.5;letter-spacing: 0rem;color: #333333;text-align:left;">
         客服电话：<a href="tel:4006680091" style="letter-spacing: 0rem;color: #ff4800;">4006680091 转 2 </a>（会员权益业务），如有疑问，请致电工作人员。
       </p>
     </popup>

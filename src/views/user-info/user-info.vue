@@ -40,7 +40,7 @@
       </div>
     </scroll>
     <popup v-show="isLogOut" @cancel="cancel" @confirm="confirm">
-      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333; line-height: 1.2;">
+      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333; line-height: 1.5;">
         确认退出登录?
       </p>
     </popup>

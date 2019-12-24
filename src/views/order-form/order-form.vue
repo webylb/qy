@@ -59,12 +59,12 @@
       </div>
     </scroll>
     <popup v-show="showQuXiaoPopup" :isShowTitle="false" @confirm="confirmQuXiao" @cancel="cancel">
-      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
+      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;line-height: 1.5;">
         是否取消订单?
       </p>
     </popup>
     <popup v-show="showQueRenPopup" :isShowTitle="false" @confirm="confirmQueRen" @cancel="cancel">
-      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
+      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;line-height: 1.5;">
         是否确认支付?
       </p>
     </popup>
@@ -84,12 +84,12 @@
       </p>
     </popup>
     <popup v-show="showActivePopup" title="温馨提示" @confirm="confirmActiveOrder" @cancel="cancel" cancelText="暂不使用" confirmText="立即使用">
-      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
+      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;line-height: 1.5;">
         点击立即使用后请在券码有效期内使用!<br/>若商品过期后客服小蜜将无法为您售后哦!
       </p>
     </popup>
     <popup v-show="showActiveErrPopup" :isShowCancel=false title="正在调取商品信息" confirmText="我知道了" @cancel="cancel">
-      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
+      <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;line-height: 1.5;">
         您购买的商品太火爆了~<br/>
         稍后可在“我的订单”中查看
       </p>
@@ -274,8 +274,10 @@
       this.getNewShopTequan({pageUuid: this.privilegePageUuid})
     },
     beforeRouteLeave(to,from,next){
+      if(this.ImagePreviewDialog){
         this.ImagePreviewDialog.close()
-        next()
+      }  
+      next()
     },
     activated() {
       this.cancel()

@@ -82,18 +82,18 @@
           </div>
         </div>
         <popup v-show="showConfirmPopup" :isShowTitle=false @confirm="confirm" @cancel="cancel">
-          <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: rgba(61,58,57,1);">
+          <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: rgba(61,58,57,1);line-height: 1.5;">
             卡券确认已使用？
           </p>
         </popup>
         <popup v-show="showActiveErrPopup" title="正在调取商品信息" confirmText="前去查看" @confirm="goOrderDetail" @cancel="cancelErr">
-          <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
+          <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;line-height: 1.5;">
             您购买的商品太火爆了~<br/>
             稍后可在“我的订单”中查看
           </p>
         </popup>
         <popup v-show="showActivePopup" title="温馨提示" @confirm="confirmActiveOrder" @cancel="cancel" cancelText="暂不使用" confirmText="立即使用">
-          <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;">
+          <p style="padding:2.5rem 0.8rem 3rem; font-size: 1rem; color: #333333;line-height: 1.5;">
             点击立即使用后请在券码有效期内使用!<br/>若商品过期后客服小蜜将无法为您售后哦!
           </p>
         </popup>

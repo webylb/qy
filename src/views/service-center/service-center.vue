@@ -17,7 +17,7 @@
           <transition-group tag="div" :name="transitionName">
             <div v-show="index == activeMeunIndex" v-for="(i, index) in serveMeunData" :key="i.id" class="serveTabs">
               <scroll ref="servicesWrapper" class="services-Wrapper" :key="i.id" :data="i.qyCategoryResultList">
-                <ul class="services-content">
+                <ul class="services-content" ref="servicesContent">
                   <li class="service-list" v-for="(service, index) in i.qyCategoryResultList" :key="index">
                     <div>
                       <div class="service-title">{{ service.name }}</div>
@@ -164,7 +164,7 @@
             // this.$refs.menuContent.style.width = width+'px'
             if(this.$route.query.goodsLibraryId && this.$route.query.goodsLibraryId !=0){
               let id = this.$route.query.goodsLibraryId
-              let defaultLibrary = null
+              let defaultLibrary = 0
               for (let j = 0 ; j < this.serveMeunData.length; j++) {
                 if (this.serveMeunData[j].id === parseInt(id)) {
                   defaultLibrary = j
@@ -172,7 +172,8 @@
               }
               // console.log(defaultLibrary)
               this.clickMenuItem(defaultLibrary)
-              this.$router.replace({path:'/serviceCenter', query:{goodsLibraryId: 0}})
+              this.checkedDefault(defaultLibrary)
+              // this.$router.replace({path:'/serviceCenter', query:{goodsLibraryId: 0}})
             }else{
               if(this.$route.query.index > -1){
                 // console.log(this.$route.query.index)
@@ -243,8 +244,6 @@
           this.tabsLineChange(index)
         })
         this.refreshScroll()
-        // var li = this.$refs.servicesWrapper.getElementsByClassName('service-list')[index]
-        // this.servicesScroll.scrollToElement(li, 300)
       },
       clickServieItem(id,jumpUrl,libraryId){
         if(jumpUrl){
@@ -260,16 +259,24 @@
           this.$router.push({path:'/couponGoods', query:{itemId: id, libraryId: libraryId}})
         }
       },
-      checkedDefault(){
+      checkedDefault(defaultLibrary=0){
         if(this.$route.query.categoryId && String(this.$route.query.categoryId).length > 0 && this.$route.query.categoryId > 0){
-          for(let item in this.serviceMenuList){
-            if(this.serviceMenuList[item].id == this.$route.query.categoryId){
+          let defaultLibraryData =  this.serveMeunData[defaultLibrary].qyCategoryResultList
+          for(let item in defaultLibraryData){
+            if(defaultLibraryData[item].id == this.$route.query.categoryId){
               let index = parseInt(item)
-              this.clickMenuItem(index,event)
-              this.$router.replace({path:'/serviceCenter',query:{categoryId: 0}})
+              setTimeout(() => {
+                var li = this.$refs.servicesContent[defaultLibrary].getElementsByClassName('service-list')[index]
+                setTimeout(() => {
+                  this.$refs.servicesWrapper[defaultLibrary].scrollToElement(li, 300)
+                }, 500)
+                this.$router.replace({path:'/serviceCenter',query:{goodsLibraryId: 0, categoryId: 0}})
+              }, 20)
               return
             }
           }
+        }else{
+          this.$router.replace({path:'/serviceCenter',query:{goodsLibraryId: 0}})
         }
       },
       tabsLineChange(index){
@@ -410,6 +417,10 @@
             height: 100%;
             box-sizing border-box
             line-height 3.5rem
+            // max-width 33%
+            // overflow hidden
+            // text-overflow ellipsis
+            // white-space nowrap
           .active-menu-item
             color: rgba(196,143,73,1);
             animation: changeType 0.1s linear;

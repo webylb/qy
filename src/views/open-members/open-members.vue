@@ -84,7 +84,7 @@
     </div> -->
     <ExchangePopup v-show="exchangeOpen" title="兑换码激活" confirmText="立即兑换" @cancel="hideSuccessPopup" @confirm="goExcharge">
       <div class="exchange-open-top" style="padding:1.88rem 1.25rem 2.69rem;margin: 0;text-align:center;">
-        <input type="text" v-model="exchangeInput" @click.stop="focusInput"  @blur="scrollToTop" class="exchange-input" placeholder="请输入兑换码" maxlength="16" />
+        <input type="text" v-model="exchangeInput" @click.stop="focusInput"  @blur="scrollToTop" class="exchange-input" placeholder="请输入兑换码" />
       </div>
     </ExchangePopup>
     <ExchangePopup v-show="exchangeErrOpen" title="兑换失败" :isShowCancel=false confirmText="知道了" @cancel="hideSuccessPopup" >
