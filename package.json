@@ -11,7 +11,7 @@
     "dev": "vue-cli-service build --mode dev"
   },
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "better-scroll": "^1.15.1",
     "fastclick": "^1.0.6",
     "vant": "^2.2.15",
